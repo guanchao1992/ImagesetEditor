@@ -600,6 +600,10 @@ namespace ImageSetEditor.EditControl
                 foreach (SubImage image in m_selects)
                 {
                     m_canvas.DrawImage(image, offset);
+                }
+
+                foreach (SubImage image in m_selects)
+                {
                     m_canvas.DrawImageArea(image, offset);
                 }
             }
@@ -876,10 +880,6 @@ namespace ImageSetEditor.EditControl
         }
 
         #endregion Constructors
-
-        
-
-        
     }
 
     /// <summary>
@@ -1066,6 +1066,73 @@ namespace ImageSetEditor.EditControl
             m_whitePen = new Pen(Color.White);
         }
 
+        #endregion Constructors
+    };
+
+    /// <summary>
+    /// 停靠辅助
+    /// </summary>
+    internal class DockAid
+    {
+        #region Fields
+
+        enum Direction
+        {
+            Upper,
+            UpperLeft,
+            UpperRight,
+            Lower,
+            LowerLeft,
+            LowerRight,
+            Left,
+            Right,
+        };
+
+        private SubImage[] m_arrow;
+        private bool[] m_arrowVisible;
+
+        #endregion Fields
+
+        #region Methods
+
+        /// <summary>
+        /// 设置当前需要停靠的图片
+        /// </summary>
+        public void SetImage()
+        {
+        }
+
+        /// <summary>
+        /// 绘制箭头
+        /// </summary>
+        public void DrawArrow()
+        {
+        }
+
+        /// <summary>
+        /// 某个点在箭头范围内
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public bool InArror(int x, int y)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// 按下某个箭头
+        /// </summary>
+        public void Click()
+        {
+        }
+
+        #endregion Methods
+
+        #region Properties
+        #endregion Properties
+
+        #region Constructors
         #endregion Constructors
     };
 

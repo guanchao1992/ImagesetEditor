@@ -82,7 +82,6 @@
             this.sizeToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.aidPanel = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -107,7 +106,6 @@
             // 
             // splitContainer.Panel2
             // 
-            this.splitContainer.Panel2.Controls.Add(this.aidPanel);
             this.splitContainer.Panel2.Controls.Add(this.imageSetBox);
             this.splitContainer.Panel2.Controls.Add(this.vScrollBar);
             this.splitContainer.Panel2.Controls.Add(this.hScrollBar);
@@ -526,16 +524,6 @@
             this.openFileDialog.Filter = "图片文件(png,bmp,jpg)|*.png;*.bmp;*.jpg;";
             this.openFileDialog.Multiselect = true;
             // 
-            // aidPanel
-            // 
-            this.aidPanel.BackColor = System.Drawing.Color.White;
-            this.aidPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.aidPanel.Location = new System.Drawing.Point(268, 120);
-            this.aidPanel.Name = "aidPanel";
-            this.aidPanel.Size = new System.Drawing.Size(190, 112);
-            this.aidPanel.TabIndex = 4;
-            this.aidPanel.Visible = false;
-            // 
             // ImagesetEditControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -616,6 +604,5 @@
         private System.Windows.Forms.ToolStripMenuItem imagename08ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem imagename09ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem imagename10ToolStripMenuItem;
-        private System.Windows.Forms.Panel aidPanel;
     }
 }
