@@ -1109,21 +1109,12 @@ namespace ImageSetEditor.EditControl
         {
         }
 
-        /// <summary>
-        /// 某个点在箭头范围内
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public bool InArror(int x, int y)
+        public void OnMouseMove(int x, int y)
         {
-            return false;
+
         }
 
-        /// <summary>
-        /// 按下某个箭头
-        /// </summary>
-        public void Click()
+        public void OnClick()
         {
         }
 
