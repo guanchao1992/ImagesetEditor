@@ -309,7 +309,7 @@ namespace ImageSetEditor.EditControl
             {
                 SubImage image = (SubImage)usedListView.Items[i].Tag;
 
-                if (image.Rectangle.Contains(m_curMousePos))
+                if (image.Rectangle.Contains(m_curMousePos.X + m_canvas.ViewPos.X, m_curMousePos.Y + m_canvas.ViewPos.Y))
                 {
                     m_listViewNodeLock = true;
 
@@ -518,7 +518,7 @@ namespace ImageSetEditor.EditControl
             {
                 SubImage image = (SubImage)usedListView.Items[i].Tag;
 
-                if (image.Rectangle.Contains(m_curMousePos))
+                if (image.Rectangle.Contains(m_curMousePos.X + m_canvas.ViewPos.X, m_curMousePos.Y + m_canvas.ViewPos.Y))
                 {
                     m_menuImageViewItem[menuViewItem].Text = (menuViewItem + 1).ToString() + ")  " + image.Name;
                     m_menuImageViewItem[menuViewItem].Tag = image;
