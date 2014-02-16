@@ -646,6 +646,9 @@ namespace ImageSetEditor.EditControl
                     return;
                 }
 
+
+                int i = 0;
+
                 foreach (string file in openFileDialog.FileNames)
                 {
                     ListViewItem newItem = new ListViewItem();
@@ -653,6 +656,8 @@ namespace ImageSetEditor.EditControl
                     newImage.BindItem = newItem;
                     newItem.Tag = newImage;
                     newItem.Text = newImage.Name;
+                    newImage.Position =
+                        new Point(m_canvas.ViewPos.X + i++, m_canvas.ViewPos.Y + i++);
                     usedListView.Items.Add(newItem);
                 }
 
