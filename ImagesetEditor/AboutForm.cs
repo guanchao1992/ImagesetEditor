@@ -21,7 +21,7 @@ namespace ImageSetEditor
 
         private void toProjectWebButton_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/frimin/FancyFramework");
+            System.Diagnostics.Process.Start("https://github.com/frimin/ImagesetEditor");
         }
 
         #endregion Events

@@ -27,6 +27,15 @@ namespace ImageSetEditor.EditControl
             Select, /// 选择图片
         };
 
+        private enum SortTypes
+        {
+            Name = 0,
+            NameReverse = 1,
+            Size = 2,
+            SizeReverse = 3,
+            Invert = 4,
+        };
+
         /// <summary>
         /// 当前文档路径
         /// </summary>
@@ -78,13 +87,10 @@ namespace ImageSetEditor.EditControl
         /// 防止修改节点选择状态时对事件的调用
         private bool m_listViewNodeLock;
 
-        private enum SortTypes
-        {
-            Name        = 0,
-            NameReverse = 1,
-            Size        = 2,
-            SizeReverse = 3,
-        };
+        /// <summary>
+        /// 菜单中显示图片名称的项
+        /// </summary>
+        private List<ToolStripMenuItem> m_menuImageViewItem;
 
         #endregion Fields
 
@@ -224,9 +230,19 @@ namespace ImageSetEditor.EditControl
         {
             ArrayList list = new ArrayList();
 
-            foreach (ListViewItem item in items)
+            if (type == SortTypes.Invert)
             {
-                list.Add(item.Tag);
+                for (int i = items.Count - 1; i >= 0; --i)
+                {
+                    list.Add(((ListViewItem)items[i]).Tag);
+                }
+            }
+            else
+            {
+                foreach (ListViewItem item in items)
+                {
+                    list.Add(item.Tag);
+                }
             }
 
             IComparer sorter = null;
@@ -245,9 +261,14 @@ namespace ImageSetEditor.EditControl
                 case SortTypes.SizeReverse:
                     sorter = new CompareSizeReverse();
                     break;
+                case SortTypes.Invert:
+                    break;
+                default:
+                    break;
             };
 
-            list.Sort((IComparer)sorter);
+            if (sorter != null)
+                list.Sort((IComparer)sorter);
 
             for (int i = 0; i != list.Count; ++i)
             {
@@ -297,6 +318,8 @@ namespace ImageSetEditor.EditControl
                     m_listViewNodeLock = false;
 
                     m_selects.Add(image);
+
+                    SetSelect(image);
 
                     break;
                 }
@@ -478,11 +501,73 @@ namespace ImageSetEditor.EditControl
 
         private void imageSetBoxContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
+            /*
             if (m_inSelects == false)
             {
                 SelectTop();
+
                 imageSetBoxUpdate();
             }
+            */
+
+            /// 使菜单显示鼠标位置顶层十个图片名称
+            
+            int menuViewItem = 0;
+
+            for (int i = usedListView.Items.Count - 1; i >= 0; --i)
+            {
+                SubImage image = (SubImage)usedListView.Items[i].Tag;
+
+                if (image.Rectangle.Contains(m_curMousePos))
+                {
+                    m_menuImageViewItem[menuViewItem].Text = (menuViewItem + 1).ToString() + ")  " + image.Name;
+                    m_menuImageViewItem[menuViewItem].Tag = image;
+                    m_menuImageViewItem[menuViewItem].Visible = true;
+                    m_menuImageViewItem[menuViewItem].Enabled = true;
+
+                    menuViewItem++;
+
+                    if (menuViewItem == m_menuImageViewItem.Count)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            for (; menuViewItem != m_menuImageViewItem.Count; ++menuViewItem)
+            {
+                m_menuImageViewItem[menuViewItem].Text = "";
+                m_menuImageViewItem[menuViewItem].Visible = false;
+                m_menuImageViewItem[menuViewItem].Tag = null;
+            }
+
+            if (m_menuImageViewItem[0].Tag == null)
+            {
+                m_menuImageViewItem[0].Text = "未选中图片";
+                m_menuImageViewItem[0].Visible = true;
+                m_menuImageViewItem[0].Enabled = false;
+            }
+        }
+
+        private void imagenameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearSelects();
+
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+            SubImage image = (SubImage)item.Tag;
+
+            m_listViewNodeLock = true;
+
+            image.BindItem.Selected = true;
+
+            SetSelect(image);
+
+            m_selects.Clear();
+            m_selects.Add(image);
+
+            m_listViewNodeLock = true;
+
+            imageSetBoxUpdate();
         }
 
         private void imageSetBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -602,14 +687,16 @@ namespace ImageSetEditor.EditControl
             if (usedListView.SelectedItems.Count == 0)
                 return;
             if (DialogResult.OK == MessageBox.Show("确定从列表中删除所选的 " + usedListView.SelectedItems.Count + " 个图片？", "删除", MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
-            {
-                SetSelect(null);
+            {           
                 foreach (ListViewItem item in usedListView.SelectedItems)
                 {
                     ((SubImage)item.Tag).Dispose();
                     item.Tag = null;
                     item.Remove();
                 }
+
+                SetSelect(null);
+                m_selects.Clear();
             }
 
             imageCountUpdate();
@@ -700,6 +787,18 @@ namespace ImageSetEditor.EditControl
             }
         }
 
+        private void invertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (usedListView.SelectedItems.Count <= 1)
+            {
+                SortItems(SortTypes.Invert, usedListView.Items);
+            }
+            else
+            {
+                SortItems(SortTypes.Invert, usedListView.SelectedItems);
+            }
+        }
+
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in usedListView.Items)
@@ -747,10 +846,24 @@ namespace ImageSetEditor.EditControl
         {
             m_canvas = new Canvas();
             m_selects = new List<SubImage>();
+            m_menuImageViewItem = new List<ToolStripMenuItem>();
 
             m_MouseStatus = MouseStatus.Normal;
 
             InitializeComponent();
+
+            m_menuImageViewItem.AddRange(new System.Windows.Forms.ToolStripMenuItem[] {
+                imagename01ToolStripMenuItem,
+                imagename02ToolStripMenuItem,
+                imagename03ToolStripMenuItem,
+                imagename04ToolStripMenuItem,
+                imagename05ToolStripMenuItem,
+                imagename06ToolStripMenuItem,
+                imagename07ToolStripMenuItem,
+                imagename08ToolStripMenuItem,
+                imagename09ToolStripMenuItem,
+                imagename10ToolStripMenuItem,
+            });
 
             SetSelect(null);
 
@@ -758,6 +871,10 @@ namespace ImageSetEditor.EditControl
         }
 
         #endregion Constructors
+
+        
+
+        
     }
 
     /// <summary>

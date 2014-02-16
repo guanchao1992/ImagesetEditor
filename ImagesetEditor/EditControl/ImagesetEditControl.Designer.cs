@@ -42,6 +42,8 @@
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.usedSelectSortSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.usedSelectSortSizeReverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
+            this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.usedToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.addImageMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,6 +53,16 @@
             this.imageCountToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.imageSetBox = new System.Windows.Forms.PictureBox();
             this.imageSetBoxContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.imagename01ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename02ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename03ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename04ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename05ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename06ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename07ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename08ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename09ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imagename10ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.delusedToolStripMenuItem_Click2 = new System.Windows.Forms.ToolStripMenuItem();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
@@ -160,7 +172,9 @@
             this.usedSelectSortNameReverseToolStripMenuItem,
             this.toolStripMenuItem5,
             this.usedSelectSortSizeToolStripMenuItem,
-            this.usedSelectSortSizeReverseToolStripMenuItem});
+            this.usedSelectSortSizeReverseToolStripMenuItem,
+            this.toolStripMenuItem6,
+            this.invertToolStripMenuItem});
             this.sortToolStripMenuItem.Name = "sortToolStripMenuItem";
             this.sortToolStripMenuItem.Size = new System.Drawing.Size(165, 24);
             this.sortToolStripMenuItem.Text = "排序";
@@ -198,6 +212,18 @@
             this.usedSelectSortSizeReverseToolStripMenuItem.Text = "按尺寸倒序";
             this.usedSelectSortSizeReverseToolStripMenuItem.Click += new System.EventHandler(this.usedSelectSortSizeReverseToolStripMenuItem_Click);
             // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(150, 6);
+            // 
+            // invertToolStripMenuItem
+            // 
+            this.invertToolStripMenuItem.Name = "invertToolStripMenuItem";
+            this.invertToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
+            this.invertToolStripMenuItem.Text = "倒置";
+            this.invertToolStripMenuItem.Click += new System.EventHandler(this.invertToolStripMenuItem_Click);
+            // 
             // usedToolStrip
             // 
             this.usedToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
@@ -224,19 +250,19 @@
             // addImageMenuItem
             // 
             this.addImageMenuItem.Name = "addImageMenuItem";
-            this.addImageMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.addImageMenuItem.Size = new System.Drawing.Size(153, 24);
             this.addImageMenuItem.Text = "添加图片";
             this.addImageMenuItem.Click += new System.EventHandler(this.addImageMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(172, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(150, 6);
             // 
             // clearUsedToolStripMenuItem
             // 
             this.clearUsedToolStripMenuItem.Name = "clearUsedToolStripMenuItem";
-            this.clearUsedToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.clearUsedToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
             this.clearUsedToolStripMenuItem.Text = "清空图片组";
             this.clearUsedToolStripMenuItem.Click += new System.EventHandler(this.clearUsedToolStripMenuItem_Click);
             // 
@@ -272,21 +298,101 @@
             // imageSetBoxContextMenuStrip
             // 
             this.imageSetBoxContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.imagename01ToolStripMenuItem,
+            this.imagename02ToolStripMenuItem,
+            this.imagename03ToolStripMenuItem,
+            this.imagename04ToolStripMenuItem,
+            this.imagename05ToolStripMenuItem,
+            this.imagename06ToolStripMenuItem,
+            this.imagename07ToolStripMenuItem,
+            this.imagename08ToolStripMenuItem,
+            this.imagename09ToolStripMenuItem,
+            this.imagename10ToolStripMenuItem,
             this.toolStripMenuItem3,
             this.delusedToolStripMenuItem_Click2});
             this.imageSetBoxContextMenuStrip.Name = "imageSetBoxContextMenuStrip";
-            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(176, 62);
+            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(182, 302);
             this.imageSetBoxContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.imageSetBoxContextMenuStrip_Opening);
+            // 
+            // imagename01ToolStripMenuItem
+            // 
+            this.imagename01ToolStripMenuItem.Name = "imagename01ToolStripMenuItem";
+            this.imagename01ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename01ToolStripMenuItem.Text = "imagename01";
+            this.imagename01ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename02ToolStripMenuItem
+            // 
+            this.imagename02ToolStripMenuItem.Name = "imagename02ToolStripMenuItem";
+            this.imagename02ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename02ToolStripMenuItem.Text = "imagename02";
+            this.imagename02ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename03ToolStripMenuItem
+            // 
+            this.imagename03ToolStripMenuItem.Name = "imagename03ToolStripMenuItem";
+            this.imagename03ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename03ToolStripMenuItem.Text = "imagename03";
+            this.imagename03ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename04ToolStripMenuItem
+            // 
+            this.imagename04ToolStripMenuItem.Name = "imagename04ToolStripMenuItem";
+            this.imagename04ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename04ToolStripMenuItem.Text = "imagename04";
+            this.imagename04ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename05ToolStripMenuItem
+            // 
+            this.imagename05ToolStripMenuItem.Name = "imagename05ToolStripMenuItem";
+            this.imagename05ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename05ToolStripMenuItem.Text = "imagename05";
+            this.imagename05ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename06ToolStripMenuItem
+            // 
+            this.imagename06ToolStripMenuItem.Name = "imagename06ToolStripMenuItem";
+            this.imagename06ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename06ToolStripMenuItem.Text = "imagename06";
+            this.imagename06ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename07ToolStripMenuItem
+            // 
+            this.imagename07ToolStripMenuItem.Name = "imagename07ToolStripMenuItem";
+            this.imagename07ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename07ToolStripMenuItem.Text = "imagename07";
+            this.imagename07ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename08ToolStripMenuItem
+            // 
+            this.imagename08ToolStripMenuItem.Name = "imagename08ToolStripMenuItem";
+            this.imagename08ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename08ToolStripMenuItem.Text = "imagename08";
+            this.imagename08ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename09ToolStripMenuItem
+            // 
+            this.imagename09ToolStripMenuItem.Name = "imagename09ToolStripMenuItem";
+            this.imagename09ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename09ToolStripMenuItem.Text = "imagename09";
+            this.imagename09ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
+            // 
+            // imagename10ToolStripMenuItem
+            // 
+            this.imagename10ToolStripMenuItem.Name = "imagename10ToolStripMenuItem";
+            this.imagename10ToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.imagename10ToolStripMenuItem.Text = "imagename10";
+            this.imagename10ToolStripMenuItem.Click += new System.EventHandler(this.imagenameToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(172, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(178, 6);
             // 
             // delusedToolStripMenuItem_Click2
             // 
             this.delusedToolStripMenuItem_Click2.Name = "delusedToolStripMenuItem_Click2";
-            this.delusedToolStripMenuItem_Click2.Size = new System.Drawing.Size(175, 24);
+            this.delusedToolStripMenuItem_Click2.Size = new System.Drawing.Size(181, 24);
             this.delusedToolStripMenuItem_Click2.Text = "删除";
             this.delusedToolStripMenuItem_Click2.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
             // 
@@ -486,5 +592,17 @@
         private System.Windows.Forms.ToolStripMenuItem delusedToolStripMenuItem_Click2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripLabel imageCountToolStripLabel;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem invertToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename01ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename02ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename03ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename04ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename05ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename06ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename07ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename08ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename09ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagename10ToolStripMenuItem;
     }
 }
