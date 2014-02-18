@@ -92,6 +92,11 @@ namespace ImageSetEditor.EditControl
         /// </summary>
         private List<ToolStripMenuItem> m_menuImageViewItem;
 
+        /// <summary>
+        /// 停靠辅助
+        /// </summary>
+        private DockAid m_dockAid;
+
         #endregion Fields
 
         #region Methods
@@ -131,6 +136,8 @@ namespace ImageSetEditor.EditControl
                 rectToolStripTextBox.Text = "不可用";
                 sizeToolStripTextBox.Text = "不可用";
                 nameToolStripTextBox.ReadOnly = true;
+
+               
             }
             else
             {
@@ -141,7 +148,15 @@ namespace ImageSetEditor.EditControl
                     String.Format("{0},{1}", select.Size.Width, select.Size.Height);
                 nameToolStripTextBox.ReadOnly = false;
             }
+
             m_select = select;
+
+            m_dockAid.SetImage(select);
+        }
+
+        public void SetCursor(Cursor cursor)
+        {
+            imageSetBox.Cursor = cursor;
         }
 
         /// <summary>
@@ -434,6 +449,7 @@ namespace ImageSetEditor.EditControl
                                     SetSelect(m_selects.First());
                                 }
                             }
+
                             imageSetBoxUpdate();
                         }
                         break;
@@ -450,6 +466,8 @@ namespace ImageSetEditor.EditControl
                     m_MouseStatus = MouseStatus.Drag;
                     m_beginMousePos = e.Location;
                     m_curMousePos = e.Location;
+
+                    m_dockAid.SetImage(null);
                 }
                 else
                 {
@@ -472,6 +490,8 @@ namespace ImageSetEditor.EditControl
 
                 return;
             }
+
+            m_dockAid.OnMouseMove(e.X, e.Y);
 
             /// 鼠标移动到已经选择的图片里时变更光标
 
@@ -622,6 +642,8 @@ namespace ImageSetEditor.EditControl
 
                 m_canvas.DrawRectangle(selectArea);
             }
+
+            m_dockAid.Draw(m_canvas);
 
             m_canvas.End(); 
         }
@@ -856,6 +878,7 @@ namespace ImageSetEditor.EditControl
             m_canvas = new Canvas();
             m_selects = new List<SubImage>();
             m_menuImageViewItem = new List<ToolStripMenuItem>();
+            m_dockAid = new DockAid();
 
             m_MouseStatus = MouseStatus.Normal;
 
@@ -976,6 +999,30 @@ namespace ImageSetEditor.EditControl
                 image.Size.Height);
         }
 
+        public void DrawImageCenter(SubImage image)
+        {
+            if (IsView(image) == false)
+                return;
+            m_viewGraph.DrawImage(
+                image.Image,
+                image.Position.X - m_viewPosition.X - image.Size.Width / 2,
+                image.Position.Y - m_viewPosition.Y - image.Size.Height / 2,
+                image.Size.Width,
+                image.Size.Height);
+        }
+
+        public void DrawImageCenter(SubImage image, Point offset)
+        {
+            if (IsView(image) == false)
+                return;
+            m_viewGraph.DrawImage(
+                image.Image,
+                image.Position.X - m_viewPosition.X - image.Size.Width / 2 + offset.X,
+                image.Position.Y - m_viewPosition.Y - image.Size.Height / 2 + offset.Y,
+                image.Size.Width,
+                image.Size.Height);
+        }
+
         public void DrawImageArea(SubImage image)
         {
             DrawSmallBox(image.Position.X, image.Position.Y);
@@ -1076,20 +1123,21 @@ namespace ImageSetEditor.EditControl
     {
         #region Fields
 
-        enum Direction
-        {
-            Upper,
-            UpperLeft,
-            UpperRight,
-            Lower,
-            LowerLeft,
-            LowerRight,
-            Left,
-            Right,
-        };
+        private const int Direction_Upper        = 0;
+        private const int Direction_UpperLeft    = 1;
+        private const int Direction_UpperRight   = 2;
+        private const int Direction_Lower        = 3;
+        private const int Direction_LowerLeft    = 4;
+        private const int Direction_LowerRight   = 5;
+        private const int Direction_Left         = 6;
+        private const int Direction_Right        = 7;
+        private const int Direction_Nums         = 8;
+
+        private bool[] m_arrowVisible;
 
         private SubImage[] m_arrow;
-        private bool[] m_arrowVisible;
+
+        private SubImage m_select;
 
         #endregion Fields
 
@@ -1098,23 +1146,56 @@ namespace ImageSetEditor.EditControl
         /// <summary>
         /// 设置当前需要停靠的图片
         /// </summary>
-        public void SetImage()
+        public void SetImage(SubImage image)
         {
+            m_select = image;
+        }
+
+        public void Draw(Canvas canvas)
+        {
+            if (m_select != null)
+            {
+                m_arrow[Direction_Upper].Position
+                    = new Point(m_select.Position.X + m_select.Size.Width / 2, m_select.Position.Y);
+                m_arrow[Direction_UpperLeft].Position
+                    = new Point(m_select.Position.X, m_select.Position.Y);
+                m_arrow[Direction_UpperRight].Position
+                    = new Point(m_select.Position.X + m_select.Size.Width, m_select.Position.Y);
+                m_arrow[Direction_Lower].Position
+                    = new Point(m_select.Position.X + m_select.Size.Width / 2, m_select.Position.Y + m_select.Size.Height);
+                m_arrow[Direction_LowerLeft].Position
+                    = new Point(m_select.Position.X, m_select.Position.Y + m_select.Size.Height);
+                m_arrow[Direction_LowerRight].Position
+                    = new Point(m_select.Position.X + m_select.Size.Width, m_select.Position.Y + m_select.Size.Height);
+                m_arrow[Direction_Left].Position
+                    = new Point(m_select.Position.X , m_select.Position.Y + m_select.Size.Height / 2);
+                m_arrow[Direction_Right].Position
+                    = new Point(m_select.Position.X + m_select.Size.Width, m_select.Position.Y + m_select.Size.Height / 2);
+
+
+                canvas.DrawImageCenter(m_arrow[Direction_Upper]);
+                canvas.DrawImageCenter(m_arrow[Direction_UpperLeft]);
+                canvas.DrawImageCenter(m_arrow[Direction_UpperRight]);
+                canvas.DrawImageCenter(m_arrow[Direction_Lower]);
+                canvas.DrawImageCenter(m_arrow[Direction_LowerLeft]);
+                canvas.DrawImageCenter(m_arrow[Direction_LowerRight]);
+                canvas.DrawImageCenter(m_arrow[Direction_Left]);
+                canvas.DrawImageCenter(m_arrow[Direction_Right]);
+            }
         }
 
         /// <summary>
-        /// 绘制箭头
+        /// 处理鼠标移动事件
         /// </summary>
-        public void DrawArrow()
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>是否处于可点击区域</returns>
+        public bool OnMouseMove(int x, int y)
         {
+            return false;
         }
 
-        public void OnMouseMove(int x, int y)
-        {
-
-        }
-
-        public void OnClick()
+        public void OnClick(int x, int y)
         {
         }
 
@@ -1124,6 +1205,23 @@ namespace ImageSetEditor.EditControl
         #endregion Properties
 
         #region Constructors
+
+        public DockAid()
+        {
+            m_arrow = new SubImage[] {
+                new SubImage(@"icons\arrow_upper.png"),
+                new SubImage(@"icons\arrow_upper_left.png"),
+                new SubImage(@"icons\arrow_upper_right.png"),
+                new SubImage(@"icons\arrow_lower.png"),
+                new SubImage(@"icons\arrow_lower_left.png"),
+                new SubImage(@"icons\arrow_lower_right.png"),
+                new SubImage(@"icons\arrow_left.png"),
+                new SubImage(@"icons\arrow_right.png"),
+            };
+
+            m_arrowVisible = new bool[Direction_Nums];
+        }
+
         #endregion Constructors
     };
 
