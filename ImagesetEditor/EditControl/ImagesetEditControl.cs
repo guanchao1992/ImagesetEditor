@@ -13,7 +13,7 @@ using System.Drawing.Imaging;
 
 namespace ImageSetEditor.EditControl
 {
-    public partial class ImagesetEditControl : UserControl, IDisposable
+    public partial class ImagesetEditControl : UserControl, IDisposable, IRedraw
     {
         #region Fields
 
@@ -123,6 +123,11 @@ namespace ImageSetEditor.EditControl
             imageSetBox.Invalidate();
         }
 
+        public void Redraw()
+        {
+            imageSetBoxUpdate();
+        }
+
         private void imageCountUpdate()
         {
             imageCountToolStripLabel.Text = "共 " + usedListView.Items.Count.ToString() + " 个图片";
@@ -136,8 +141,6 @@ namespace ImageSetEditor.EditControl
                 rectToolStripTextBox.Text = "不可用";
                 sizeToolStripTextBox.Text = "不可用";
                 nameToolStripTextBox.ReadOnly = true;
-
-               
             }
             else
             {
@@ -165,8 +168,8 @@ namespace ImageSetEditor.EditControl
         static private Rectangle GetRectangleArea(Point p1, Point p2)
         {
             return new Rectangle(
-                Math.Min(p1.X, p2.X), 
-                Math.Min(p1.Y, p2.Y), 
+                Math.Min(p1.X, p2.X),
+                Math.Min(p1.Y, p2.Y),
                 Math.Abs(p1.X - p2.X),
                 Math.Abs(p1.Y - p2.Y));
         }
@@ -379,7 +382,7 @@ namespace ImageSetEditor.EditControl
                 hScrollBar.LargeChange = m_canvas.ViewSize.Width;
                 hScrollBar.Visible = true;
             }
-            
+
         }
 
         private void imageSetBox_MouseUp(object sender, MouseEventArgs e)
@@ -491,13 +494,16 @@ namespace ImageSetEditor.EditControl
                 return;
             }
 
-            m_dockAid.OnMouseMove(e.X, e.Y);
+            if (m_dockAid.OnMouseMove(e.X, e.Y))
+            {
+                imageSetBox.Cursor = Cursors.Hand;
+                return;
+            }
 
             /// 鼠标移动到已经选择的图片里时变更光标
 
             m_inSelects = false;
 
-            
             foreach (SubImage image in m_selects)
             {
                 if (image.Rectangle.Contains(new Point(
@@ -529,9 +535,9 @@ namespace ImageSetEditor.EditControl
                 imageSetBoxUpdate();
             }
             */
-            
+
             /// 使菜单显示鼠标位置顶层十个图片名称
-            
+
             int menuViewItem = 0;
 
             for (int i = usedListView.Items.Count - 1; i >= 0; --i)
@@ -592,7 +598,7 @@ namespace ImageSetEditor.EditControl
 
         private void imageSetBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            
+
         }
 
         private void imageSetBox_Paint(object sender, PaintEventArgs e)
@@ -614,7 +620,7 @@ namespace ImageSetEditor.EditControl
             if (m_MouseStatus == MouseStatus.Drag)
             {
                 Point offset = new Point(
-                    m_curMousePos.X - m_beginMousePos.X, 
+                    m_curMousePos.X - m_beginMousePos.X,
                     m_curMousePos.Y - m_beginMousePos.Y);
 
                 foreach (SubImage image in m_selects)
@@ -637,7 +643,7 @@ namespace ImageSetEditor.EditControl
 
             if (m_MouseStatus == MouseStatus.Select)
             {
-                Rectangle selectArea = 
+                Rectangle selectArea =
                     GetRectangleArea(m_beginMousePos, m_curMousePos, m_canvas.ViewPos);
 
                 m_canvas.DrawRectangle(selectArea);
@@ -645,7 +651,7 @@ namespace ImageSetEditor.EditControl
 
             m_dockAid.Draw(m_canvas);
 
-            m_canvas.End(); 
+            m_canvas.End();
         }
 
         private void vScrollBar_Scroll(object sender, ScrollEventArgs e)
@@ -672,9 +678,6 @@ namespace ImageSetEditor.EditControl
                     return;
                 }
 
-
-                int i = 0;
-
                 foreach (string file in openFileDialog.FileNames)
                 {
                     ListViewItem newItem = new ListViewItem();
@@ -683,7 +686,7 @@ namespace ImageSetEditor.EditControl
                     newItem.Tag = newImage;
                     newItem.Text = newImage.Name;
                     newImage.Position =
-                        new Point(m_canvas.ViewPos.X + i++, m_canvas.ViewPos.Y + i++);
+                        new Point(m_canvas.ViewPos.X, m_canvas.ViewPos.Y);
                     usedListView.Items.Add(newItem);
                 }
 
@@ -718,13 +721,17 @@ namespace ImageSetEditor.EditControl
             if (usedListView.SelectedItems.Count == 0)
                 return;
             if (DialogResult.OK == MessageBox.Show("确定从列表中删除所选的 " + usedListView.SelectedItems.Count + " 个图片？", "删除", MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
-            {           
+            {
+                m_listViewNodeLock = true;
+
                 foreach (ListViewItem item in usedListView.SelectedItems)
                 {
                     ((SubImage)item.Tag).Dispose();
                     item.Tag = null;
                     item.Remove();
                 }
+
+                m_listViewNodeLock = false;
 
                 SetSelect(null);
                 m_selects.Clear();
@@ -876,13 +883,16 @@ namespace ImageSetEditor.EditControl
         public ImagesetEditControl()
         {
             m_canvas = new Canvas();
+
             m_selects = new List<SubImage>();
+
             m_menuImageViewItem = new List<ToolStripMenuItem>();
-            m_dockAid = new DockAid();
 
             m_MouseStatus = MouseStatus.Normal;
 
             InitializeComponent();
+
+            m_dockAid = new DockAid(usedListView.Items, m_canvas, this);
 
             m_menuImageViewItem.AddRange(new System.Windows.Forms.ToolStripMenuItem[] {
                 imagename01ToolStripMenuItem,
@@ -905,6 +915,12 @@ namespace ImageSetEditor.EditControl
         #endregion Constructors
     }
 
+    internal interface IRedraw
+    {
+        void Redraw();
+    }
+
+
     /// <summary>
     /// 画布对象
     /// </summary>
@@ -921,7 +937,7 @@ namespace ImageSetEditor.EditControl
         /// 画布位图尺寸
         /// </summary>
         private Size m_canvasSize;
-        
+
         /// <summary>
         /// 当前查看位置
         /// </summary>
@@ -942,6 +958,8 @@ namespace ImageSetEditor.EditControl
         private Pen m_blackPen;
 
         private Pen m_whitePen;
+
+        private Pen m_greenPen;
 
         #endregion Fields
 
@@ -993,32 +1011,8 @@ namespace ImageSetEditor.EditControl
                 return;
             m_viewGraph.DrawImage(
                 image.Image,
-                image.Position.X - m_viewPosition.X, 
+                image.Position.X - m_viewPosition.X,
                 image.Position.Y - m_viewPosition.Y,
-                image.Size.Width,
-                image.Size.Height);
-        }
-
-        public void DrawImageCenter(SubImage image)
-        {
-            if (IsView(image) == false)
-                return;
-            m_viewGraph.DrawImage(
-                image.Image,
-                image.Position.X - m_viewPosition.X - image.Size.Width / 2,
-                image.Position.Y - m_viewPosition.Y - image.Size.Height / 2,
-                image.Size.Width,
-                image.Size.Height);
-        }
-
-        public void DrawImageCenter(SubImage image, Point offset)
-        {
-            if (IsView(image) == false)
-                return;
-            m_viewGraph.DrawImage(
-                image.Image,
-                image.Position.X - m_viewPosition.X - image.Size.Width / 2 + offset.X,
-                image.Position.Y - m_viewPosition.Y - image.Size.Height / 2 + offset.Y,
                 image.Size.Width,
                 image.Size.Height);
         }
@@ -1070,6 +1064,12 @@ namespace ImageSetEditor.EditControl
                 m_blackPen.Brush, x - 3 - m_viewPosition.X, y - 3 - m_viewPosition.Y, 6, 6);
         }
 
+        public void DrawDockLine(int x0, int y0, int x1, int y1)
+        {
+            m_viewGraph.DrawLine(
+                m_greenPen, x0 - m_viewPosition.X, y0 - m_viewPosition.Y, x1 - m_viewPosition.X, y1 - m_viewPosition.Y);
+        }
+
         #endregion Methods
 
         #region Properties
@@ -1106,11 +1106,16 @@ namespace ImageSetEditor.EditControl
             m_viewGraph = null;
 
             m_dashedPen = new Pen(Color.Gray);
+
             m_dashedPen.DashStyle = DashStyle.DashDot;
 
             m_blackPen = new Pen(Color.Black);
 
             m_whitePen = new Pen(Color.White);
+
+            m_greenPen = new Pen(Color.Green);
+
+            m_greenPen.DashStyle = DashStyle.DashDot;
         }
 
         #endregion Constructors
@@ -1123,21 +1128,43 @@ namespace ImageSetEditor.EditControl
     {
         #region Fields
 
-        private const int Direction_Upper        = 0;
-        private const int Direction_UpperLeft    = 1;
-        private const int Direction_UpperRight   = 2;
-        private const int Direction_Lower        = 3;
-        private const int Direction_LowerLeft    = 4;
-        private const int Direction_LowerRight   = 5;
-        private const int Direction_Left         = 6;
-        private const int Direction_Right        = 7;
-        private const int Direction_Nums         = 8;
+        private const int Direction_Upper = 0;
 
-        private bool[] m_arrowVisible;
+        private const int Direction_UpperLeft = 1;
+
+        private const int Direction_UpperRight = 2;
+
+        private const int Direction_Lower = 3;
+
+        private const int Direction_LowerLeft = 4;
+
+        private const int Direction_LowerRight = 5;
+
+        private const int Direction_Left = 6;
+
+        private const int Direction_Right = 7;
+
+        private const int Direction_Nums = 8;
+
+        private int m_selectArrow;
 
         private SubImage[] m_arrow;
 
         private SubImage m_select;
+
+        private ListView.ListViewItemCollection m_items;
+
+        private Canvas m_canvas;
+
+        private IRedraw m_redraw;
+
+        private List<int> m_leftContactEdge;
+
+        private List<int> m_upperContactEdge;
+
+        private List<int> m_rightContactEdge;
+
+        private List<int> m_lowerContactEdge;
 
         #endregion Fields
 
@@ -1149,54 +1176,247 @@ namespace ImageSetEditor.EditControl
         public void SetImage(SubImage image)
         {
             m_select = image;
+
+            m_selectArrow = -1;
+
+            if (image == null)
+            {
+                m_leftContactEdge.Clear();
+                m_upperContactEdge.Clear();
+                m_rightContactEdge.Clear();
+                m_lowerContactEdge.Clear();
+                return;
+            }
+
+            ContactBegin();
+
+            foreach (ListViewItem item in m_items)
+            {
+                SubImage img = (SubImage)item.Tag;
+                Contact(image, img);
+            }
+
+            ContactEnd();
         }
 
         public void Draw(Canvas canvas)
         {
-            if (m_select != null)
+            if (m_select == null)
             {
-                m_arrow[Direction_Upper].Position
-                    = new Point(m_select.Position.X + m_select.Size.Width / 2, m_select.Position.Y);
-                m_arrow[Direction_UpperLeft].Position
-                    = new Point(m_select.Position.X, m_select.Position.Y);
-                m_arrow[Direction_UpperRight].Position
-                    = new Point(m_select.Position.X + m_select.Size.Width, m_select.Position.Y);
-                m_arrow[Direction_Lower].Position
-                    = new Point(m_select.Position.X + m_select.Size.Width / 2, m_select.Position.Y + m_select.Size.Height);
-                m_arrow[Direction_LowerLeft].Position
-                    = new Point(m_select.Position.X, m_select.Position.Y + m_select.Size.Height);
-                m_arrow[Direction_LowerRight].Position
-                    = new Point(m_select.Position.X + m_select.Size.Width, m_select.Position.Y + m_select.Size.Height);
-                m_arrow[Direction_Left].Position
-                    = new Point(m_select.Position.X , m_select.Position.Y + m_select.Size.Height / 2);
-                m_arrow[Direction_Right].Position
-                    = new Point(m_select.Position.X + m_select.Size.Width, m_select.Position.Y + m_select.Size.Height / 2);
-
-
-                canvas.DrawImageCenter(m_arrow[Direction_Upper]);
-                canvas.DrawImageCenter(m_arrow[Direction_UpperLeft]);
-                canvas.DrawImageCenter(m_arrow[Direction_UpperRight]);
-                canvas.DrawImageCenter(m_arrow[Direction_Lower]);
-                canvas.DrawImageCenter(m_arrow[Direction_LowerLeft]);
-                canvas.DrawImageCenter(m_arrow[Direction_LowerRight]);
-                canvas.DrawImageCenter(m_arrow[Direction_Left]);
-                canvas.DrawImageCenter(m_arrow[Direction_Right]);
+                return;
             }
+
+            m_arrow[Direction_Upper].Position
+                = new Point(m_select.Position.X + m_select.Size.Width / 2 - m_arrow[Direction_Upper].Size.Width / 2, m_select.Position.Y - m_arrow[Direction_Upper].Size.Height / 2);
+            m_arrow[Direction_UpperLeft].Position
+                = new Point(m_select.Position.X - m_arrow[Direction_UpperLeft].Size.Width / 2, m_select.Position.Y - m_arrow[Direction_UpperLeft].Size.Height / 2);
+            m_arrow[Direction_UpperRight].Position
+                = new Point(m_select.Position.X + m_select.Size.Width - m_arrow[Direction_UpperRight].Size.Width / 2, m_select.Position.Y - m_arrow[Direction_UpperRight].Size.Height / 2);
+            m_arrow[Direction_Lower].Position
+                = new Point(m_select.Position.X + m_select.Size.Width / 2 - m_arrow[Direction_Lower].Size.Width / 2, m_select.Position.Y + m_select.Size.Height - m_arrow[Direction_Lower].Size.Height / 2);
+            m_arrow[Direction_LowerLeft].Position
+                = new Point(m_select.Position.X - m_arrow[Direction_LowerLeft].Size.Width / 2, m_select.Position.Y + m_select.Size.Height - m_arrow[Direction_LowerLeft].Size.Height / 2);
+            m_arrow[Direction_LowerRight].Position
+                = new Point(m_select.Position.X + m_select.Size.Width - m_arrow[Direction_LowerRight].Size.Width / 2, m_select.Position.Y + m_select.Size.Height - m_arrow[Direction_LowerRight].Size.Height / 2);
+            m_arrow[Direction_Left].Position
+                = new Point(m_select.Position.X - m_arrow[Direction_Left].Size.Width / 2, m_select.Position.Y + m_select.Size.Height / 2 - m_arrow[Direction_Left].Size.Height / 2);
+            m_arrow[Direction_Right].Position
+                = new Point(m_select.Position.X + m_select.Size.Width - m_arrow[Direction_Right].Size.Width / 2, m_select.Position.Y + m_select.Size.Height / 2 - m_arrow[Direction_Right].Size.Height / 2);
+
+            if (m_upperContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_Upper]);
+
+            if (m_upperContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_UpperLeft]);
+
+            if (m_upperContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_UpperRight]);
+
+            if (m_lowerContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_Lower]);
+
+            if (m_lowerContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_LowerLeft]);
+
+            if (m_lowerContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_LowerRight]);
+
+            if (m_leftContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_Left]);
+
+            if (m_rightContactEdge.Count > 0)
+                canvas.DrawImage(m_arrow[Direction_Right]);
+
+            switch (m_selectArrow)
+            {
+                case Direction_Upper:
+                    if (m_upperContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(0, m_upperContactEdge.Last(), canvas.Size.Width, m_upperContactEdge.Last());
+                    }
+                    break;
+                case Direction_UpperLeft:
+                    if (m_upperContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(0, m_upperContactEdge.Last(), m_leftContactEdge.Last(), m_upperContactEdge.Last());
+                        canvas.DrawDockLine(m_leftContactEdge.Last(), 0, m_leftContactEdge.Last(), m_upperContactEdge.Last());
+                    }
+                    break;
+                case Direction_UpperRight:
+                    if (m_upperContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(m_rightContactEdge.First(), m_upperContactEdge.Last(), canvas.Size.Width, m_upperContactEdge.Last());
+                        canvas.DrawDockLine(m_rightContactEdge.First(), 0, m_rightContactEdge.First(), m_upperContactEdge.Last());
+                    }
+                    break;
+                case Direction_Lower:
+                    if (m_lowerContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(0, m_lowerContactEdge.First(), canvas.Size.Width, m_lowerContactEdge.First());
+                    }
+                    break;
+                case Direction_LowerLeft:
+                    if (m_lowerContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(0, m_lowerContactEdge.First(), m_leftContactEdge.Last(), m_lowerContactEdge.First());
+                        canvas.DrawDockLine(m_leftContactEdge.Last(), m_lowerContactEdge.First(), m_leftContactEdge.Last(), canvas.Size.Height);
+                    }
+                    break;
+                case Direction_LowerRight:
+                    if (m_lowerContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(m_rightContactEdge.First(), m_lowerContactEdge.First(), canvas.Size.Width, m_lowerContactEdge.First());
+                        canvas.DrawDockLine(m_rightContactEdge.First(), m_lowerContactEdge.First(), m_rightContactEdge.First(), canvas.Size.Height);
+                    }
+                    break;
+                case Direction_Left:
+                    if (m_leftContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(m_leftContactEdge.Last(), 0, m_leftContactEdge.Last(), canvas.Size.Height);
+                    }
+                    break;
+                case Direction_Right:
+                    if (m_rightContactEdge.Count > 0)
+                    {
+                        canvas.DrawDockLine(m_rightContactEdge.First(), 0, m_rightContactEdge.First(), canvas.Size.Height);
+                    }
+                    break;
+                default:
+                    break;
+            };
+
         }
 
-        /// <summary>
-        /// 处理鼠标移动事件
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns>是否处于可点击区域</returns>
+        public bool InArrowButton(int x, int y)
+        {
+            foreach (SubImage image in m_arrow)
+            {
+                if (image.Rectangle.Contains(x + m_canvas.ViewPos.X, y + m_canvas.ViewPos.Y))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool OnMouseMove(int x, int y)
         {
-            return false;
+            if (m_select == null)
+            {
+                return false;
+            }
+
+            int lastSelectArrow = m_selectArrow;
+
+            m_selectArrow = -1;
+
+            for (int i = 0; i != m_arrow.Count(); ++i)
+            {
+                if (m_arrow[i].Rectangle.Contains(x + m_canvas.ViewPos.X, y + m_canvas.ViewPos.Y))
+                {
+                    m_selectArrow = i;
+                    break;
+                }
+            }
+
+            if (lastSelectArrow != m_selectArrow)
+            {
+                m_redraw.Redraw();
+            }
+
+            return m_selectArrow != -1;
         }
 
         public void OnClick(int x, int y)
         {
+        }
+
+        private void ContactBegin()
+        {
+            m_leftContactEdge.Clear();
+            m_upperContactEdge.Clear();
+            m_rightContactEdge.Clear();
+            m_lowerContactEdge.Clear();
+
+            /*
+            m_leftContactEdge.Add(m_canvas.Size.Width);
+            m_upperContactEdge.Add(m_canvas.Size.Height);
+            m_rightContactEdge.Add(0);
+            m_lowerContactEdge.Add(0);*/
+        }
+
+        private void Contact(SubImage imageA, SubImage imageB)
+        {
+            if (imageA == imageB)
+            {
+                return;
+            }
+
+            if (imageA.Rectangle.IntersectsWith(imageB.Rectangle))
+            {
+                /*
+                // 相交左上角的点则添加左和顶边
+                if (imageA.Rectangle.Contains(imageB.Position))
+                {
+                    m_leftContactEdge.Add(imageB.Position.X);
+                    m_upperContactEdge.Add(imageB.Position.Y);
+                }
+
+                // 相交右上角的点则添加右和顶边
+                if (imageA.Rectangle.Contains(imageB.Position.X + imageB.Size.Width, imageB.Position.Y))
+                {
+                    m_upperContactEdge.Add(imageB.Position.Y);
+                    m_rightContactEdge.Add(imageB.Position.X + imageB.Size.Width);
+                }
+
+                // 相交左下角的点则添加左和底边
+                if (imageA.Rectangle.Contains(imageB.Position.X, imageB.Position.Y + imageB.Size.Height))
+                {
+                    m_leftContactEdge.Add(imageB.Position.X);
+                    m_lowerContactEdge.Add(imageB.Position.Y + imageB.Size.Height);
+                }
+
+                // 相交右下角的点则添加右和底边
+                if (imageA.Rectangle.Contains(imageB.Position.X + imageB.Size.Width, imageB.Position.Y + imageB.Size.Height))
+                {
+                    m_rightContactEdge.Add(imageB.Position.X + imageB.Size.Width);
+                    m_lowerContactEdge.Add(imageB.Position.Y + imageB.Size.Height);
+                }
+                */
+                m_leftContactEdge.Add(imageB.Position.X);
+                m_upperContactEdge.Add(imageB.Position.Y);
+                m_rightContactEdge.Add(imageB.Position.X + imageB.Size.Width);
+                m_lowerContactEdge.Add(imageB.Position.Y + imageB.Size.Height);
+            }
+        }
+
+        private void ContactEnd()
+        {
+            m_leftContactEdge.Sort();
+            m_upperContactEdge.Sort();
+            m_rightContactEdge.Sort();
+            m_lowerContactEdge.Sort();
         }
 
         #endregion Methods
@@ -1206,7 +1426,7 @@ namespace ImageSetEditor.EditControl
 
         #region Constructors
 
-        public DockAid()
+        public DockAid(ListView.ListViewItemCollection items, Canvas canvas, IRedraw redraw)
         {
             m_arrow = new SubImage[] {
                 new SubImage(@"icons\arrow_upper.png"),
@@ -1219,7 +1439,19 @@ namespace ImageSetEditor.EditControl
                 new SubImage(@"icons\arrow_right.png"),
             };
 
-            m_arrowVisible = new bool[Direction_Nums];
+            m_items = items;
+
+            m_canvas = canvas;
+
+            m_redraw = redraw;
+
+            m_leftContactEdge = new List<int>();
+
+            m_upperContactEdge = new List<int>();
+
+            m_rightContactEdge = new List<int>();
+
+            m_lowerContactEdge = new List<int>();
         }
 
         #endregion Constructors

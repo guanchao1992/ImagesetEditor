@@ -110,8 +110,8 @@
             this.splitContainer.Panel2.Controls.Add(this.vScrollBar);
             this.splitContainer.Panel2.Controls.Add(this.hScrollBar);
             this.splitContainer.Panel2.Controls.Add(this.toolStrip);
-            this.splitContainer.Size = new System.Drawing.Size(1049, 585);
-            this.splitContainer.SplitterDistance = 197;
+            this.splitContainer.Size = new System.Drawing.Size(779, 420);
+            this.splitContainer.SplitterDistance = 146;
             this.splitContainer.TabIndex = 0;
             // 
             // usedListView
@@ -123,7 +123,7 @@
             this.usedListView.HideSelection = false;
             this.usedListView.Location = new System.Drawing.Point(0, 25);
             this.usedListView.Name = "usedListView";
-            this.usedListView.Size = new System.Drawing.Size(197, 560);
+            this.usedListView.Size = new System.Drawing.Size(146, 395);
             this.usedListView.TabIndex = 1;
             this.usedListView.UseCompatibleStateImageBehavior = false;
             this.usedListView.View = System.Windows.Forms.View.Details;
@@ -233,7 +233,7 @@
             this.imageCountToolStripLabel});
             this.usedToolStrip.Location = new System.Drawing.Point(0, 0);
             this.usedToolStrip.Name = "usedToolStrip";
-            this.usedToolStrip.Size = new System.Drawing.Size(197, 25);
+            this.usedToolStrip.Size = new System.Drawing.Size(146, 25);
             this.usedToolStrip.TabIndex = 2;
             this.usedToolStrip.Text = "toolStrip2";
             // 
@@ -283,9 +283,9 @@
             this.imageSetBox.ContextMenuStrip = this.imageSetBoxContextMenuStrip;
             this.imageSetBox.Cursor = System.Windows.Forms.Cursors.SizeAll;
             this.imageSetBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageSetBox.Location = new System.Drawing.Point(0, 27);
+            this.imageSetBox.Location = new System.Drawing.Point(0, 29);
             this.imageSetBox.Name = "imageSetBox";
-            this.imageSetBox.Size = new System.Drawing.Size(827, 537);
+            this.imageSetBox.Size = new System.Drawing.Size(608, 370);
             this.imageSetBox.TabIndex = 2;
             this.imageSetBox.TabStop = false;
             this.imageSetBox.SizeChanged += new System.EventHandler(this.imageSetBox_SizeChanged);
@@ -400,18 +400,18 @@
             // 
             this.vScrollBar.Dock = System.Windows.Forms.DockStyle.Right;
             this.vScrollBar.LargeChange = 20;
-            this.vScrollBar.Location = new System.Drawing.Point(827, 27);
+            this.vScrollBar.Location = new System.Drawing.Point(608, 29);
             this.vScrollBar.Name = "vScrollBar";
-            this.vScrollBar.Size = new System.Drawing.Size(21, 537);
+            this.vScrollBar.Size = new System.Drawing.Size(21, 370);
             this.vScrollBar.TabIndex = 1;
             this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
             // 
             // hScrollBar
             // 
             this.hScrollBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.hScrollBar.Location = new System.Drawing.Point(0, 564);
+            this.hScrollBar.Location = new System.Drawing.Point(0, 399);
             this.hScrollBar.Name = "hScrollBar";
-            this.hScrollBar.Size = new System.Drawing.Size(848, 21);
+            this.hScrollBar.Size = new System.Drawing.Size(629, 21);
             this.hScrollBar.TabIndex = 0;
             this.hScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar_Scroll);
             // 
@@ -432,7 +432,7 @@
             this.sizeToolStripTextBox});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(848, 27);
+            this.toolStrip.Size = new System.Drawing.Size(629, 29);
             this.toolStrip.TabIndex = 3;
             this.toolStrip.Text = "toolStrip1";
             // 
@@ -441,7 +441,7 @@
             this.toolStripMenuItem2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fitToolStripMenuItem});
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(51, 27);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(51, 29);
             this.toolStripMenuItem2.Text = "画布";
             // 
             // fitToolStripMenuItem
@@ -453,12 +453,12 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 29);
             // 
             // toolStripLabel1
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(39, 24);
+            this.toolStripLabel1.Size = new System.Drawing.Size(39, 26);
             this.toolStripLabel1.Text = "尺寸";
             // 
             // sizeSetToolStripComboBox
@@ -474,43 +474,43 @@
             "2048*2048",
             "4096*4096"});
             this.sizeSetToolStripComboBox.Name = "sizeSetToolStripComboBox";
-            this.sizeSetToolStripComboBox.Size = new System.Drawing.Size(121, 27);
+            this.sizeSetToolStripComboBox.Size = new System.Drawing.Size(121, 29);
             this.sizeSetToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.sizeSetToolStripComboBox_SelectedIndexChanged);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 29);
             // 
             // toolStripLabel2
             // 
             this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(54, 24);
+            this.toolStripLabel2.Size = new System.Drawing.Size(54, 26);
             this.toolStripLabel2.Text = "索引名";
             // 
             // nameToolStripTextBox
             // 
             this.nameToolStripTextBox.Name = "nameToolStripTextBox";
-            this.nameToolStripTextBox.Size = new System.Drawing.Size(150, 27);
+            this.nameToolStripTextBox.Size = new System.Drawing.Size(150, 29);
             this.nameToolStripTextBox.Leave += new System.EventHandler(this.nameToolStripTextBox_Leave);
             this.nameToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.nameToolStripTextBox_KeyUp);
             // 
             // toolStripLabel3
             // 
             this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(39, 24);
+            this.toolStripLabel3.Size = new System.Drawing.Size(39, 26);
             this.toolStripLabel3.Text = "位置";
             // 
             // rectToolStripTextBox
             // 
             this.rectToolStripTextBox.Name = "rectToolStripTextBox";
             this.rectToolStripTextBox.ReadOnly = true;
-            this.rectToolStripTextBox.Size = new System.Drawing.Size(100, 27);
+            this.rectToolStripTextBox.Size = new System.Drawing.Size(100, 29);
             // 
             // toolStripLabel4
             // 
             this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(39, 24);
+            this.toolStripLabel4.Size = new System.Drawing.Size(39, 26);
             this.toolStripLabel4.Text = "尺寸";
             // 
             // sizeToolStripTextBox
@@ -530,7 +530,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainer);
             this.Name = "ImagesetEditControl";
-            this.Size = new System.Drawing.Size(1049, 585);
+            this.Size = new System.Drawing.Size(779, 420);
             this.Load += new System.EventHandler(this.ImagesetEditControl_Load);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
