@@ -59,6 +59,7 @@
     <Compile Include="EditControl\ImagesetEditControl.Designer.cs">
       <DependentUpon>ImagesetEditControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Export.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

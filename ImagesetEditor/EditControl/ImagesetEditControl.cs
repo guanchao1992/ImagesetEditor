@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-namespace ImageSetEditor.EditControl
+namespace ImageSetEditor
 {
     public partial class ImagesetEditControl : UserControl, IDisposable, IRedraw
     {
@@ -35,16 +35,6 @@ namespace ImageSetEditor.EditControl
             SizeReverse = 3,
             Invert = 4,
         };
-
-        /// <summary>
-        /// 当前文档路径
-        /// </summary>
-        private string m_documentPath;
-
-        /// <summary>
-        /// 当前文档是否被修改
-        /// </summary>
-        private bool m_modify;
 
         /// <summary>
         /// 画布
@@ -101,21 +91,49 @@ namespace ImageSetEditor.EditControl
 
         #region Methods
 
-        public void Open(string fileName)
+        public void AddImage(string fileName)
         {
+            ListViewItem newItem = new ListViewItem();
+            SubImage newImage = new SubImage(fileName);
+            newImage.BindItem = newItem;
+            newItem.Tag = newImage;
+            newItem.Text = newImage.Name;
+            newImage.Position =
+                new Point(m_canvas.ViewPos.X, m_canvas.ViewPos.Y);
+            usedListView.Items.Add(newItem);
         }
 
-        public void Close()
+        public void AddImage(string fileName, string name, Point position, Size size)
         {
+            ListViewItem newItem = new ListViewItem();
+            SubImage newImage = new SubImage(fileName);
+
+            newImage.Name = name;
+            newImage.Position = position;
+            newImage.Size = size;
+
+            newImage.BindItem = newItem;
+            newItem.Tag = newImage;
+            newItem.Text = newImage.Name;
+            newImage.Position =
+                new Point(m_canvas.ViewPos.X, m_canvas.ViewPos.Y);
+            usedListView.Items.Add(newItem);
         }
 
-        public void Save(string fileName)
+        public void Export(IImagesetExport saver)
         {
+            saver.OnExportBegin();
+
+            foreach (ListViewItem item in usedListView.Items)
+            {
+                saver.OnExportImage((SubImage)item.Tag);
+            }
+
+            OutputBigImage(saver.OnExportEnd());
         }
 
-        public string GetCurrentName()
+        private void OutputBigImage(string filePath)
         {
-            return "";
         }
 
         private void imageSetBoxUpdate()
@@ -138,28 +156,25 @@ namespace ImageSetEditor.EditControl
             if (select == null)
             {
                 nameToolStripTextBox.Text = "不可用";
-                rectToolStripTextBox.Text = "不可用";
+                posToolStripTextBox.Text = "不可用";
                 sizeToolStripTextBox.Text = "不可用";
                 nameToolStripTextBox.ReadOnly = true;
+                posToolStripTextBox.ReadOnly = true;
             }
             else
             {
                 nameToolStripTextBox.Text = select.Name;
-                rectToolStripTextBox.Text =
+                posToolStripTextBox.Text =
                     String.Format("{0},{1}", select.Position.X, select.Position.Y);
                 sizeToolStripTextBox.Text =
                     String.Format("{0},{1}", select.Size.Width, select.Size.Height);
                 nameToolStripTextBox.ReadOnly = false;
+                posToolStripTextBox.ReadOnly = false;
             }
 
             m_select = select;
 
             m_dockAid.SetImage(select);
-        }
-
-        public void SetCursor(Cursor cursor)
-        {
-            imageSetBox.Cursor = cursor;
         }
 
         /// <summary>
@@ -419,6 +434,18 @@ namespace ImageSetEditor.EditControl
                         {
                             m_MouseStatus = MouseStatus.Normal;
 
+                            /// 拖动的矩形区域
+                            Rectangle selectArea = GetRectangleArea(
+                                m_beginMousePos,
+                                m_curMousePos,
+                                m_canvas.ViewPos);
+
+                            /// 当拖动一个很小的矩形区域时，视为点击了一下
+                            if (selectArea.Width <= 5 && selectArea.Height <= 5)
+                            {
+                                m_beginMousePos = m_curMousePos;
+                            }
+
                             if (m_beginMousePos == m_curMousePos)
                             {
                                 /// 光标位置不变点击一次则只选取最顶层的图片
@@ -426,11 +453,6 @@ namespace ImageSetEditor.EditControl
                             }
                             else
                             {
-                                /// 拖动一个矩形区域
-                                Rectangle selectArea = GetRectangleArea(
-                                    m_beginMousePos,
-                                    m_curMousePos,
-                                    m_canvas.ViewPos);
 
                                 foreach (ListViewItem item in usedListView.Items)
                                 {
@@ -459,8 +481,8 @@ namespace ImageSetEditor.EditControl
                     default:
                         if (m_dockAid.InArrowButton(e.X, e.Y) && m_dockAid.OnClick(e.X, e.Y))
                         {
+                            SetSelect(m_select);
                             imageSetBoxUpdate();
-                            m_dockAid.SetImage(m_select);
                         }
                         break;
                 }
@@ -540,15 +562,6 @@ namespace ImageSetEditor.EditControl
 
         private void imageSetBoxContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            /*
-            if (m_inSelects == false)
-            {
-                SelectTop();
-
-                imageSetBoxUpdate();
-            }
-            */
-
             /// 使菜单显示鼠标位置顶层十个图片名称
 
             int menuViewItem = 0;
@@ -607,11 +620,6 @@ namespace ImageSetEditor.EditControl
             m_listViewNodeLock = true;
 
             imageSetBoxUpdate();
-        }
-
-        private void imageSetBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-
         }
 
         private void imageSetBox_Paint(object sender, PaintEventArgs e)
@@ -693,14 +701,7 @@ namespace ImageSetEditor.EditControl
 
                 foreach (string file in openFileDialog.FileNames)
                 {
-                    ListViewItem newItem = new ListViewItem();
-                    SubImage newImage = new SubImage(file);
-                    newImage.BindItem = newItem;
-                    newItem.Tag = newImage;
-                    newItem.Text = newImage.Name;
-                    newImage.Position =
-                        new Point(m_canvas.ViewPos.X, m_canvas.ViewPos.Y);
-                    usedListView.Items.Add(newItem);
+                    AddImage(file);
                 }
 
                 imageCountUpdate();
@@ -787,6 +788,40 @@ namespace ImageSetEditor.EditControl
                 }
                 m_select.Name = nameToolStripTextBox.Text;
                 m_select.BindItem.Text = m_select.Name;
+            }
+        }
+
+        private void posToolStripTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (posToolStripTextBox.Text.Length == 0)
+                {
+                    posToolStripTextBox.Text = posToolStripTextBox.Text =
+                    String.Format("{0},{1}", m_select.Position.X, m_select.Position.Y); ;
+                    return;
+                }
+
+                string[] strArray = posToolStripTextBox.Text.Split(',');
+
+                try
+                {
+                    if (strArray.Count() != 2)
+                    {
+                        throw new SystemException("无效的参数");
+                    }
+
+                    m_select.Position =
+                        new Point(int.Parse(strArray[0]), int.Parse(strArray[1]));
+
+                    imageSetBoxUpdate();
+                }
+                catch (SystemException exc)
+                {
+                    MessageBox.Show(exc.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    posToolStripTextBox.Text = 
+                        String.Format("{0},{1}", m_select.Position.X, m_select.Position.Y); ;
+                }
             }
         }
 
@@ -928,11 +963,30 @@ namespace ImageSetEditor.EditControl
         #endregion Constructors
     }
 
+    public interface IImage
+    {
+        Point Position { get; }
+
+        Size Size { get; }
+
+        string FilePath { get; }
+
+        string Name { get; }
+    }
+
+    public interface IImagesetExport
+    {
+        void OnExportBegin();
+
+        void OnExportImage(IImage image);
+
+        string OnExportEnd();
+    }
+
     internal interface IRedraw
     {
         void Redraw();
     }
-
 
     /// <summary>
     /// 画布对象
@@ -945,11 +999,6 @@ namespace ImageSetEditor.EditControl
         /// 画布位图绘图接口
         /// </summary>
         private Graphics m_viewGraph;
-
-        /// <summary>
-        /// 画布位图尺寸
-        /// </summary>
-        private Size m_canvasSize;
 
         /// <summary>
         /// 当前查看位置
@@ -1134,9 +1183,6 @@ namespace ImageSetEditor.EditControl
         #endregion Constructors
     };
 
-    /// <summary>
-    /// 停靠辅助
-    /// </summary>
     internal class DockAid
     {
         #region Fields
@@ -1434,12 +1480,6 @@ namespace ImageSetEditor.EditControl
             m_upperContactEdge.Clear();
             m_rightContactEdge.Clear();
             m_lowerContactEdge.Clear();
-
-            /*
-            m_leftContactEdge.Add(m_canvas.Size.Width);
-            m_upperContactEdge.Add(m_canvas.Size.Height);
-            m_rightContactEdge.Add(0);
-            m_lowerContactEdge.Add(0);*/
         }
 
         private void Contact(SubImage imageA, SubImage imageB)
@@ -1451,35 +1491,6 @@ namespace ImageSetEditor.EditControl
 
             if (imageA.Rectangle.IntersectsWith(imageB.Rectangle))
             {
-                /*
-                // 相交左上角的点则添加左和顶边
-                if (imageA.Rectangle.Contains(imageB.Position))
-                {
-                    m_leftContactEdge.Add(imageB.Position.X);
-                    m_upperContactEdge.Add(imageB.Position.Y);
-                }
-
-                // 相交右上角的点则添加右和顶边
-                if (imageA.Rectangle.Contains(imageB.Position.X + imageB.Size.Width, imageB.Position.Y))
-                {
-                    m_upperContactEdge.Add(imageB.Position.Y);
-                    m_rightContactEdge.Add(imageB.Position.X + imageB.Size.Width);
-                }
-
-                // 相交左下角的点则添加左和底边
-                if (imageA.Rectangle.Contains(imageB.Position.X, imageB.Position.Y + imageB.Size.Height))
-                {
-                    m_leftContactEdge.Add(imageB.Position.X);
-                    m_lowerContactEdge.Add(imageB.Position.Y + imageB.Size.Height);
-                }
-
-                // 相交右下角的点则添加右和底边
-                if (imageA.Rectangle.Contains(imageB.Position.X + imageB.Size.Width, imageB.Position.Y + imageB.Size.Height))
-                {
-                    m_rightContactEdge.Add(imageB.Position.X + imageB.Size.Width);
-                    m_lowerContactEdge.Add(imageB.Position.Y + imageB.Size.Height);
-                }
-                */
                 m_leftContactEdge.Add(imageB.Position.X);
                 m_upperContactEdge.Add(imageB.Position.Y);
                 m_rightContactEdge.Add(imageB.Position.X + imageB.Size.Width);
@@ -1496,9 +1507,6 @@ namespace ImageSetEditor.EditControl
         }
 
         #endregion Methods
-
-        #region Properties
-        #endregion Properties
 
         #region Constructors
 
@@ -1533,16 +1541,22 @@ namespace ImageSetEditor.EditControl
         #endregion Constructors
     };
 
-    internal class SubImage : IDisposable
+    internal class SubImage : IImage, IDisposable
     {
-
         #region Fields
 
         private Point m_position;
+
+        private Size m_size;
+
         private Bitmap m_image;
+
         private Rectangle m_rect;
+
         private string m_filePath;
+
         private string m_name;
+
         private ListViewItem m_bindItem;
 
         #endregion Fields
@@ -1600,7 +1614,8 @@ namespace ImageSetEditor.EditControl
 
         public Size Size
         {
-            get { return m_image.Size; }
+            get { return m_size; }
+            set { m_size = value; }
         }
 
         public Bitmap Image
@@ -1637,10 +1652,17 @@ namespace ImageSetEditor.EditControl
         public SubImage(string file)
         {
             m_position = new Point(0, 0);
+
             m_image = new Bitmap(file);
+
+            m_size = m_image.Size;
+
             m_filePath = file;
+
             m_name = m_filePath.Split('\\').Last().Split('.').First();
+
             m_bindItem = null;
+
             m_rect = new Rectangle(this.Position, this.Size);
         }
 
