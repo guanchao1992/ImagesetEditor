@@ -456,6 +456,13 @@ namespace ImageSetEditor.EditControl
                             imageSetBoxUpdate();
                         }
                         break;
+                    default:
+                        if (m_dockAid.InArrowButton(e.X, e.Y) && m_dockAid.OnClick(e.X, e.Y))
+                        {
+                            imageSetBoxUpdate();
+                            m_dockAid.SetImage(m_select);
+                        }
+                        break;
                 }
             }
         }
@@ -474,6 +481,11 @@ namespace ImageSetEditor.EditControl
                 }
                 else
                 {
+                    if (m_dockAid.InArrowButton(e.X, e.Y))
+                    {
+                        return;
+                    }
+
                     m_MouseStatus = MouseStatus.Select;
                     m_beginMousePos = e.Location;
                     m_curMousePos = e.Location;
@@ -494,6 +506,8 @@ namespace ImageSetEditor.EditControl
                 return;
             }
 
+            m_inSelects = false;
+
             if (m_dockAid.OnMouseMove(e.X, e.Y))
             {
                 imageSetBox.Cursor = Cursors.Hand;
@@ -501,8 +515,7 @@ namespace ImageSetEditor.EditControl
             }
 
             /// 鼠标移动到已经选择的图片里时变更光标
-
-            m_inSelects = false;
+            
 
             foreach (SubImage image in m_selects)
             {
@@ -1348,8 +1361,71 @@ namespace ImageSetEditor.EditControl
             return m_selectArrow != -1;
         }
 
-        public void OnClick(int x, int y)
+        public bool OnClick(int x, int y)
         {
+            bool handled = false;
+            switch (m_selectArrow)
+            {
+                case Direction_Upper:
+                    if (m_upperContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_select.Position.X, m_upperContactEdge.Last() - m_select.Size.Height);
+                        handled = true;
+                    }
+                    break;
+                case Direction_UpperLeft:
+                    if (m_upperContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_leftContactEdge.Last() - m_select.Size.Width, m_upperContactEdge.Last() - m_select.Size.Height);
+                        handled = true;
+                    }
+                    break;
+                case Direction_UpperRight:
+                    if (m_upperContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_rightContactEdge.First(), m_upperContactEdge.Last() - m_select.Size.Height);
+                        handled = true;
+                    }
+                    break;
+                case Direction_Lower:
+                    if (m_lowerContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_select.Position.X, m_lowerContactEdge.First());
+                        handled = true;
+                    }
+                    break;
+                case Direction_LowerLeft:
+                    if (m_lowerContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_leftContactEdge.Last() - m_select.Size.Width, m_lowerContactEdge.First());
+                        handled = true;
+                    }
+                    break;
+                case Direction_LowerRight:
+                    if (m_lowerContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_rightContactEdge.First(), m_lowerContactEdge.First());
+                        handled = true;
+                    }
+                    break;
+                case Direction_Left:
+                    if (m_leftContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_leftContactEdge.Last() - m_select.Size.Width, m_select.Position.Y);
+                        handled = true;
+                    }
+                    break;
+                case Direction_Right:
+                    if (m_rightContactEdge.Count > 0)
+                    {
+                        m_select.Position = new Point(m_rightContactEdge.First(), m_select.Position.Y);
+                        handled = true;
+                    }
+                    break;
+                default:
+                    break;
+            };
+            return handled;
         }
 
         private void ContactBegin()
