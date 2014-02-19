@@ -122,7 +122,7 @@ namespace ImageSetEditor
 
         public void Export(IImagesetExport saver)
         {
-            saver.OnExportBegin();
+            saver.OnExportBegin(m_canvas);
 
             foreach (ListViewItem item in usedListView.Items)
             {
@@ -965,6 +965,8 @@ namespace ImageSetEditor
 
     public interface IImage
     {
+        #region Properties
+
         Point Position { get; }
 
         Size Size { get; }
@@ -972,26 +974,45 @@ namespace ImageSetEditor
         string FilePath { get; }
 
         string Name { get; }
+
+        #endregion Properties
+    }
+
+    public interface ICanvas
+    {
+        #region Properties
+
+        Size Size { get; }
+
+        #endregion Properties
     }
 
     public interface IImagesetExport
     {
-        void OnExportBegin();
+        #region Methods
+
+        void OnExportBegin(ICanvas canvas);
 
         void OnExportImage(IImage image);
 
         string OnExportEnd();
+
+        #endregion Methods
     }
 
     internal interface IRedraw
     {
+        #region Methods
+
         void Redraw();
+
+        #endregion Methods
     }
 
     /// <summary>
     /// 画布对象
     /// </summary>
-    internal class Canvas
+    internal class Canvas : ICanvas
     {
         #region Fields
 

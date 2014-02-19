@@ -38,6 +38,7 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.mainMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,7 +50,7 @@
             this.mainMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.mainMenuStrip.Name = "mainMenuStrip";
             this.mainMenuStrip.Padding = new System.Windows.Forms.Padding(7, 3, 0, 3);
-            this.mainMenuStrip.Size = new System.Drawing.Size(875, 29);
+            this.mainMenuStrip.Size = new System.Drawing.Size(875, 30);
             this.mainMenuStrip.TabIndex = 0;
             this.mainMenuStrip.Text = "menuStrip1";
             // 
@@ -62,35 +63,36 @@
             this.toolStripMenuItem2,
             this.exportToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(51, 23);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(51, 24);
             this.fileToolStripMenuItem.Text = "文件";
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
-            this.openToolStripMenuItem.Text = "打开";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.openToolStripMenuItem.Text = "打开项目";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(105, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(172, 6);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
-            this.saveToolStripMenuItem.Text = "保存";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.saveToolStripMenuItem.Text = "保存项目";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(105, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(172, 6);
             // 
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.exportToolStripMenuItem.Text = "导出";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
@@ -99,7 +101,7 @@
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(51, 23);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(51, 24);
             this.helpToolStripMenuItem.Text = "帮助";
             // 
             // aboutToolStripMenuItem
@@ -112,6 +114,10 @@
             // exportFileDialog
             // 
             this.exportFileDialog.Filter = "纯文本文件(*.txt)|*.txt;|Xml文件(*.xml)|*.xml;";
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.Filter = "贴图集项目(*.imageset)|*.imageset;";
             // 
             // MainForm
             // 
@@ -144,6 +150,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog exportFileDialog;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
     }
 }
 

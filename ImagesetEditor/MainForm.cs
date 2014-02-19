@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace ImageSetEditor
 {
@@ -48,8 +47,18 @@ namespace ImageSetEditor
 
                 m_editControl.Export(export);
             }
+        }
 
-            
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog.FileName = "";
+
+            if (DialogResult.OK == saveFileDialog.ShowDialog())
+            {
+                IImagesetExport export = new ProjectExport(saveFileDialog.FileName);
+
+                m_editControl.Export(export);
+            }
         }
 
         #endregion Events
@@ -70,8 +79,6 @@ namespace ImageSetEditor
         }
 
         #endregion Constructors
-
-        
     }
 
     public class ExportType {
