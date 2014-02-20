@@ -68,8 +68,8 @@
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.hScrollBar = new System.Windows.Forms.HScrollBar();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.fitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rimViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.sizeSetToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
@@ -418,7 +418,7 @@
             // 
             this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem2,
+            this.viewToolStripMenuItem,
             this.toolStripSeparator1,
             this.toolStripLabel1,
             this.sizeSetToolStripComboBox,
@@ -435,19 +435,22 @@
             this.toolStrip.TabIndex = 3;
             this.toolStrip.Text = "toolStrip1";
             // 
-            // toolStripMenuItem2
+            // viewToolStripMenuItem
             // 
-            this.toolStripMenuItem2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fitToolStripMenuItem});
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(51, 27);
-            this.toolStripMenuItem2.Text = "画布";
+            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.rimViewToolStripMenuItem});
+            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(51, 27);
+            this.viewToolStripMenuItem.Text = "显示";
             // 
-            // fitToolStripMenuItem
+            // rimViewToolStripMenuItem
             // 
-            this.fitToolStripMenuItem.Name = "fitToolStripMenuItem";
-            this.fitToolStripMenuItem.Size = new System.Drawing.Size(138, 24);
-            this.fitToolStripMenuItem.Text = "自动贴合";
+            this.rimViewToolStripMenuItem.Checked = true;
+            this.rimViewToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.rimViewToolStripMenuItem.Name = "rimViewToolStripMenuItem";
+            this.rimViewToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
+            this.rimViewToolStripMenuItem.Text = "始终显示图片边框";
+            this.rimViewToolStripMenuItem.Click += new System.EventHandler(this.rimViewToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -457,8 +460,8 @@
             // toolStripLabel1
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(39, 24);
-            this.toolStripLabel1.Text = "尺寸";
+            this.toolStripLabel1.Size = new System.Drawing.Size(69, 24);
+            this.toolStripLabel1.Text = "画布尺寸";
             // 
             // sizeSetToolStripComboBox
             // 
@@ -558,14 +561,11 @@
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.ToolStripComboBox sizeSetToolStripComboBox;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ListView usedListView;
         private System.Windows.Forms.ToolStrip usedToolStrip;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem clearUsedToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem fitToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.ContextMenuStrip unsedImageContextMenuStrip;
@@ -604,5 +604,8 @@
         private System.Windows.Forms.ToolStripMenuItem imagename08ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem imagename09ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem imagename10ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rimViewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

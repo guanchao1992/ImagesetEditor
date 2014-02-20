@@ -94,30 +94,86 @@ namespace ImageSetEditor
         public void AddImage(string fileName)
         {
             ListViewItem newItem = new ListViewItem();
-            SubImage newImage = new SubImage(fileName);
+
+            Bitmap image = new Bitmap(fileName);
+
+            SubImage newImage = new SubImage(image);
+
+            newImage.FilePath = fileName;
+
             newImage.BindItem = newItem;
+
             newItem.Tag = newImage;
+
+            newImage.SetDefaultName();
+
             newItem.Text = newImage.Name;
+
             newImage.Position =
                 new Point(m_canvas.ViewPos.X, m_canvas.ViewPos.Y);
+
             usedListView.Items.Add(newItem);
+
+            ImageCountUpdate();
         }
 
-        public void AddImage(string fileName, string name, Point position, Size size)
+        public bool AddImage(string fileName, string name, Point position, Size size)
         {
+            bool result = true;
+
             ListViewItem newItem = new ListViewItem();
-            SubImage newImage = new SubImage(fileName);
+
+            Image image = null;
+
+            try
+            {
+                image = new Bitmap(fileName);
+            }
+            catch
+            {
+                image = CreateErrorImage(size);
+                result = false;
+            }
+
+            SubImage newImage = new SubImage(image);
+
+            newImage.FilePath = fileName;
 
             newImage.Name = name;
+
             newImage.Position = position;
+
             newImage.Size = size;
 
             newImage.BindItem = newItem;
+
             newItem.Tag = newImage;
+
             newItem.Text = newImage.Name;
-            newImage.Position =
-                new Point(m_canvas.ViewPos.X, m_canvas.ViewPos.Y);
+           
             usedListView.Items.Add(newItem);
+
+            ImageCountUpdate();
+
+            return result;
+        }
+
+        public void ClearImages()
+        {
+            SetSelect(null);
+
+            m_selects.Clear();
+
+            foreach (ListViewItem item in usedListView.Items)
+            {
+                ((SubImage)item.Tag).Dispose();
+                item.Tag = null;
+                item.Remove();
+            }
+
+            ImageCountUpdate();
+
+            ImageSetBoxUpdate();
         }
 
         public void Export(IImagesetExport saver)
@@ -136,17 +192,17 @@ namespace ImageSetEditor
         {
         }
 
-        private void imageSetBoxUpdate()
+        private void ImageSetBoxUpdate()
         {
             imageSetBox.Invalidate();
         }
 
         public void Redraw()
         {
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
         }
 
-        private void imageCountUpdate()
+        private void ImageCountUpdate()
         {
             imageCountToolStripLabel.Text = "共 " + usedListView.Items.Count.ToString() + " 个图片";
         }
@@ -156,25 +212,52 @@ namespace ImageSetEditor
             if (select == null)
             {
                 nameToolStripTextBox.Text = "不可用";
+
                 posToolStripTextBox.Text = "不可用";
+
                 sizeToolStripTextBox.Text = "不可用";
+
                 nameToolStripTextBox.ReadOnly = true;
+
                 posToolStripTextBox.ReadOnly = true;
             }
             else
             {
                 nameToolStripTextBox.Text = select.Name;
+
                 posToolStripTextBox.Text =
                     String.Format("{0},{1}", select.Position.X, select.Position.Y);
+
                 sizeToolStripTextBox.Text =
                     String.Format("{0},{1}", select.Size.Width, select.Size.Height);
+
                 nameToolStripTextBox.ReadOnly = false;
+
                 posToolStripTextBox.ReadOnly = false;
             }
 
             m_select = select;
 
             m_dockAid.SetImage(select);
+        }
+
+        private Image CreateErrorImage(Size size)
+        {
+            Bitmap image = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
+
+            Graphics graph = Graphics.FromImage(image);
+
+            Pen redPen = new Pen(Color.Red);
+
+            redPen.DashStyle = DashStyle.DashDot;
+
+            graph.DrawRectangle(redPen, 0, 0, size.Width - 1, size.Height - 1);
+
+            graph.DrawLine(redPen, 0, 0, size.Width - 1, size.Height - 1);
+
+            graph.DrawLine(redPen, size.Width - 1, 0, 0, size.Height - 1);
+
+            return image;
         }
 
         /// <summary>
@@ -312,7 +395,7 @@ namespace ImageSetEditor
                 image.BindItem = item;
             }
 
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
         }
 
         private void ClearSelects()
@@ -362,6 +445,18 @@ namespace ImageSetEditor
         #endregion Methods
 
         #region Properties
+
+        public int CanvasSizeIndex
+        {
+            get { return sizeSetToolStripComboBox.SelectedIndex; }
+            set { sizeSetToolStripComboBox.SelectedIndex = value; }
+        }
+
+        public int ImageCount
+        {
+            get { return usedListView.Items.Count; }
+        }
+
         #endregion Properties
 
         #region Events
@@ -427,7 +522,7 @@ namespace ImageSetEditor
                                 SetSelect(m_select);
                             }
 
-                            imageSetBoxUpdate();
+                            ImageSetBoxUpdate();
                         }
                         break;
                     case MouseStatus.Select:
@@ -475,14 +570,14 @@ namespace ImageSetEditor
                                 }
                             }
 
-                            imageSetBoxUpdate();
+                            ImageSetBoxUpdate();
                         }
                         break;
                     default:
                         if (m_dockAid.InArrowButton(e.X, e.Y) && m_dockAid.OnClick(e.X, e.Y))
                         {
                             SetSelect(m_select);
-                            imageSetBoxUpdate();
+                            ImageSetBoxUpdate();
                         }
                         break;
                 }
@@ -523,7 +618,7 @@ namespace ImageSetEditor
 
             if (m_MouseStatus != MouseStatus.Normal)
             {
-                imageSetBoxUpdate();
+                ImageSetBoxUpdate();
 
                 return;
             }
@@ -619,7 +714,7 @@ namespace ImageSetEditor
 
             m_listViewNodeLock = true;
 
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
         }
 
         private void imageSetBox_Paint(object sender, PaintEventArgs e)
@@ -635,7 +730,11 @@ namespace ImageSetEditor
                 }
 
                 SubImage image = (SubImage)item.Tag;
+
                 m_canvas.DrawImage(image);
+
+                if (rimViewToolStripMenuItem.Checked)
+                    m_canvas.DrawImageRim(image, m_canvas.RimPen);
             }
 
             if (m_MouseStatus == MouseStatus.Drag)
@@ -651,14 +750,14 @@ namespace ImageSetEditor
 
                 foreach (SubImage image in m_selects)
                 {
-                    m_canvas.DrawImageArea(image, offset);
+                    m_canvas.DrawImageArea(image, m_canvas.SelectPen, offset);
                 }
             }
             else
             {
                 foreach (SubImage image in m_selects)
                 {
-                    m_canvas.DrawImageArea(image);
+                    m_canvas.DrawImageArea(image, m_canvas.SelectPen);
                 }
             }
 
@@ -679,14 +778,14 @@ namespace ImageSetEditor
         {
             m_canvas.ViewPos = new Point(hScrollBar.Value, vScrollBar.Value);
 
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
         }
 
         private void hScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             m_canvas.ViewPos = new Point(hScrollBar.Value, vScrollBar.Value);
 
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
         }
 
         private void addImageMenuItem_Click(object sender, EventArgs e)
@@ -704,9 +803,7 @@ namespace ImageSetEditor
                     AddImage(file);
                 }
 
-                imageCountUpdate();
-
-                imageSetBoxUpdate();
+                ImageCountUpdate();
             }
         }
 
@@ -716,18 +813,8 @@ namespace ImageSetEditor
                 return;
             if (DialogResult.OK == MessageBox.Show("删除所有？", "删除", MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
             {
-                SetSelect(null);
-                foreach (ListViewItem item in usedListView.Items)
-                {
-                    ((SubImage)item.Tag).Dispose();
-                    item.Tag = null;
-                    item.Remove();
-                }
+                ClearImages();
             }
-
-            imageCountUpdate();
-
-            imageSetBoxUpdate();
         }
 
         private void delusedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -751,9 +838,9 @@ namespace ImageSetEditor
                 m_selects.Clear();
             }
 
-            imageCountUpdate();
+            ImageCountUpdate();
 
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
         }
 
         private void sizeSetToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -768,7 +855,7 @@ namespace ImageSetEditor
 
             imageSetBox_SizeChanged(null, null);
 
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
         }
 
         private void nameToolStripTextBox_Leave(object sender, EventArgs e)
@@ -814,7 +901,7 @@ namespace ImageSetEditor
                     m_select.Position =
                         new Point(int.Parse(strArray[0]), int.Parse(strArray[1]));
 
-                    imageSetBoxUpdate();
+                    ImageSetBoxUpdate();
                 }
                 catch (SystemException exc)
                 {
@@ -921,7 +1008,14 @@ namespace ImageSetEditor
                 m_selects.Add((SubImage)item.Tag);
             }
 
-            imageSetBoxUpdate();
+            ImageSetBoxUpdate();
+        }
+
+        private void rimViewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            rimViewToolStripMenuItem.Checked = !rimViewToolStripMenuItem.Checked;
+
+            ImageSetBoxUpdate();
         }
 
         #endregion Events
@@ -1036,13 +1130,15 @@ namespace ImageSetEditor
         /// </summary>
         private Size m_size;
 
-        private Pen m_dashedPen;
+        private Pen m_selectPen;
 
         private Pen m_blackPen;
 
         private Pen m_whitePen;
 
         private Pen m_greenPen;
+
+        private Pen m_rimPen;
 
         #endregion Fields
 
@@ -1071,7 +1167,7 @@ namespace ImageSetEditor
         public void End()
         {
             m_viewGraph.DrawRectangle(
-                m_dashedPen,
+                SelectPen,
                 -m_viewPosition.X,
                 -m_viewPosition.Y,
                 m_size.Width,
@@ -1100,7 +1196,17 @@ namespace ImageSetEditor
                 image.Size.Height);
         }
 
-        public void DrawImageArea(SubImage image)
+        public void DrawImageRim(SubImage image, Pen pen)
+        {
+            m_viewGraph.DrawRectangle(
+                pen,
+                image.Position.X - m_viewPosition.X,
+                image.Position.Y - m_viewPosition.Y,
+                image.Size.Width - 1,
+                image.Size.Height - 1);
+        }
+
+        public void DrawImageArea(SubImage image, Pen pen)
         {
             DrawSmallBox(image.Position.X, image.Position.Y);
             DrawSmallBox(image.Position.X + image.Size.Width, image.Position.Y);
@@ -1108,14 +1214,14 @@ namespace ImageSetEditor
             DrawSmallBox(image.Position.X, image.Position.Y + image.Size.Height);
 
             m_viewGraph.DrawRectangle(
-                m_dashedPen,
+                pen,
                 image.Position.X - m_viewPosition.X,
                 image.Position.Y - m_viewPosition.Y,
-                image.Size.Width,
-                image.Size.Height);
+                image.Size.Width - 1,
+                image.Size.Height - 1);
         }
 
-        public void DrawImageArea(SubImage image, Point offset)
+        public void DrawImageArea(SubImage image, Pen pen, Point offset)
         {
             Point p = new Point(image.Position.X + offset.X, image.Position.Y + offset.Y);
 
@@ -1125,17 +1231,17 @@ namespace ImageSetEditor
             DrawSmallBox(p.X, p.Y + image.Size.Height);
 
             m_viewGraph.DrawRectangle(
-                m_dashedPen,
+                pen,
                 p.X - m_viewPosition.X,
                 p.Y - m_viewPosition.Y,
-                image.Size.Width,
-                image.Size.Height);
+                image.Size.Width - 1,
+                image.Size.Height - 1);
         }
 
         public void DrawRectangle(Rectangle rect)
         {
             m_viewGraph.DrawRectangle(
-                m_dashedPen,
+                SelectPen,
                 rect.X - m_viewPosition.X,
                 rect.Y - m_viewPosition.Y,
                 rect.Width, rect.Height);
@@ -1180,6 +1286,16 @@ namespace ImageSetEditor
             set { m_size = value; }
         }
 
+        public Pen SelectPen
+        {
+            get { return m_selectPen; }
+        }
+
+        public Pen RimPen
+        {
+            get { return m_rimPen; }
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -1188,9 +1304,9 @@ namespace ImageSetEditor
         {
             m_viewGraph = null;
 
-            m_dashedPen = new Pen(Color.Gray);
+            m_selectPen = new Pen(Color.Gray);
 
-            m_dashedPen.DashStyle = DashStyle.DashDot;
+            //m_selectPen.DashStyle = DashStyle.DashDot;
 
             m_blackPen = new Pen(Color.Black);
 
@@ -1199,6 +1315,10 @@ namespace ImageSetEditor
             m_greenPen = new Pen(Color.Green);
 
             m_greenPen.DashStyle = DashStyle.DashDot;
+
+            m_rimPen = new Pen(Color.FromArgb(180, 180, 180));
+
+            m_rimPen.DashStyle = DashStyle.Dash;
         }
 
         #endregion Constructors
@@ -1570,7 +1690,7 @@ namespace ImageSetEditor
 
         private Size m_size;
 
-        private Bitmap m_image;
+        private Image m_image;
 
         private Rectangle m_rect;
 
@@ -1583,6 +1703,33 @@ namespace ImageSetEditor
         #endregion Fields
 
         #region Methods
+
+        public void SetDefaultName()
+        {
+            m_name = m_filePath.Split('\\').Last().Split('.').First();
+        }
+
+        public void SetImage(string file)
+        {
+            if (m_image != null)
+            {
+                m_image.Dispose();
+                m_image = null;
+            }
+
+            m_image = new Bitmap(file);
+        }
+
+        public void SetImage(Image image)
+        {
+            if (m_image != null)
+            {
+                m_image.Dispose();
+                m_image = null;
+            }
+
+            m_image = image;
+        }
 
         /// <summary>
         /// 检查是否与另一个对象相交
@@ -1639,7 +1786,7 @@ namespace ImageSetEditor
             set { m_size = value; }
         }
 
-        public Bitmap Image
+        public Image Image
         {
             get { return m_image; }
         }
@@ -1647,6 +1794,7 @@ namespace ImageSetEditor
         public string FilePath
         {
             get { return m_filePath; }
+            set { m_filePath = value; }
         }
 
         public string Name
@@ -1670,17 +1818,32 @@ namespace ImageSetEditor
 
         #region Constructors
 
-        public SubImage(string file)
+        public SubImage(string fileName)
         {
             m_position = new Point(0, 0);
 
-            m_image = new Bitmap(file);
+            m_image = new Bitmap(fileName);
 
             m_size = m_image.Size;
 
-            m_filePath = file;
+            m_filePath = "";
 
-            m_name = m_filePath.Split('\\').Last().Split('.').First();
+            SetDefaultName();
+
+            m_bindItem = null;
+
+            m_rect = new Rectangle(this.Position, this.Size);
+        }
+
+        public SubImage(Image image)
+        {
+            m_position = new Point(0, 0);
+
+            m_image = image;
+
+            m_size = m_image.Size;
+
+            m_filePath = "";
 
             m_bindItem = null;
 

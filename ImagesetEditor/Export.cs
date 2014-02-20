@@ -14,9 +14,13 @@ namespace ImageSetEditor
 
         private string m_fileName;
 
+        private string m_folder;
+
         private XmlDocument m_xml;
 
         private XmlNode m_root;
+
+        private MainForm m_form;
 
         #endregion Fields
 
@@ -25,7 +29,9 @@ namespace ImageSetEditor
         public void OnExportBegin(ICanvas canvas)
         {
             m_xml = new XmlDocument();
-            m_root = m_xml.CreateElement("Imageset");
+
+            m_root = m_xml.CreateElement("ImagesetProject");
+
             m_xml.AppendChild(m_root);
 
             XmlAttribute width = m_root.Attributes.Append(m_xml.CreateAttribute("Width"));
@@ -35,6 +41,18 @@ namespace ImageSetEditor
             XmlAttribute height = m_root.Attributes.Append(m_xml.CreateAttribute("Height"));
 
             height.Value = canvas.Size.Height.ToString();
+
+            XmlAttribute sizeIndex = m_root.Attributes.Append(m_xml.CreateAttribute("SizeIndex"));
+
+            sizeIndex.Value = m_form.EditControl.CanvasSizeIndex.ToString();
+
+            XmlAttribute lastExportFile = m_root.Attributes.Append(m_xml.CreateAttribute("LastExportFile"));
+
+            lastExportFile.Value = m_form.LastExportFile;
+
+            XmlAttribute lastExportFilterIndex = m_root.Attributes.Append(m_xml.CreateAttribute("LastExportFilterIndex"));
+
+            lastExportFilterIndex.Value = m_form.LastExportFilterIndex.ToString();
         }
 
         public void OnExportImage(IImage image)
@@ -60,10 +78,19 @@ namespace ImageSetEditor
             XmlAttribute height = imageNode.Attributes.Append(m_xml.CreateAttribute("Height"));
 
             height.Value = image.Size.Height.ToString();
+
+            XmlAttribute source = imageNode.Attributes.Append(m_xml.CreateAttribute("Source"));
+
+            source.Value = image.FilePath.Replace(m_folder, "$(ProjectDir)");
         }
 
         public string OnExportEnd()
         {
+            if (File.Exists(m_fileName))
+            {
+                File.Delete(m_fileName);
+            }
+
             FileStream file = new FileStream(m_fileName, FileMode.OpenOrCreate);
 
             StreamWriter sw = new StreamWriter(file);
@@ -77,13 +104,36 @@ namespace ImageSetEditor
             return null;
         }
 
+        public static string GetFolder(string fileName)
+        {
+            string folder = "";
+
+            List<string> path = new List<string>(fileName.Split('\\'));
+
+            if (path.Count() > 2)
+            {
+                path.RemoveAt(path.Count() - 1);
+            }
+
+            foreach (string s in path)
+            {
+                folder = folder + s + "\\";
+            }
+
+            return folder;
+        }
+
         #endregion Methods
 
         #region Constructors
 
-        public ProjectExport(string fileName)
+        public ProjectExport(string fileName, MainForm form)
         {
             m_fileName = fileName;
+
+            m_form = form;
+
+            m_folder = GetFolder(fileName);
         }
 
         #endregion Constructors
@@ -105,6 +155,11 @@ namespace ImageSetEditor
 
         public void OnExportBegin(ICanvas canvas)
         {
+            if (File.Exists(m_fileName))
+            {
+                File.Delete(m_fileName);
+            }
+
             m_file = new FileStream(m_fileName, FileMode.OpenOrCreate);
             m_sw = new StreamWriter(m_file);
         }
@@ -187,6 +242,11 @@ namespace ImageSetEditor
 
         public string OnExportEnd()
         {
+            if (File.Exists(m_fileName))
+            {
+                File.Delete(m_fileName);
+            }
+
             FileStream file = new FileStream(m_fileName, FileMode.OpenOrCreate);
 
             StreamWriter sw = new StreamWriter(file);
