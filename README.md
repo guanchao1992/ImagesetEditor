@@ -5,7 +5,7 @@ ImagesetEditor
 
 Imageset 编辑器
 
-使用它来快速编辑 imageset，以及自定义文本格式导出。
+使用它来快速创建&编辑 imageset，以及自定义文本格式导出。
 
 ![preview](http://www.frimin.com/imageset.jpg "preview")
 
