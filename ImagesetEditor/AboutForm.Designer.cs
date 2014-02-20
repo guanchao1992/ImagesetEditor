@@ -38,9 +38,10 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(166, 100);
+            this.label1.Size = new System.Drawing.Size(312, 140);
             this.label1.TabIndex = 0;
-            this.label1.Text = "ImageSetEditor\r\n\r\n版本 0.1.0\r\n作者 frimin\r\n邮箱 frimin@msn.com";
+            this.label1.Text = "ImagesetEditor\r\n\r\n版本 0.1.0\r\n作者 frimin\r\n邮箱 buzichang@vip.qq.com\r\n\r\nhttps://github." +
+    "com/frimin/ImagesetEditor";
             // 
             // okButton
             // 

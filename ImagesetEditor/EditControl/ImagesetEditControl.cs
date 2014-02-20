@@ -185,11 +185,36 @@ namespace ImageSetEditor
                 saver.OnExportImage((SubImage)item.Tag);
             }
 
-            OutputBigImage(saver.OnExportEnd());
+            ExportImage(saver.OnExportEnd());
         }
 
-        private void OutputBigImage(string filePath)
+        private void ExportImage(string filePath)
         {
+            if (filePath == null || filePath == "")
+                return;
+
+            Bitmap outputImage = new Bitmap(
+                m_canvas.Size.Width, 
+                m_canvas.Size.Height, 
+                PixelFormat.Format32bppArgb);
+
+            Graphics outputGraph = Graphics.FromImage(outputImage);
+
+            outputGraph.CompositingQuality = CompositingQuality.HighQuality;
+            outputGraph.SmoothingMode = SmoothingMode.HighQuality;
+            outputGraph.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            outputGraph.Clear(Color.Transparent);
+
+            foreach (ListViewItem item in usedListView.Items)
+            {
+                SubImage image = (SubImage)item.Tag;
+                outputGraph.DrawImage(image.Image,
+                        new Rectangle(image.Position.X, image.Position.Y, image.Size.Width, image.Size.Height),
+                        new Rectangle(0, 0, image.Size.Width, image.Size.Height), 
+                        GraphicsUnit.Pixel);
+            }
+
+            outputImage.Save(filePath, outputImage.RawFormat);
         }
 
         private void ImageSetBoxUpdate()
@@ -474,6 +499,7 @@ namespace ImageSetEditor
             if (m_canvas.ViewSize.Height >= m_canvas.Size.Height)
             {
                 vScrollBar.Visible = false;
+                m_canvas.ViewPos = new Point(m_canvas.ViewPos.X, 0);
             }
             else
             {
@@ -485,6 +511,7 @@ namespace ImageSetEditor
             if (m_canvas.ViewSize.Width >= m_canvas.Size.Width)
             {
                 hScrollBar.Visible = false;
+                m_canvas.ViewPos = new Point(0, m_canvas.ViewPos.Y);
             }
             else
             {

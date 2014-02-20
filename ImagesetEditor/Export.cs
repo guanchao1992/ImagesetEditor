@@ -179,7 +179,7 @@ namespace ImageSetEditor
 
             m_file.Close();
 
-            return null;
+            return m_fileName.Split('.').First() + ".png";
         }
 
         #endregion Methods
@@ -257,7 +257,7 @@ namespace ImageSetEditor
 
             file.Close();
 
-            return null;
+            return m_fileName.Split('.').First() + ".png"; ;
         }
 
         #endregion Methods
