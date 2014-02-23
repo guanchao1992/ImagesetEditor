@@ -109,6 +109,9 @@ namespace ImageSetEditor
                 m_editControl.CanvasSizeIndex = 
                     int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("SizeIndex").Value);
 
+                m_editControl.RimView =
+                    xmlDoc.DocumentElement.Attributes.GetNamedItem("RimView").Value == "True";
+
                 exportFileDialog.InitialDirectory =
                     xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
 

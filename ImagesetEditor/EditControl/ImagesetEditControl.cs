@@ -95,7 +95,17 @@ namespace ImageSetEditor
         {
             ListViewItem newItem = new ListViewItem();
 
-            Bitmap image = new Bitmap(fileName);
+            Bitmap image = null;
+
+            try
+            {
+
+                image = new Bitmap(fileName);
+            }
+            catch
+            {
+                throw new SystemException(fileName + " 加载失败");
+            }
 
             SubImage newImage = new SubImage(image);
 
@@ -482,6 +492,12 @@ namespace ImageSetEditor
             get { return usedListView.Items.Count; }
         }
 
+        public bool RimView
+        {
+            get { return rimViewToolStripMenuItem.Checked; }
+            set { rimViewToolStripMenuItem.Checked = value; }
+        }
+
         #endregion Properties
 
         #region Events
@@ -796,6 +812,8 @@ namespace ImageSetEditor
                 m_canvas.DrawRectangle(selectArea);
             }
 
+            m_canvas.DrawRim();
+
             m_dockAid.Draw(m_canvas);
 
             m_canvas.End();
@@ -829,6 +847,8 @@ namespace ImageSetEditor
                 {
                     AddImage(file);
                 }
+
+                ImageSetBoxUpdate();
 
                 ImageCountUpdate();
             }
@@ -1189,16 +1209,22 @@ namespace ImageSetEditor
                 -m_viewPosition.Y,
                 m_size.Width,
                 m_size.Height);
+            
         }
 
-        public void End()
+        public void DrawRim()
         {
             m_viewGraph.DrawRectangle(
-                SelectPen,
+                m_rimPen,
                 -m_viewPosition.X,
                 -m_viewPosition.Y,
                 m_size.Width,
                 m_size.Height);
+        }
+
+        public void End()
+        {
+            
         }
 
         public void DrawImage(SubImage image, Point offset)
@@ -1256,7 +1282,7 @@ namespace ImageSetEditor
             DrawSmallBox(p.X + image.Size.Width, p.Y);
             DrawSmallBox(p.X + image.Size.Width, p.Y + image.Size.Height);
             DrawSmallBox(p.X, p.Y + image.Size.Height);
-
+            
             m_viewGraph.DrawRectangle(
                 pen,
                 p.X - m_viewPosition.X,
@@ -1341,7 +1367,7 @@ namespace ImageSetEditor
 
             m_greenPen = new Pen(Color.Green);
 
-            m_greenPen.DashStyle = DashStyle.DashDot;
+            //m_greenPen.DashStyle = DashStyle.DashDot;
 
             m_rimPen = new Pen(Color.FromArgb(180, 180, 180));
 
@@ -1652,7 +1678,7 @@ namespace ImageSetEditor
 
         private void Contact(SubImage imageA, SubImage imageB)
         {
-            if (imageA == imageB)
+            if (imageA == imageB || imageA == null || imageB == null)
             {
                 return;
             }
@@ -1668,6 +1694,15 @@ namespace ImageSetEditor
 
         private void ContactEnd()
         {
+            if (m_select.Position.X < 0)
+                m_rightContactEdge.Add(0);
+            if (m_select.Position.Y < 0)
+                m_lowerContactEdge.Add(0);
+            if (m_select.Position.X + m_select.Size.Width > m_canvas.Size.Width)
+                m_leftContactEdge.Add(m_canvas.Size.Width);
+            if (m_select.Position.Y + m_select.Size.Height > m_canvas.Size.Height)
+                m_upperContactEdge.Add(m_canvas.Size.Height);
+
             m_leftContactEdge.Sort();
             m_upperContactEdge.Sort();
             m_rightContactEdge.Sort();

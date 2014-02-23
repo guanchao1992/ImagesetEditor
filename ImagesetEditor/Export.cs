@@ -46,6 +46,14 @@ namespace ImageSetEditor
 
             sizeIndex.Value = m_form.EditControl.CanvasSizeIndex.ToString();
 
+            XmlAttribute rimView = m_root.Attributes.Append(m_xml.CreateAttribute("RimView"));
+
+            rimView.Value = m_form.EditControl.RimView.ToString();
+
+            XmlAttribute background = m_root.Attributes.Append(m_xml.CreateAttribute("Background"));
+
+            background.Value = m_form.EditControl.RimView.ToString();
+
             XmlAttribute lastExportFile = m_root.Attributes.Append(m_xml.CreateAttribute("LastExportFile"));
 
             lastExportFile.Value = m_form.LastExportFile;
