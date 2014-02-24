@@ -14,6 +14,11 @@ namespace ImageSetEditor
     {
         #region Events
 
+        private void AboutForm_Load(object sender, EventArgs e)
+        {
+            label1.Text = label1.Text.Replace("#VER#", MainForm.GetVersion());
+        }
+
         private void okButton_Click(object sender, EventArgs e)
         {
             Close();
@@ -33,6 +38,6 @@ namespace ImageSetEditor
             InitializeComponent();
         }
 
-        #endregion Constructors
+        #endregion Constructors 
     }
 }

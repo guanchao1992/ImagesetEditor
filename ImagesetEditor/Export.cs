@@ -34,6 +34,14 @@ namespace ImageSetEditor
 
             m_xml.AppendChild(m_root);
 
+            XmlAttribute projectVersion = m_root.Attributes.Append(m_xml.CreateAttribute("ProjectVersion"));
+
+            projectVersion.Value = MainForm.GetProjectVersion();
+
+            XmlAttribute version = m_root.Attributes.Append(m_xml.CreateAttribute("Version"));
+
+            version.Value = MainForm.GetVersion();
+
             XmlAttribute width = m_root.Attributes.Append(m_xml.CreateAttribute("Width"));
 
             width.Value = canvas.Size.Width.ToString();
@@ -42,17 +50,16 @@ namespace ImageSetEditor
 
             height.Value = canvas.Size.Height.ToString();
 
-            XmlAttribute sizeIndex = m_root.Attributes.Append(m_xml.CreateAttribute("SizeIndex"));
-
-            sizeIndex.Value = m_form.EditControl.CanvasSizeIndex.ToString();
-
             XmlAttribute rimView = m_root.Attributes.Append(m_xml.CreateAttribute("RimView"));
 
             rimView.Value = m_form.EditControl.RimView.ToString();
 
             XmlAttribute background = m_root.Attributes.Append(m_xml.CreateAttribute("Background"));
 
-            background.Value = m_form.EditControl.RimView.ToString();
+            background.Value = 
+                canvas.ColorWorkSpace.R.ToString() + "," +
+                canvas.ColorWorkSpace.G.ToString() + "," +
+                canvas.ColorWorkSpace.B.ToString();
 
             XmlAttribute lastExportFile = m_root.Attributes.Append(m_xml.CreateAttribute("LastExportFile"));
 

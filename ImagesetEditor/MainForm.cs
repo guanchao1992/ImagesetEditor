@@ -27,6 +27,16 @@ namespace ImageSetEditor
 
         #region Methods
 
+        public static string GetVersion()
+        {
+            return "0.1.2";
+        }
+
+        public static string GetProjectVersion()
+        {
+            return "0.2";
+        }
+
         private void ExportToFile(string fileName, int typeIndex)
         {
             IImagesetExport export = null;
@@ -96,67 +106,104 @@ namespace ImageSetEditor
 
             if (DialogResult.OK == openFileDialog.ShowDialog())
             {
-                m_editControl.ClearImages();
-
-                XmlDocument xmlDoc = new XmlDocument();
-
-                xmlDoc.Load(openFileDialog.FileName);
-
-                string projectDir = ProjectExport.GetFolder(openFileDialog.FileName);
-
-                List<string> loadFaild = new List<string>();
-
-                m_editControl.CanvasSizeIndex = 
-                    int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("SizeIndex").Value);
-
-                m_editControl.RimView =
-                    xmlDoc.DocumentElement.Attributes.GetNamedItem("RimView").Value == "True";
-
-                exportFileDialog.InitialDirectory =
-                    xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
-
-                m_lastExportFile =
-                    xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
-
-                m_lastExportFilterIndex =
-                    int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFilterIndex").Value);
-
-                foreach (XmlNode n in xmlDoc.DocumentElement)
+                try
                 {
-                    if (m_editControl.AddImage(
-                        n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir),
-                        n.Attributes.GetNamedItem("Name").Value,
-                        new Point(
-                            int.Parse(n.Attributes.GetNamedItem("XPos").Value),
-                            int.Parse(n.Attributes.GetNamedItem("YPos").Value)
-                            ),
-                        new Size(
-                            int.Parse(n.Attributes.GetNamedItem("Width").Value),
-                            int.Parse(n.Attributes.GetNamedItem("Height").Value)
-                            )
-                        ) == false)
-                    {
-                        loadFaild.Add(n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir));
-                    }
-                }
+                    XmlDocument xmlDoc = new XmlDocument();
 
-                if (loadFaild.Count != 0)
-                {
-                    string text = "一个或多个图片未能加载，将使用红色线框代替它们，他们可能被其他程序占用或者已经从原来的位置移除。";
+                    xmlDoc.Load(openFileDialog.FileName);
 
-                    foreach (string s in loadFaild)
+                    string projectVer = xmlDoc.DocumentElement.Attributes.GetNamedItem("ProjectVersion").Value;
+
+                    if (projectVer != GetProjectVersion())
                     {
-                        text = text + "\n\n" + s;
+                        if (DialogResult.Cancel ==
+                            MessageBox.Show("项目格式版本不匹配，是否继续尝试打开？\n\n" +
+                            "要打开的项目版本: " + projectVer + ", 由 " + xmlDoc.DocumentElement.Attributes.GetNamedItem("Version").Value + " 版本的编辑器创建。\n\n" +
+                            "当前的支持的项目版本: " + GetProjectVersion(), "打开项目", MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
+                        {
+                            return;
+                        }
                     }
 
-                    MessageBox.Show(text, "加载图片失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    m_editControl.ClearImages();
+
+                    string projectDir = ProjectExport.GetFolder(openFileDialog.FileName);
+
+                    List<string> loadFaild = new List<string>();
+
+                    m_editControl.CanvasSize = new Size(
+                        int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("Width").Value),
+                        int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("Height").Value)
+                        );
+
+                    string[] colorParams =
+                        xmlDoc.DocumentElement.Attributes.GetNamedItem("Background").Value.Split(',');
+
+                    if (colorParams.Count() == 3)
+                    {
+                        m_editControl.ColorWorkSpace = Color.FromArgb(
+                            int.Parse(colorParams[0]),
+                            int.Parse(colorParams[1]),
+                            int.Parse(colorParams[2]));
+                    }
+                    else
+                    {
+                        m_editControl.ColorWorkSpace = Color.White;
+                    }
+
+                    m_editControl.RimView =
+                        xmlDoc.DocumentElement.Attributes.GetNamedItem("RimView").Value == "True";
+
+                    exportFileDialog.InitialDirectory =
+                        xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
+
+                    m_lastExportFile =
+                        xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
+
+                    m_lastExportFilterIndex =
+                        int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFilterIndex").Value);
+
+                    foreach (XmlNode n in xmlDoc.DocumentElement)
+                    {
+                        if (m_editControl.AddImage(
+                            n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir),
+                            n.Attributes.GetNamedItem("Name").Value,
+                            new Point(
+                                int.Parse(n.Attributes.GetNamedItem("XPos").Value),
+                                int.Parse(n.Attributes.GetNamedItem("YPos").Value)
+                                ),
+                            new Size(
+                                int.Parse(n.Attributes.GetNamedItem("Width").Value),
+                                int.Parse(n.Attributes.GetNamedItem("Height").Value)
+                                )
+                            ) == false)
+                        {
+                            loadFaild.Add(n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir));
+                        }
+                    }
+
+                    if (loadFaild.Count != 0)
+                    {
+                        string text = "一个或多个图片未能加载，将使用红色线框代替它们，他们可能被其他程序占用或者已经从原来的位置移除。";
+
+                        foreach (string s in loadFaild)
+                        {
+                            text = text + "\n\n" + s;
+                        }
+
+                        MessageBox.Show(text, "加载图片失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
+                    m_editControl.Redraw();
+
+                    m_docPath = openFileDialog.FileName;
+
+                    toolStripStatusLabel.Text = "就绪";
                 }
-
-                m_editControl.Redraw();
-
-                m_docPath = openFileDialog.FileName;
-
-                toolStripStatusLabel.Text = "就绪";
+                catch
+                {
+                    MessageBox.Show("项目 " + openFileDialog.FileName + " 加载失败", "打开项目", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -276,7 +323,7 @@ namespace ImageSetEditor
         public MainForm()
         {
             InitializeComponent();
-
+            
             m_editControl = new ImagesetEditControl();
 
             m_editControl.Dock = DockStyle.Fill;

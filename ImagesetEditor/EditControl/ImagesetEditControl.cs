@@ -78,14 +78,21 @@ namespace ImageSetEditor
         private bool m_listViewNodeLock;
 
         /// <summary>
-        /// 菜单中显示图片名称的项
-        /// </summary>
-        private List<ToolStripMenuItem> m_menuImageViewItem;
-
-        /// <summary>
         /// 停靠辅助
         /// </summary>
         private DockAid m_dockAid;
+
+        /// <summary>
+        /// 对齐预览线段
+        /// </summary>
+        private Point m_alignmentPreviewLineBegin;
+
+        private Point m_alignmentPreviewLineEnd;
+
+        /// <summary>
+        /// 用于排序对齐边的列表
+        /// </summary>
+        private List<int> m_alignmentArray;
 
         #endregion Fields
 
@@ -481,10 +488,15 @@ namespace ImageSetEditor
 
         #region Properties
 
-        public int CanvasSizeIndex
+        public Size CanvasSize
         {
-            get { return sizeSetToolStripComboBox.SelectedIndex; }
-            set { sizeSetToolStripComboBox.SelectedIndex = value; }
+            get { return m_canvas.Size; }
+            set
+            {
+                sizeSetToolStripComboBox.Text =
+                  value.Width.ToString() + "*" + value.Height.ToString();
+                sizeSetToolStripComboBox_SelectedIndexChanged(null, null);
+            }
         }
 
         public int ImageCount
@@ -496,6 +508,17 @@ namespace ImageSetEditor
         {
             get { return rimViewToolStripMenuItem.Checked; }
             set { rimViewToolStripMenuItem.Checked = value; }
+        }
+
+        public Color ColorWorkSpace
+        {
+            get { return m_canvas.ColorWorkSpace; }
+            set { 
+                m_canvas.ColorWorkSpace = value;
+                colorWorkspaceToolStripMenuItem.BackColor = value;
+                colorDialog.Color = value;
+                ImageSetBoxUpdate();
+            }
         }
 
         #endregion Properties
@@ -698,47 +721,6 @@ namespace ImageSetEditor
             }
         }
 
-        private void imageSetBoxContextMenuStrip_Opening(object sender, CancelEventArgs e)
-        {
-            /// 使菜单显示鼠标位置顶层十个图片名称
-
-            int menuViewItem = 0;
-
-            for (int i = usedListView.Items.Count - 1; i >= 0; --i)
-            {
-                SubImage image = (SubImage)usedListView.Items[i].Tag;
-
-                if (image.Rectangle.Contains(m_curMousePos.X + m_canvas.ViewPos.X, m_curMousePos.Y + m_canvas.ViewPos.Y))
-                {
-                    m_menuImageViewItem[menuViewItem].Text = (menuViewItem + 1).ToString() + ")  " + image.Name;
-                    m_menuImageViewItem[menuViewItem].Tag = image;
-                    m_menuImageViewItem[menuViewItem].Visible = true;
-                    m_menuImageViewItem[menuViewItem].Enabled = true;
-
-                    menuViewItem++;
-
-                    if (menuViewItem == m_menuImageViewItem.Count)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            for (; menuViewItem != m_menuImageViewItem.Count; ++menuViewItem)
-            {
-                m_menuImageViewItem[menuViewItem].Text = "";
-                m_menuImageViewItem[menuViewItem].Visible = false;
-                m_menuImageViewItem[menuViewItem].Tag = null;
-            }
-
-            if (m_menuImageViewItem[0].Tag == null)
-            {
-                m_menuImageViewItem[0].Text = "未选中图片";
-                m_menuImageViewItem[0].Visible = true;
-                m_menuImageViewItem[0].Enabled = false;
-            }
-        }
-
         private void imagenameToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ClearSelects();
@@ -813,6 +795,15 @@ namespace ImageSetEditor
             }
 
             m_canvas.DrawRim();
+
+            if (m_alignmentPreviewLineBegin != m_alignmentPreviewLineEnd)
+            {
+                m_canvas.DrawDockLine(
+                    m_alignmentPreviewLineBegin.X,
+                    m_alignmentPreviewLineBegin.Y,
+                    m_alignmentPreviewLineEnd.X,
+                    m_alignmentPreviewLineEnd.Y);
+            }
 
             m_dockAid.Draw(m_canvas);
 
@@ -890,11 +881,29 @@ namespace ImageSetEditor
             ImageSetBoxUpdate();
         }
 
+        private void sizeSetToolStripComboBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                sizeSetToolStripComboBox_SelectedIndexChanged(sender, e);
+            }
+        }
+
         private void sizeSetToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = int.Parse(((ToolStripComboBox)sender).Text.Split('*')[0]);
+            try
+            {
+                string[] sizeParam = sizeSetToolStripComboBox.Text.Split('*');
 
-            m_canvas.Size = new Size(n, n);
+                m_canvas.Size = new Size(int.Parse(sizeParam[0]), int.Parse(sizeParam[1]));
+            }
+            catch
+            {
+                MessageBox.Show("无效的文本格式", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                sizeSetToolStripComboBox.Text = 
+                    m_canvas.Size.Width.ToString() + "*" + m_canvas.Size.Height.ToString();
+                return;
+            }
 
             m_canvas.ViewPos = new Point(0, 0);
             hScrollBar.Value = 0;
@@ -1065,6 +1074,288 @@ namespace ImageSetEditor
             ImageSetBoxUpdate();
         }
 
+        private void imageSetBoxContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            alignmentToolStripMenuItem.Enabled = (m_selects.Count > 1);
+        }
+
+        private void imageSetBoxContextMenuStrip_Closing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+            m_alignmentPreviewLineEnd = m_alignmentPreviewLineBegin;
+        }
+
+        private void leftOutsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.X);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(m_alignmentArray.First(), 0);
+
+            m_alignmentPreviewLineEnd = new Point(m_alignmentArray.First(), m_canvas.Size.Height);
+
+            leftOutsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.First();
+
+            ImageSetBoxUpdate();
+        }
+
+        private void leftOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    (int)leftOutsideAlignmentToolStripMenuItem.Tag, image.Position.Y);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void leftInsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.X);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(m_alignmentArray.Last(), 0);
+
+            m_alignmentPreviewLineEnd = new Point(m_alignmentArray.Last(), m_canvas.Size.Height);
+
+            leftInsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.Last();
+
+            ImageSetBoxUpdate();
+        }
+
+        private void leftInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    (int)leftInsideAlignmentToolStripMenuItem.Tag, image.Position.Y);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void rightOutsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.X + image.Size.Width);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(m_alignmentArray.Last(), 0);
+
+            m_alignmentPreviewLineEnd = new Point(m_alignmentArray.Last(), m_canvas.Size.Height);
+
+            rightOutsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.Last();
+
+            ImageSetBoxUpdate();
+        }
+
+        private void rightOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    (int)rightOutsideAlignmentToolStripMenuItem.Tag - image.Size.Width, image.Position.Y);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void rightInsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.X + image.Size.Width);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(m_alignmentArray.First(), 0);
+
+            m_alignmentPreviewLineEnd = new Point(m_alignmentArray.First(), m_canvas.Size.Height);
+
+            rightInsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.First();
+
+            ImageSetBoxUpdate();
+        }
+
+        private void rightInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    (int)rightInsideAlignmentToolStripMenuItem.Tag - image.Size.Width, image.Position.Y);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void topOutsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.Y);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(0, m_alignmentArray.First());
+
+            m_alignmentPreviewLineEnd = new Point(m_canvas.Size.Width, m_alignmentArray.First());
+
+            topOutsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.First();
+
+            ImageSetBoxUpdate();
+        }
+        
+        private void topOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    image.Position.X, (int)topOutsideAlignmentToolStripMenuItem.Tag);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void topInsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.Y);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(0, m_alignmentArray.Last());
+
+            m_alignmentPreviewLineEnd = new Point(m_canvas.Size.Width, m_alignmentArray.Last());
+
+            topInsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.Last();
+
+            ImageSetBoxUpdate();
+        }
+
+        private void topInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    image.Position.X, (int)topInsideAlignmentToolStripMenuItem.Tag);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void bottomOutsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.Y + image.Size.Height);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(0, m_alignmentArray.Last());
+
+            m_alignmentPreviewLineEnd = new Point(m_canvas.Size.Width, m_alignmentArray.Last());
+
+            bottomOutsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.Last();
+
+            ImageSetBoxUpdate();
+        }
+
+        private void bottomOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    image.Position.X, (int)bottomOutsideAlignmentToolStripMenuItem.Tag - image.Size.Height);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void bottomInsideAlignmentToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_alignmentArray.Clear();
+
+            foreach (SubImage image in m_selects)
+            {
+                m_alignmentArray.Add(image.Position.Y + image.Size.Height);
+            }
+
+            m_alignmentArray.Sort();
+
+            m_alignmentPreviewLineBegin = new Point(0, m_alignmentArray.First());
+
+            m_alignmentPreviewLineEnd = new Point(m_canvas.Size.Width, m_alignmentArray.First());
+
+            bottomInsideAlignmentToolStripMenuItem.Tag = m_alignmentArray.First();
+
+            ImageSetBoxUpdate();
+        }
+
+        private void bottomInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (SubImage image in m_selects)
+            {
+                image.Position = new Point(
+                    image.Position.X, (int)bottomInsideAlignmentToolStripMenuItem.Tag - image.Size.Height);
+            }
+
+            ImageSetBoxUpdate();
+        }
+
+        private void colorWorkspaceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (DialogResult.OK == this.colorDialog.ShowDialog())
+            {
+                colorWorkspaceToolStripMenuItem.BackColor = colorDialog.Color;
+
+                m_canvas.ColorWorkSpace = colorDialog.Color;
+
+                ImageSetBoxUpdate();
+            }
+        }
+
+        private void colorWorkspaceToolStripMenuItem_BackColorChanged(object sender, EventArgs e)
+        {
+            if (colorWorkspaceToolStripMenuItem.BackColor.GetBrightness() * 240 < 90)
+            {
+                colorWorkspaceToolStripMenuItem.ForeColor = Color.White;
+            }
+            else
+            {
+                colorWorkspaceToolStripMenuItem.ForeColor = Color.Black;
+            }
+        }
+
         #endregion Events
 
         #region Constructors
@@ -1075,7 +1366,7 @@ namespace ImageSetEditor
 
             m_selects = new List<SubImage>();
 
-            m_menuImageViewItem = new List<ToolStripMenuItem>();
+            m_alignmentArray = new List<int>();
 
             m_MouseStatus = MouseStatus.Normal;
 
@@ -1083,25 +1374,12 @@ namespace ImageSetEditor
 
             m_dockAid = new DockAid(usedListView.Items, m_canvas, this);
 
-            m_menuImageViewItem.AddRange(new System.Windows.Forms.ToolStripMenuItem[] {
-                imagename01ToolStripMenuItem,
-                imagename02ToolStripMenuItem,
-                imagename03ToolStripMenuItem,
-                imagename04ToolStripMenuItem,
-                imagename05ToolStripMenuItem,
-                imagename06ToolStripMenuItem,
-                imagename07ToolStripMenuItem,
-                imagename08ToolStripMenuItem,
-                imagename09ToolStripMenuItem,
-                imagename10ToolStripMenuItem,
-            });
-
             SetSelect(null);
 
             sizeSetToolStripComboBox.SelectedIndex = 3;
         }
 
-        #endregion Constructors
+        #endregion Constructors     
     }
 
     public interface IImage
@@ -1124,6 +1402,8 @@ namespace ImageSetEditor
         #region Properties
 
         Size Size { get; }
+
+        Color ColorWorkSpace { get; }
 
         #endregion Properties
     }
@@ -1181,7 +1461,7 @@ namespace ImageSetEditor
 
         private Pen m_blackPen;
 
-        private Pen m_whitePen;
+        private Pen m_workSpacePen;
 
         private Pen m_greenPen;
 
@@ -1204,12 +1484,11 @@ namespace ImageSetEditor
         {
             m_viewGraph = viewGraph;
             m_viewGraph.FillRectangle(
-                m_whitePen.Brush,
+                m_workSpacePen.Brush,
                 -m_viewPosition.X,
                 -m_viewPosition.Y,
                 m_size.Width,
                 m_size.Height);
-            
         }
 
         public void DrawRim()
@@ -1321,6 +1600,12 @@ namespace ImageSetEditor
             get { return m_viewGraph; }
         }
 
+        public Color ColorWorkSpace
+        {
+            get { return m_workSpacePen.Color; }
+            set { m_workSpacePen.Color = value; }
+        }
+
         public Point ViewPos
         {
             get { return m_viewPosition; }
@@ -1349,6 +1634,11 @@ namespace ImageSetEditor
             get { return m_rimPen; }
         }
 
+        public Pen GreenPen
+        {
+            get { return m_greenPen; }
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -1363,7 +1653,7 @@ namespace ImageSetEditor
 
             m_blackPen = new Pen(Color.Black);
 
-            m_whitePen = new Pen(Color.White);
+            m_workSpacePen = new Pen(Color.White);
 
             m_greenPen = new Pen(Color.Green);
 
@@ -1401,7 +1691,7 @@ namespace ImageSetEditor
 
         private int m_selectArrow;
 
-        private SubImage[] m_arrow;
+        private Arrow[] m_arrow;
 
         private SubImage m_select;
 
@@ -1476,28 +1766,30 @@ namespace ImageSetEditor
             m_arrow[Direction_Right].Position
                 = new Point(m_select.Position.X + m_select.Size.Width - m_arrow[Direction_Right].Size.Width / 2, m_select.Position.Y + m_select.Size.Height / 2 - m_arrow[Direction_Right].Size.Height / 2);
 
-            if (m_upperContactEdge.Count > 0)
+            if (m_arrow[Direction_Upper].Visible = (m_upperContactEdge.Count > 0))
+            {
                 canvas.DrawImage(m_arrow[Direction_Upper]);
+            }
 
-            if (m_upperContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+            if (m_arrow[Direction_UpperLeft].Visible = (m_upperContactEdge.Count > 0 && m_leftContactEdge.Count > 0))
                 canvas.DrawImage(m_arrow[Direction_UpperLeft]);
 
-            if (m_upperContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+            if (m_arrow[Direction_UpperRight].Visible = (m_upperContactEdge.Count > 0 && m_rightContactEdge.Count > 0))
                 canvas.DrawImage(m_arrow[Direction_UpperRight]);
 
-            if (m_lowerContactEdge.Count > 0)
+            if (m_arrow[Direction_Lower].Visible = (m_lowerContactEdge.Count > 0))
                 canvas.DrawImage(m_arrow[Direction_Lower]);
 
-            if (m_lowerContactEdge.Count > 0 && m_leftContactEdge.Count > 0)
+            if (m_arrow[Direction_LowerLeft].Visible = (m_lowerContactEdge.Count > 0 && m_leftContactEdge.Count > 0))
                 canvas.DrawImage(m_arrow[Direction_LowerLeft]);
 
-            if (m_lowerContactEdge.Count > 0 && m_rightContactEdge.Count > 0)
+            if (m_arrow[Direction_LowerRight].Visible = (m_lowerContactEdge.Count > 0 && m_rightContactEdge.Count > 0))
                 canvas.DrawImage(m_arrow[Direction_LowerRight]);
 
-            if (m_leftContactEdge.Count > 0)
+            if (m_arrow[Direction_Left].Visible = (m_leftContactEdge.Count > 0))
                 canvas.DrawImage(m_arrow[Direction_Left]);
 
-            if (m_rightContactEdge.Count > 0)
+            if (m_arrow[Direction_Right].Visible = (m_rightContactEdge.Count > 0))
                 canvas.DrawImage(m_arrow[Direction_Right]);
 
             switch (m_selectArrow)
@@ -1586,6 +1878,8 @@ namespace ImageSetEditor
 
             for (int i = 0; i != m_arrow.Count(); ++i)
             {
+                if (m_arrow[i].Visible == false)
+                    continue;
                 if (m_arrow[i].Rectangle.Contains(x + m_canvas.ViewPos.X, y + m_canvas.ViewPos.Y))
                 {
                     m_selectArrow = i;
@@ -1715,15 +2009,15 @@ namespace ImageSetEditor
 
         public DockAid(ListView.ListViewItemCollection items, Canvas canvas, IRedraw redraw)
         {
-            m_arrow = new SubImage[] {
-                new SubImage(@"icons\arrow_upper.png"),
-                new SubImage(@"icons\arrow_upper_left.png"),
-                new SubImage(@"icons\arrow_upper_right.png"),
-                new SubImage(@"icons\arrow_lower.png"),
-                new SubImage(@"icons\arrow_lower_left.png"),
-                new SubImage(@"icons\arrow_lower_right.png"),
-                new SubImage(@"icons\arrow_left.png"),
-                new SubImage(@"icons\arrow_right.png"),
+            m_arrow = new Arrow[] {
+                new Arrow(@"icons\arrow_upper.png"),
+                new Arrow(@"icons\arrow_upper_left.png"),
+                new Arrow(@"icons\arrow_upper_right.png"),
+                new Arrow(@"icons\arrow_lower.png"),
+                new Arrow(@"icons\arrow_lower_left.png"),
+                new Arrow(@"icons\arrow_lower_right.png"),
+                new Arrow(@"icons\arrow_left.png"),
+                new Arrow(@"icons\arrow_right.png"),
             };
 
             m_items = items;
@@ -1914,4 +2208,22 @@ namespace ImageSetEditor
 
         #endregion Constructors
     };
+
+    internal class Arrow : SubImage
+    {
+        #region Properties
+
+        public bool Visible { get; set; }
+
+        #endregion Properties
+
+        #region Constructors
+
+        public Arrow(string fileName) 
+            : base(fileName)
+        {
+        }
+
+        #endregion Constructors
+    }
 }
