@@ -42,14 +42,22 @@ namespace ImageSetEditor
         private Canvas m_canvas;
 
         /// <summary>
-        /// 当前选中的图片
+        /// 选中对象
         /// </summary>
-        private SubImage m_select;
+        private SubImageSelects m_select;
 
+        
+        /// <summary>
+        /// 显示信息的图片
+        /// </summary>
+        private SubImage m_viewInfoImage;
+
+        /*
         /// <summary>
         /// 当前选中的图片组
         /// </summary>
         private List<SubImage> m_selects;
+        */
 
         /// <summary>
         /// 操作开始时鼠标起始位置
@@ -177,9 +185,9 @@ namespace ImageSetEditor
 
         public void ClearImages()
         {
-            SetSelect(null);
+            SetViewInfo(null);
 
-            m_selects.Clear();
+            m_select.Selects.Clear();
 
             foreach (ListViewItem item in usedListView.Items)
             {
@@ -249,9 +257,9 @@ namespace ImageSetEditor
             imageCountToolStripLabel.Text = "共 " + usedListView.Items.Count.ToString() + " 个图片";
         }
 
-        private void SetSelect(SubImage select)
+        private void SetViewInfo(SubImage image)
         {
-            if (select == null)
+            if (image == null)
             {
                 nameToolStripTextBox.Text = "不可用";
 
@@ -265,22 +273,20 @@ namespace ImageSetEditor
             }
             else
             {
-                nameToolStripTextBox.Text = select.Name;
+                nameToolStripTextBox.Text = image.Name;
 
                 posToolStripTextBox.Text =
-                    String.Format("{0},{1}", select.Position.X, select.Position.Y);
+                    String.Format("{0},{1}", image.Position.X, image.Position.Y);
 
                 sizeToolStripTextBox.Text =
-                    String.Format("{0},{1}", select.Size.Width, select.Size.Height);
+                    String.Format("{0},{1}", image.Size.Width, image.Size.Height);
 
                 nameToolStripTextBox.ReadOnly = false;
 
                 posToolStripTextBox.ReadOnly = false;
             }
 
-            m_select = select;
-
-            m_dockAid.SetImage(select);
+            m_viewInfoImage = image;
         }
 
         private Image CreateErrorImage(Size size)
@@ -442,21 +448,23 @@ namespace ImageSetEditor
 
         private void ClearSelects()
         {
-            if (m_selects.Count != 0)
+            if (m_select.Selects.Count != 0)
             {
                 m_listViewNodeLock = true;
 
-                foreach (SubImage image in m_selects)
+                foreach (SubImage image in m_select.Selects)
                 {
                     image.BindItem.Selected = false;
                 }
 
                 m_listViewNodeLock = false;
 
-                m_selects.Clear();
+                m_select.Selects.Clear();
 
-                SetSelect(null);
+                SetViewInfo(null);
             }
+
+            m_dockAid.SetImage(null);
         }
 
         private void SelectTop()
@@ -475,9 +483,13 @@ namespace ImageSetEditor
 
                     m_listViewNodeLock = false;
 
-                    m_selects.Add(image);
+                    SetViewInfo(image);
 
-                    SetSelect(image);
+                    m_select.Selects.Add(image);
+
+                    m_select.UpdateRim();
+
+                    m_dockAid.SetImage(m_select);
 
                     break;
                 }
@@ -525,11 +537,6 @@ namespace ImageSetEditor
 
         #region Events
 
-        private void ImagesetEditControl_Load(object sender, EventArgs e)
-        {
-            this.Dock = DockStyle.Fill;
-        }
-
         private void imageSetBox_SizeChanged(object sender, EventArgs e)
         {
             m_canvas.ViewSize = imageSetBox.Size;
@@ -572,20 +579,15 @@ namespace ImageSetEditor
                         {
                             m_MouseStatus = MouseStatus.Normal;
 
-                            Point offset = new Point(
+                            m_select.SetMove(
                                 m_curMousePos.X - m_beginMousePos.X,
                                 m_curMousePos.Y - m_beginMousePos.Y);
 
-                            foreach (SubImage image in m_selects)
-                            {
-                                image.Position = new Point(
-                                    image.Position.X + offset.X,
-                                    image.Position.Y + offset.Y);
-                            }
+                            m_dockAid.SetImage(m_select);
 
                             if (m_select != null)
                             {
-                                SetSelect(m_select);
+                                SetViewInfo(m_viewInfoImage);
                             }
 
                             ImageSetBoxUpdate();
@@ -624,15 +626,19 @@ namespace ImageSetEditor
                                     if (selectArea.IntersectsWith(image.Rectangle))
                                     {
                                         item.Selected = true;
-                                        m_selects.Add(image);
+                                        m_select.Selects.Add(image);
                                     }
 
                                     m_listViewNodeLock = false;
                                 }
 
-                                if (m_selects.Count == 1)
+                                m_select.UpdateRim();
+
+                                m_dockAid.SetImage(m_select);
+
+                                if (m_select.Selects.Count == 1)
                                 {
-                                    SetSelect(m_selects.First());
+                                    SetViewInfo(m_select.Selects.First());
                                 }
                             }
 
@@ -642,7 +648,7 @@ namespace ImageSetEditor
                     default:
                         if (m_dockAid.InArrowButton(e.X, e.Y) && m_dockAid.OnClick(e.X, e.Y))
                         {
-                            SetSelect(m_select);
+                            m_dockAid.SetImage(m_select);
                             ImageSetBoxUpdate();
                         }
                         break;
@@ -698,9 +704,8 @@ namespace ImageSetEditor
             }
 
             /// 鼠标移动到已经选择的图片里时变更光标
-            
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 if (image.Rectangle.Contains(new Point(
                     e.X + m_canvas.ViewPos.X,
@@ -732,10 +737,10 @@ namespace ImageSetEditor
 
             image.BindItem.Selected = true;
 
-            SetSelect(image);
+            SetViewInfo(image);
 
-            m_selects.Clear();
-            m_selects.Add(image);
+            m_select.Selects.Clear();
+            m_select.Selects.Add(image);
 
             m_listViewNodeLock = true;
 
@@ -746,6 +751,7 @@ namespace ImageSetEditor
         {
             m_canvas.Begin(e.Graphics);
 
+            /// 绘制图片内容和他们的边框
             foreach (ListViewItem item in usedListView.Items)
             {
                 if (m_MouseStatus == MouseStatus.Drag)
@@ -762,30 +768,42 @@ namespace ImageSetEditor
                     m_canvas.DrawImageRim(image, m_canvas.RimPen);
             }
 
+            /// 绘制选中项
             if (m_MouseStatus == MouseStatus.Drag)
             {
                 Point offset = new Point(
                     m_curMousePos.X - m_beginMousePos.X,
                     m_curMousePos.Y - m_beginMousePos.Y);
 
-                foreach (SubImage image in m_selects)
+                foreach (SubImage image in m_select.Selects)
                 {
                     m_canvas.DrawImage(image, offset);
                 }
 
-                foreach (SubImage image in m_selects)
+                foreach (SubImage image in m_select.Selects)
                 {
                     m_canvas.DrawImageArea(image, m_canvas.SelectPen, offset);
+                }
+
+                if (m_select.Selects.Count > 1)
+                {
+                    m_canvas.DrawImageRim(m_select, m_canvas.SelectPen, offset);
                 }
             }
             else
             {
-                foreach (SubImage image in m_selects)
+                foreach (SubImage image in m_select.Selects)
                 {
                     m_canvas.DrawImageArea(image, m_canvas.SelectPen);
                 }
+
+                if (m_select.Selects.Count > 1)
+                {
+                    m_canvas.DrawImageRim(m_select, m_canvas.SelectPen);
+                }
             }
 
+            /// 绘制鼠标框选的区域
             if (m_MouseStatus == MouseStatus.Select)
             {
                 Rectangle selectArea =
@@ -872,8 +890,8 @@ namespace ImageSetEditor
 
                 m_listViewNodeLock = false;
 
-                SetSelect(null);
-                m_selects.Clear();
+                SetViewInfo(null);
+                m_select.Selects.Clear();
             }
 
             ImageCountUpdate();
@@ -1048,21 +1066,23 @@ namespace ImageSetEditor
 
             int n = usedListView.SelectedItems.Count;
 
-            if (n != 1)
+            if (n == 1)
             {
-                SetSelect(null);
+                SetViewInfo((SubImage)usedListView.SelectedItems[0].Tag);
             }
             else
             {
-                SetSelect((SubImage)usedListView.SelectedItems[0].Tag);
+                SetViewInfo(null);
             }
 
-            m_selects.Clear();
+            m_select.Selects.Clear();
 
             foreach (ListViewItem item in usedListView.SelectedItems)
             {
-                m_selects.Add((SubImage)item.Tag);
+                m_select.Selects.Add((SubImage)item.Tag);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1076,7 +1096,7 @@ namespace ImageSetEditor
 
         private void imageSetBoxContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            alignmentToolStripMenuItem.Enabled = (m_selects.Count > 1);
+            alignmentToolStripMenuItem.Enabled = (m_select.Selects.Count > 1);
         }
 
         private void imageSetBoxContextMenuStrip_Closing(object sender, ToolStripDropDownClosingEventArgs e)
@@ -1088,7 +1108,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.X);
             }
@@ -1106,11 +1126,13 @@ namespace ImageSetEditor
 
         private void leftOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     (int)leftOutsideAlignmentToolStripMenuItem.Tag, image.Position.Y);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1119,7 +1141,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.X);
             }
@@ -1137,11 +1159,13 @@ namespace ImageSetEditor
 
         private void leftInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     (int)leftInsideAlignmentToolStripMenuItem.Tag, image.Position.Y);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1150,7 +1174,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.X + image.Size.Width);
             }
@@ -1168,11 +1192,13 @@ namespace ImageSetEditor
 
         private void rightOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     (int)rightOutsideAlignmentToolStripMenuItem.Tag - image.Size.Width, image.Position.Y);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1181,7 +1207,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.X + image.Size.Width);
             }
@@ -1199,11 +1225,13 @@ namespace ImageSetEditor
 
         private void rightInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     (int)rightInsideAlignmentToolStripMenuItem.Tag - image.Size.Width, image.Position.Y);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1212,7 +1240,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.Y);
             }
@@ -1230,11 +1258,13 @@ namespace ImageSetEditor
         
         private void topOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     image.Position.X, (int)topOutsideAlignmentToolStripMenuItem.Tag);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1243,7 +1273,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.Y);
             }
@@ -1261,11 +1291,13 @@ namespace ImageSetEditor
 
         private void topInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     image.Position.X, (int)topInsideAlignmentToolStripMenuItem.Tag);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1274,7 +1306,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.Y + image.Size.Height);
             }
@@ -1292,11 +1324,13 @@ namespace ImageSetEditor
 
         private void bottomOutsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     image.Position.X, (int)bottomOutsideAlignmentToolStripMenuItem.Tag - image.Size.Height);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1305,7 +1339,7 @@ namespace ImageSetEditor
         {
             m_alignmentArray.Clear();
 
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 m_alignmentArray.Add(image.Position.Y + image.Size.Height);
             }
@@ -1323,11 +1357,13 @@ namespace ImageSetEditor
 
         private void bottomInsideAlignmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (SubImage image in m_selects)
+            foreach (SubImage image in m_select.Selects)
             {
                 image.Position = new Point(
                     image.Position.X, (int)bottomInsideAlignmentToolStripMenuItem.Tag - image.Size.Height);
             }
+
+            m_select.UpdateRim();
 
             ImageSetBoxUpdate();
         }
@@ -1356,6 +1392,11 @@ namespace ImageSetEditor
             }
         }
 
+        private void imageSetBox_Click(object sender, EventArgs e)
+        {
+            usedListView.Select();
+        }
+
         #endregion Events
 
         #region Constructors
@@ -1364,7 +1405,7 @@ namespace ImageSetEditor
         {
             m_canvas = new Canvas();
 
-            m_selects = new List<SubImage>();
+            m_select = new SubImageSelects();
 
             m_alignmentArray = new List<int>();
 
@@ -1374,7 +1415,7 @@ namespace ImageSetEditor
 
             m_dockAid = new DockAid(usedListView.Items, m_canvas, this);
 
-            SetSelect(null);
+            SetViewInfo(null);
 
             sizeSetToolStripComboBox.SelectedIndex = 3;
         }
@@ -1508,8 +1549,7 @@ namespace ImageSetEditor
 
         public void DrawImage(SubImage image, Point offset)
         {
-            m_viewGraph.DrawImage(
-                image.Image,
+            image.Draw(m_viewGraph,
                 image.Position.X - m_viewPosition.X + offset.X,
                 image.Position.Y - m_viewPosition.Y + offset.Y,
                 image.Size.Width,
@@ -1520,8 +1560,7 @@ namespace ImageSetEditor
         {
             if (IsView(image) == false)
                 return;
-            m_viewGraph.DrawImage(
-                image.Image,
+            image.Draw(m_viewGraph, 
                 image.Position.X - m_viewPosition.X,
                 image.Position.Y - m_viewPosition.Y,
                 image.Size.Width,
@@ -1534,6 +1573,16 @@ namespace ImageSetEditor
                 pen,
                 image.Position.X - m_viewPosition.X,
                 image.Position.Y - m_viewPosition.Y,
+                image.Size.Width - 1,
+                image.Size.Height - 1);
+        }
+
+        public void DrawImageRim(SubImage image, Pen pen, Point offset)
+        {
+            m_viewGraph.DrawRectangle(
+                pen,
+                image.Position.X - m_viewPosition.X + offset.X,
+                image.Position.Y - m_viewPosition.Y + offset.Y,
                 image.Size.Width - 1,
                 image.Size.Height - 1);
         }
@@ -1639,6 +1688,11 @@ namespace ImageSetEditor
             get { return m_greenPen; }
         }
 
+        public Pen BlackPen
+        {
+            get { return m_blackPen; }
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -1735,6 +1789,8 @@ namespace ImageSetEditor
 
             foreach (ListViewItem item in m_items)
             {
+                if (item.Selected)
+                    continue;
                 SubImage img = (SubImage)item.Tag;
                 Contact(image, img);
             }
@@ -1972,7 +2028,7 @@ namespace ImageSetEditor
 
         private void Contact(SubImage imageA, SubImage imageB)
         {
-            if (imageA == imageB || imageA == null || imageB == null)
+            if (imageA == null || imageB == null)
             {
                 return;
             }
@@ -2042,13 +2098,13 @@ namespace ImageSetEditor
     {
         #region Fields
 
-        private Point m_position;
+        protected Point m_position;
 
-        private Size m_size;
+        protected Size m_size;
+
+        protected Rectangle m_rect;
 
         private Image m_image;
-
-        private Rectangle m_rect;
 
         private string m_filePath;
 
@@ -2059,6 +2115,11 @@ namespace ImageSetEditor
         #endregion Fields
 
         #region Methods
+
+        public virtual void Draw(Graphics graph, int x, int y, int width, int height)
+        {
+            graph.DrawImage(m_image, x, y, width, height);
+        }
 
         public void SetDefaultName()
         {
@@ -2130,13 +2191,13 @@ namespace ImageSetEditor
 
         #region Properties
 
-        public Point Position
+        virtual public Point Position
         {
             get { return m_position; }
             set { m_position = value; m_rect = new Rectangle(this.Position, this.Size); }
         }
 
-        public Size Size
+        virtual public Size Size
         {
             get { return m_size; }
             set { m_size = value; }
@@ -2197,7 +2258,8 @@ namespace ImageSetEditor
 
             m_image = image;
 
-            m_size = m_image.Size;
+            if (image != null)
+                m_size = m_image.Size;
 
             m_filePath = "";
 
@@ -2222,6 +2284,100 @@ namespace ImageSetEditor
         public Arrow(string fileName) 
             : base(fileName)
         {
+        }
+
+        #endregion Constructors
+    }
+
+    internal class SubImageSelects : SubImage
+    {
+        #region Fields
+
+        private List<SubImage> m_selects;
+
+        #endregion Fields
+
+        #region Properties
+
+        public List<SubImage> Selects
+        {
+            get { return m_selects; }
+        }
+
+        public override Point Position
+        {
+            get { return m_position; }
+            set 
+            { 
+                SetMove(value.X - m_position.X, value.Y - m_position.Y);
+                m_rect = new Rectangle(this.Position, this.Size);
+            }
+        }
+
+        public override Size Size
+        {
+            get { return m_size; }
+            set { m_size = value; }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        public override void Draw(Graphics graph, int x, int y, int width, int height)
+        {
+            
+        }
+
+
+        public void SetMove(int x, int y)
+        {
+            m_position.X += x;
+            m_position.Y += y;
+
+            foreach (SubImage image in m_selects)
+            {
+                image.Position =
+                    new Point(image.Position.X + x, image.Position.Y + y);
+            }
+
+            m_rect.Offset(x, y);
+        }
+
+        public void UpdateRim()
+        {
+            if (m_selects.Count == 0)
+                return;
+
+            m_position.X = m_selects.First().Position.X;
+            m_position.Y = m_selects.First().Position.Y;
+
+            foreach (SubImage image in m_selects)
+            {
+                m_position.X = Math.Min(image.Position.X, m_position.X);
+                m_position.Y = Math.Min(image.Position.Y, m_position.Y);
+            }
+
+            m_size.Width = 0;
+            m_size.Height = 0;
+
+            foreach (SubImage image in m_selects)
+            {
+                m_size.Width = Math.Max(image.Position.X + image.Size.Width - m_position.X, m_size.Width);
+                m_size.Height = Math.Max(image.Position.Y + image.Size.Height - m_position.Y, m_size.Height);
+            }
+
+            m_rect = new Rectangle(this.Position, this.Size);
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public SubImageSelects()
+            : base((Image)null)
+        {
+            m_selects = new List<SubImage>();
         }
 
         #endregion Constructors

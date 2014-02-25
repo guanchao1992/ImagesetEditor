@@ -29,7 +29,7 @@ namespace ImageSetEditor
 
         public static string GetVersion()
         {
-            return "0.1.2";
+            return "0.1.3";
         }
 
         public static string GetProjectVersion()

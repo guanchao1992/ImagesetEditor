@@ -291,6 +291,7 @@
             this.imageSetBox.TabIndex = 2;
             this.imageSetBox.TabStop = false;
             this.imageSetBox.SizeChanged += new System.EventHandler(this.imageSetBox_SizeChanged);
+            this.imageSetBox.Click += new System.EventHandler(this.imageSetBox_Click);
             this.imageSetBox.Paint += new System.Windows.Forms.PaintEventHandler(this.imageSetBox_Paint);
             this.imageSetBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.imageSetBox_MouseDown);
             this.imageSetBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.imageSetBox_MouseMove);
@@ -303,21 +304,21 @@
             this.toolStripMenuItem3,
             this.alignmentToolStripMenuItem});
             this.imageSetBoxContextMenuStrip.Name = "imageSetBoxContextMenuStrip";
-            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(176, 86);
+            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(109, 58);
             this.imageSetBoxContextMenuStrip.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.imageSetBoxContextMenuStrip_Closing);
             this.imageSetBoxContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.imageSetBoxContextMenuStrip_Opening);
             // 
             // delusedToolStripMenuItem_Click2
             // 
             this.delusedToolStripMenuItem_Click2.Name = "delusedToolStripMenuItem_Click2";
-            this.delusedToolStripMenuItem_Click2.Size = new System.Drawing.Size(175, 24);
+            this.delusedToolStripMenuItem_Click2.Size = new System.Drawing.Size(108, 24);
             this.delusedToolStripMenuItem_Click2.Text = "删除";
             this.delusedToolStripMenuItem_Click2.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(172, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(105, 6);
             // 
             // alignmentToolStripMenuItem
             // 
@@ -332,7 +333,7 @@
             this.bottomOutsideAlignmentToolStripMenuItem,
             this.bottomInsideAlignmentToolStripMenuItem});
             this.alignmentToolStripMenuItem.Name = "alignmentToolStripMenuItem";
-            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.alignmentToolStripMenuItem.Text = "对齐";
             // 
             // leftOutsideAlignmentToolStripMenuItem
@@ -552,7 +553,6 @@
             this.MinimumSize = new System.Drawing.Size(300, 200);
             this.Name = "ImagesetEditControl";
             this.Size = new System.Drawing.Size(956, 503);
-            this.Load += new System.EventHandler(this.ImagesetEditControl_Load);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);
