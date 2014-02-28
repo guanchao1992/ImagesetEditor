@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.IO;
 
 namespace ImageSetEditor
 {
@@ -17,6 +18,10 @@ namespace ImageSetEditor
 
         private ImagesetEditControl m_editControl;
 
+        private Localization m_local;
+
+        private XmlDocument m_configDoc;
+
         private string m_lastExportFile = "";
 
         private int m_lastExportFilterIndex;
@@ -25,11 +30,43 @@ namespace ImageSetEditor
 
         #endregion Fields
 
+        #region Strings
+
+        private string m_strNewProject = "New project";
+
+        private string m_strNewProjectAndClear = "Create new project and clear current images?";
+
+        private string m_strExportedTo = "Exported to #FILENAME#";
+
+        private string m_strExportToLastPosition = "Export to last Position #FILENAME#";
+
+        private string m_strExportedToLastPosition = "Exported to last Position #FILENAME#";
+
+        private string m_strSavedTo = "Saved to #FILENAME#";
+
+        private string m_strSavedError = "Failed to save";
+
+        private string m_strOpenProject = "Open project";
+
+        private string m_strOpenVersionMismatch = "Project version mismatch, try to open it?#N##N#To be opened project version: #OPEN-PROJECT-VER#, Created from the #OPEN-PROJECT-CREATED-VER# version of the editor。#N##N#Editor can open project version: #CURRENT-PROJECT-VER#";
+
+        private string m_strOpenImageFailed = "One or more images failed to load, they will be replaced with a red frame, they may be in use by another program or has been removed from its original location.";
+
+        private string m_strOpenProjectFailed = "Failed to open #FILENAME#";
+
+        private string m_strStatusReady = "Ready";
+
+        private string m_strChangeLanguageCaption = "Change language";
+
+        private string m_strChangeLanguage = "Change the interface language must restart the program.";
+
+        #endregion Strings
+
         #region Methods
 
         public static string GetVersion()
         {
-            return "0.1.3";
+            return "0.2.0";
         }
 
         public static string GetProjectVersion()
@@ -56,13 +93,92 @@ namespace ImageSetEditor
                 m_editControl.Export(export);
         }
 
+        private string GetConfig(string name, string attribute, string defaultValue)
+        {
+            XmlNode node = m_configDoc.DocumentElement.SelectSingleNode(name);
+            if (node == null)
+                return defaultValue;
+            XmlNode att = node.Attributes.GetNamedItem(attribute);
+            if (att == null)
+                return defaultValue;
+            return att.Value;
+        }
+
+        private void SetConfig(string name, string attribute, string value)
+        {
+            XmlNode node = m_configDoc.DocumentElement.SelectSingleNode(name);
+            if (node == null)
+                node = m_configDoc.DocumentElement.AppendChild(m_configDoc.CreateNode(XmlNodeType.Element, name, ""));
+            XmlNode att = node.Attributes.GetNamedItem(attribute);
+            if (att == null)
+                att = node.Attributes.Append(m_configDoc.CreateAttribute(attribute));
+            att.Value = value;
+        }
+
+        private void UpdateLocalization(Localization local)
+        {
+            // Menu
+
+            // file
+
+            fileToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.01");
+
+            newToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.02");
+
+            openToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.03");
+
+            saveToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.04");
+
+            saveAsToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.05");
+
+            exportToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.06");
+
+            // help
+
+            helpToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.Help.01");
+
+            languageToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.Help.02");
+
+            aboutToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.Help.03");
+
+            // Messages
+
+            m_strNewProject = local.GetName("Forms.MainForm.Messages.new-project");
+
+            m_strNewProjectAndClear = local.GetName("Forms.MainForm.Messages.new-project-and-clear");
+
+            m_strExportedTo = local.GetName("Forms.MainForm.Messages.exported-to");
+
+            m_strExportToLastPosition = local.GetName("Forms.MainForm.Messages.export-to-last-position");
+
+            m_strExportedToLastPosition = local.GetName("Forms.MainForm.Messages.exported-to-last-position");
+
+            m_strSavedTo = local.GetName("Forms.MainForm.Messages.saved-to");
+
+            m_strSavedError = local.GetName("Forms.MainForm.Messages.saved-error");
+
+            m_strOpenProject = local.GetName("Forms.MainForm.Messages.open-project");
+
+            m_strOpenVersionMismatch = local.GetName("Forms.MainForm.Messages.open-version-mismatch");
+
+            m_strOpenImageFailed = local.GetName("Forms.MainForm.Messages.open-image-failed");
+
+            m_strOpenProjectFailed = local.GetName("Forms.MainForm.Messages.open-project-failed");
+
+            m_strStatusReady = local.GetName("Forms.MainForm.Messages.status-ready");
+
+            m_strChangeLanguageCaption = local.GetName("Forms.MainForm.Messages.change-language-caption");
+
+            m_strChangeLanguage = local.GetName("Forms.MainForm.Messages.change-language");
+        }
+
         #endregion Methods
 
         #region Events
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            (new AboutForm()).ShowDialog();
+            (new AboutForm(m_local)).ShowDialog();
         }
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
@@ -73,7 +189,8 @@ namespace ImageSetEditor
             {
                 ExportToFile(exportFileDialog.FileName, exportFileDialog.FilterIndex);
 
-                toolStripStatusLabel.Text = "已导出至 " + exportFileDialog.FileName;
+                toolStripStatusLabel.Text = 
+                    m_strExportedTo.Replace("#FILENAME#", exportFileDialog.FileName);
 
                 m_lastExportFile = exportFileDialog.FileName;
 
@@ -81,13 +198,13 @@ namespace ImageSetEditor
             }
         }
 
-        private void createToolStripMenuItem_Click(object sender, EventArgs e)
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (m_editControl.ImageCount != 0)
             {
                 if (DialogResult.Cancel == MessageBox.Show(
-                    "新建项目并且清空当前图片组？", 
-                    "新建项目", 
+                    m_strNewProjectAndClear,
+                    m_strNewProject, 
                     MessageBoxButtons.OKCancel, 
                     MessageBoxIcon.Question))
                 {
@@ -117,9 +234,13 @@ namespace ImageSetEditor
                     if (projectVer != GetProjectVersion())
                     {
                         if (DialogResult.Cancel ==
-                            MessageBox.Show("项目格式版本不匹配，是否继续尝试打开？\n\n" +
-                            "要打开的项目版本: " + projectVer + ", 由 " + xmlDoc.DocumentElement.Attributes.GetNamedItem("Version").Value + " 版本的编辑器创建。\n\n" +
-                            "当前的支持的项目版本: " + GetProjectVersion(), "打开项目", MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
+                            MessageBox.Show(
+                            m_strOpenVersionMismatch
+                            .Replace("#N#", "\n")
+                            .Replace("#OPEN-PROJECT-VER#", projectVer)
+                            .Replace("#OPEN-PROJECT-CREATED-VER#", xmlDoc.DocumentElement.Attributes.GetNamedItem("Version").Value)
+                            .Replace("#CURRENT-PROJECT-VER#", GetProjectVersion()),
+                            m_strOpenProject, MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
                         {
                             return;
                         }
@@ -184,30 +305,31 @@ namespace ImageSetEditor
 
                     if (loadFaild.Count != 0)
                     {
-                        string text = "一个或多个图片未能加载，将使用红色线框代替它们，他们可能被其他程序占用或者已经从原来的位置移除。";
+                        string text = m_strOpenImageFailed;
 
                         foreach (string s in loadFaild)
                         {
                             text = text + "\n\n" + s;
                         }
 
-                        MessageBox.Show(text, "加载图片失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(text, m_strOpenProject, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
                     m_editControl.Redraw();
 
                     m_docPath = openFileDialog.FileName;
 
-                    toolStripStatusLabel.Text = "就绪";
+                    toolStripStatusLabel.Text = m_strStatusReady;
                 }
                 catch
                 {
-                    MessageBox.Show("项目 " + openFileDialog.FileName + " 加载失败", "打开项目", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(m_strOpenProjectFailed.Replace("#FILENAME#", openFileDialog.FileName),
+                        m_strOpenProject, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        private void saveToToolStripMenuItem_Click(object sender, EventArgs e)
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog.FileName = "";
 
@@ -219,11 +341,12 @@ namespace ImageSetEditor
 
                     m_editControl.Export(export);
 
-                    toolStripStatusLabel.Text = "已保存至 " + saveFileDialog.FileName;
+                    toolStripStatusLabel.Text = 
+                        m_strSavedTo.Replace("#FILENAME#", saveFileDialog.FileName);
                 }
                 catch (SystemException exc)
                 {
-                    MessageBox.Show(exc.Message, "保存失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(exc.Message, m_strSavedError, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 m_docPath = saveFileDialog.FileName;
@@ -234,9 +357,11 @@ namespace ImageSetEditor
         {
             if (m_lastExportFile != "")
             {
-                exportLastFileToolStripMenuItem.Text = "导出到最后导出位置 " + m_lastExportFile;
+                exportLastFileToolStripMenuItem.Text = 
+                    m_strExportToLastPosition.Replace("#FILENAME#", m_lastExportFile);
                 exportLastFileToolStripMenuItem.Visible = true;
-                toolStripStatusLabel.Text = "已导出至 " + m_lastExportFile;
+                toolStripStatusLabel.Text =
+                    m_strExportedToLastPosition.Replace("#FILENAME#", exportFileDialog.FileName);
             }
             else
             {
@@ -259,11 +384,11 @@ namespace ImageSetEditor
 
                     m_editControl.Export(export);
 
-                    toolStripStatusLabel.Text = "已保存至 " + m_docPath;
+                    toolStripStatusLabel.Text = m_strSavedTo.Replace("#FILENAME#", m_docPath);
                 }
                 catch (SystemException exc)
                 {
-                    MessageBox.Show(exc.Message, "保存失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(exc.Message, m_strSavedError, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -278,8 +403,73 @@ namespace ImageSetEditor
             {
                 ExportToFile(m_lastExportFile, m_lastExportFilterIndex);
 
-                toolStripStatusLabel.Text = "已导出至上一次的位置 " + m_lastExportFile;
+                toolStripStatusLabel.Text = m_strExportedToLastPosition.Replace("#FILENAME#", m_lastExportFile);
             }
+        }
+
+        private void languageSelectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+
+            if (item.Checked == true)
+            {
+                return;
+            }
+
+            MessageBox.Show(m_strChangeLanguage, m_strChangeLanguageCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            if (sender == defaultToolStripMenuItem)
+            {
+                SetConfig("Language", "Value", "English");
+            }
+            else
+            {
+                SetConfig("Language", "Value", item.Text);
+            }
+
+            foreach (ToolStripMenuItem i in languageToolStripMenuItem.DropDownItems)
+            {
+                i.Checked = false;
+            }
+
+            item.Checked = true;
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            DirectoryInfo dirInfo = new DirectoryInfo("Localization");
+
+            foreach (FileInfo file in dirInfo.GetFiles("*.xml"))
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(file.Name.Split('.').First());
+
+                item.Click += languageSelectToolStripMenuItem_Click;
+
+                languageToolStripMenuItem.DropDownItems.Add(item);
+            }
+
+            string lanName = GetConfig("Language", "Value", "English");
+
+            if (lanName == "English")
+            {
+                defaultToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                foreach (ToolStripMenuItem item in languageToolStripMenuItem.DropDownItems)
+                {
+                    if (item.Text == lanName)
+                    {
+                        item.Checked = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            m_configDoc.Save("config.xml");
         }
 
         #endregion Events
@@ -323,8 +513,38 @@ namespace ImageSetEditor
         public MainForm()
         {
             InitializeComponent();
-            
-            m_editControl = new ImagesetEditControl();
+
+            try
+            {
+                m_configDoc = new XmlDocument();
+                m_configDoc.Load("config.xml");
+            }
+            catch
+            {
+                m_configDoc = new XmlDocument();
+                m_configDoc.AppendChild(m_configDoc.CreateElement("Config"));
+            }
+
+            if (GetConfig("Language", "Value", "English") != "English")
+            {
+                try
+                {
+                    m_local = new Localization(@"localization\" +
+                        GetConfig("Language", "Value", "English") + ".xml");
+
+                    UpdateLocalization(m_local);
+                }
+                catch
+                {
+                    m_local = null;
+                }
+            }
+            else
+            {
+                m_local = null;
+            }
+
+            m_editControl = new ImagesetEditControl(m_local);
 
             m_editControl.Dock = DockStyle.Fill;
 

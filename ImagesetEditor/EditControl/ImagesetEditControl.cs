@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
@@ -104,6 +105,24 @@ namespace ImageSetEditor
 
         #endregion Fields
 
+        #region Strings
+
+        private string m_strImageNums = "Total of #COUNT# images";
+
+        private string m_strUnavailable = "Unavailable";
+
+        private string m_strDelCaption = "Delete";
+
+        private string m_strDelAll = "Delete all?";
+
+        private string m_strDelSelected = "OK to delete the #COUNT# images selected from the list?";
+
+        private string m_strErrorCaption = "Error";
+
+        private string m_strErrorFormat = "Invalid format";
+
+        #endregion Strings
+
         #region Methods
 
         public void AddImage(string fileName)
@@ -119,7 +138,7 @@ namespace ImageSetEditor
             }
             catch
             {
-                throw new SystemException(fileName + " 加载失败");
+                throw new SystemException(fileName + " Load error");
             }
 
             SubImage newImage = new SubImage(image);
@@ -252,24 +271,117 @@ namespace ImageSetEditor
             ImageSetBoxUpdate();
         }
 
+        public void UpdateLocalization(Localization local)
+        {
+            // ImagesListView
+
+            // DropMenu
+
+            toolStripMenuItem1.Text = local.GetName("Control.ImagesListView.DropMenu.01");
+
+            addImageMenuItem.Text = local.GetName("Control.ImagesListView.DropMenu.02");
+
+            clearUsedToolStripMenuItem.Text = local.GetName("Control.ImagesListView.DropMenu.03");
+
+            // ContextMenu
+
+            selectAllToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.01");
+
+            delusedToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.02");
+
+            sortToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.03");
+
+            usedSelectSortNameToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.04");
+
+            usedSelectSortNameReverseToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.05");
+
+            usedSelectSortSizeToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.06");
+
+            usedSelectSortSizeReverseToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.07");
+
+            invertToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.08");
+
+            m_strImageNums = local.GetName("Control.ImagesListView.01");
+
+            // CanvasView
+
+            toolStripLabel1.Text = local.GetName("Control.CanvasView.01");
+
+            toolStripLabel2.Text = local.GetName("Control.CanvasView.02");
+
+            toolStripLabel3.Text = local.GetName("Control.CanvasView.03");
+
+            toolStripLabel4.Text = local.GetName("Control.CanvasView.04");
+
+            m_strUnavailable = local.GetName("Control.CanvasView.05");
+
+            // DropMenu
+
+            viewToolStripMenuItem.Text = local.GetName("Control.CanvasView.DropMenu.01");
+
+            rimViewToolStripMenuItem.Text = local.GetName("Control.CanvasView.DropMenu.02");
+
+            colorWorkspaceToolStripMenuItem.Text = local.GetName("Control.CanvasView.DropMenu.03");
+
+            // ContextMenu
+
+            delusedToolStripMenuItem2.Text = local.GetName("Control.CanvasView.ContextMenu.01");
+            
+            alignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.02");
+
+            leftOutsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.03");
+
+            leftInsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.04");
+
+            rightOutsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.05");
+
+            rightInsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.06");
+
+            topOutsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.07");
+
+            topInsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.08");
+
+            bottomOutsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.09");
+
+            bottomInsideAlignmentToolStripMenuItem.Text = local.GetName("Control.CanvasView.ContextMenu.10");
+
+            // Messages
+
+            m_strDelCaption = local.GetName("Control.Messages.del-caption");
+
+            m_strDelAll = local.GetName("Control.Messages.del-all");
+
+            m_strDelSelected = local.GetName("Control.Messages.del-delete-select");
+
+            m_strErrorCaption = local.GetName("Control.Messages.error-caption");
+
+            m_strErrorFormat = local.GetName("Control.Messages.error-invalid-format"); 
+
+            SetViewInfo(m_viewInfoImage);
+
+            ImageCountUpdate();
+        }
+
         private void ImageCountUpdate()
         {
-            imageCountToolStripLabel.Text = "共 " + usedListView.Items.Count.ToString() + " 个图片";
+            imageCountToolStripLabel.Text = m_strImageNums.Replace("#COUNT#", usedListView.Items.Count.ToString());
         }
 
         private void SetViewInfo(SubImage image)
         {
             if (image == null)
             {
-                nameToolStripTextBox.Text = "不可用";
+                nameToolStripTextBox.Text = m_strUnavailable;
 
-                posToolStripTextBox.Text = "不可用";
+                posToolStripTextBox.Text = m_strUnavailable;
 
-                sizeToolStripTextBox.Text = "不可用";
+                sizeToolStripTextBox.Text = m_strUnavailable;
 
-                nameToolStripTextBox.ReadOnly = true;
+                nameToolStripTextBox.Enabled = false;
 
-                posToolStripTextBox.ReadOnly = true;
+                posToolStripTextBox.Enabled = false;
+
+                sizeToolStripTextBox.Enabled = false;
             }
             else
             {
@@ -281,9 +393,11 @@ namespace ImageSetEditor
                 sizeToolStripTextBox.Text =
                     String.Format("{0},{1}", image.Size.Width, image.Size.Height);
 
-                nameToolStripTextBox.ReadOnly = false;
+                nameToolStripTextBox.Enabled = true;
 
-                posToolStripTextBox.ReadOnly = false;
+                posToolStripTextBox.Enabled = true;
+
+                sizeToolStripTextBox.Enabled = true;
             }
 
             m_viewInfoImage = image;
@@ -597,6 +711,8 @@ namespace ImageSetEditor
                         {
                             m_MouseStatus = MouseStatus.Normal;
 
+                            ClearSelects();
+
                             /// 拖动的矩形区域
                             Rectangle selectArea = GetRectangleArea(
                                 m_beginMousePos,
@@ -616,7 +732,6 @@ namespace ImageSetEditor
                             }
                             else
                             {
-
                                 foreach (ListViewItem item in usedListView.Items)
                                 {
                                     SubImage image = (SubImage)item.Tag;
@@ -678,8 +793,6 @@ namespace ImageSetEditor
                     m_MouseStatus = MouseStatus.Select;
                     m_beginMousePos = e.Location;
                     m_curMousePos = e.Location;
-
-                    ClearSelects();
                 }
             }
         }
@@ -846,12 +959,6 @@ namespace ImageSetEditor
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                if (usedListView.Items.Count + openFileDialog.FileNames.Count() > 500)
-                {
-                    MessageBox.Show("添加这些图片后超过图片数量限制，你编辑图片总数不能超过500。", "超过数量上限", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
                 foreach (string file in openFileDialog.FileNames)
                 {
                     AddImage(file);
@@ -867,7 +974,7 @@ namespace ImageSetEditor
         {
             if (usedListView.Items.Count == 0)
                 return;
-            if (DialogResult.OK == MessageBox.Show("删除所有？", "删除", MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
+            if (DialogResult.OK == MessageBox.Show(m_strDelAll, m_strDelCaption, MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
             {
                 ClearImages();
             }
@@ -877,7 +984,8 @@ namespace ImageSetEditor
         {
             if (usedListView.SelectedItems.Count == 0)
                 return;
-            if (DialogResult.OK == MessageBox.Show("确定从列表中删除所选的 " + usedListView.SelectedItems.Count + " 个图片？", "删除", MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
+            if (DialogResult.OK ==
+                MessageBox.Show(m_strDelSelected.Replace("#COUNT#", usedListView.SelectedItems.Count.ToString()), m_strDelCaption, MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
             {
                 m_listViewNodeLock = true;
 
@@ -917,7 +1025,7 @@ namespace ImageSetEditor
             }
             catch
             {
-                MessageBox.Show("无效的文本格式", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(m_strErrorFormat, m_strErrorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 sizeSetToolStripComboBox.Text = 
                     m_canvas.Size.Width.ToString() + "*" + m_canvas.Size.Height.ToString();
                 return;
@@ -969,7 +1077,7 @@ namespace ImageSetEditor
                 {
                     if (strArray.Count() != 2)
                     {
-                        throw new SystemException("无效的参数");
+                        throw new SystemException(m_strErrorFormat);
                     }
 
                     m_select.Position =
@@ -979,7 +1087,7 @@ namespace ImageSetEditor
                 }
                 catch (SystemException exc)
                 {
-                    MessageBox.Show(exc.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(exc.Message, m_strErrorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     posToolStripTextBox.Text = 
                         String.Format("{0},{1}", m_select.Position.X, m_select.Position.Y); ;
                 }
@@ -1401,7 +1509,7 @@ namespace ImageSetEditor
 
         #region Constructors
 
-        public ImagesetEditControl()
+        public ImagesetEditControl(Localization local = null)
         {
             m_canvas = new Canvas();
 
@@ -1418,6 +1526,9 @@ namespace ImageSetEditor
             SetViewInfo(null);
 
             sizeSetToolStripComboBox.SelectedIndex = 3;
+
+            if (local != null)
+                UpdateLocalization(local);
         }
 
         #endregion Constructors     
@@ -2378,6 +2489,68 @@ namespace ImageSetEditor
             : base((Image)null)
         {
             m_selects = new List<SubImage>();
+        }
+
+        #endregion Constructors
+    }
+
+    public class Localization
+    {
+        #region Fields
+
+        private XmlDocument m_xmlDoc;
+
+        #endregion Fields
+
+        #region Methods
+
+        public string GetName(string itemPath)
+        {
+            if (m_xmlDoc == null)
+                return "";
+
+            string[] path = itemPath.Split('.');
+
+            XmlNode n = m_xmlDoc.DocumentElement;
+
+            for (int i = 0; i != path.Count(); ++i)
+            {
+                if (i == (path.Count() - 1))
+                {
+                    foreach(XmlNode item in n.ChildNodes)
+                    {
+                        if (item.Name == "Item" && 
+                            item.Attributes.GetNamedItem("ID").Value == path.Last())
+                        {
+                            return item.Attributes.GetNamedItem("Name").Value;
+                        }
+                    }
+
+                    return "(!Load error #1)";
+                }
+
+                n = n.SelectSingleNode(path[i]);
+
+                if (n == null)
+                    return "(!Load error #2)";
+            }
+
+            return null;
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public Localization()
+        {
+            m_xmlDoc = null;
+        }
+
+        public Localization(string localFileName)
+        {
+            m_xmlDoc = new XmlDocument();
+            m_xmlDoc.Load(localFileName);
         }
 
         #endregion Constructors

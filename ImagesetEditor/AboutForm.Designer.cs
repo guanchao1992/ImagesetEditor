@@ -40,26 +40,26 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(312, 140);
             this.label1.TabIndex = 0;
-            this.label1.Text = "ImagesetEditor\r\n\r\n版本 #VER#\r\n作者 frimin\r\n邮箱 buzichang@vip.qq.com\r\n\r\nhttps://github." +
-    "com/frimin/ImagesetEditor";
+            this.label1.Text = "ImagesetEditor\r\n\r\nhttps://github.com/frimin/ImagesetEditor\r\n\r\nVersion  #VER#\r\nAut" +
+    "hor   frimin\r\nEmail      buzichang@vip.qq.com\r\n";
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(397, 195);
+            this.okButton.Location = new System.Drawing.Point(316, 140);
             this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(120, 32);
+            this.okButton.Size = new System.Drawing.Size(201, 32);
             this.okButton.TabIndex = 1;
-            this.okButton.Text = "确定";
+            this.okButton.Text = "Ok";
             this.okButton.UseVisualStyleBackColor = true;
             this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
             // toProjectWebButton
             // 
-            this.toProjectWebButton.Location = new System.Drawing.Point(271, 195);
+            this.toProjectWebButton.Location = new System.Drawing.Point(316, 102);
             this.toProjectWebButton.Name = "toProjectWebButton";
-            this.toProjectWebButton.Size = new System.Drawing.Size(120, 32);
+            this.toProjectWebButton.Size = new System.Drawing.Size(201, 32);
             this.toProjectWebButton.TabIndex = 2;
-            this.toProjectWebButton.Text = "访问项目网页";
+            this.toProjectWebButton.Text = "Visit the project website";
             this.toProjectWebButton.UseVisualStyleBackColor = true;
             this.toProjectWebButton.Click += new System.EventHandler(this.toProjectWebButton_Click);
             // 
@@ -67,7 +67,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 239);
+            this.ClientSize = new System.Drawing.Size(529, 185);
             this.Controls.Add(this.toProjectWebButton);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.label1);
@@ -78,7 +78,7 @@
             this.MinimizeBox = false;
             this.Name = "AboutForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "关于";
+            this.Text = "About";
             this.Load += new System.EventHandler(this.AboutForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

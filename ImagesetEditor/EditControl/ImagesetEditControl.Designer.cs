@@ -53,7 +53,7 @@
             this.imageCountToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.imageSetBox = new System.Windows.Forms.PictureBox();
             this.imageSetBoxContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.delusedToolStripMenuItem_Click2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.delusedToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.alignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.leftOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -112,8 +112,8 @@
             this.splitContainer.Panel2.Controls.Add(this.vScrollBar);
             this.splitContainer.Panel2.Controls.Add(this.hScrollBar);
             this.splitContainer.Panel2.Controls.Add(this.toolStrip);
-            this.splitContainer.Size = new System.Drawing.Size(956, 503);
-            this.splitContainer.SplitterDistance = 179;
+            this.splitContainer.Size = new System.Drawing.Size(1047, 571);
+            this.splitContainer.SplitterDistance = 195;
             this.splitContainer.TabIndex = 0;
             // 
             // usedListView
@@ -125,7 +125,7 @@
             this.usedListView.HideSelection = false;
             this.usedListView.Location = new System.Drawing.Point(0, 25);
             this.usedListView.Name = "usedListView";
-            this.usedListView.Size = new System.Drawing.Size(179, 478);
+            this.usedListView.Size = new System.Drawing.Size(195, 546);
             this.usedListView.TabIndex = 1;
             this.usedListView.UseCompatibleStateImageBehavior = false;
             this.usedListView.View = System.Windows.Forms.View.Details;
@@ -144,28 +144,28 @@
             this.toolStripMenuItem4,
             this.sortToolStripMenuItem});
             this.unsedImageContextMenuStrip.Name = "unusedImageContextMenuStrip";
-            this.unsedImageContextMenuStrip.Size = new System.Drawing.Size(166, 82);
+            this.unsedImageContextMenuStrip.Size = new System.Drawing.Size(201, 82);
             // 
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
             this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(165, 24);
-            this.selectAllToolStripMenuItem.Text = "全选";
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.selectAllToolStripMenuItem.Text = "Select all";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
             // 
             // delusedToolStripMenuItem
             // 
             this.delusedToolStripMenuItem.Name = "delusedToolStripMenuItem";
             this.delusedToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.delusedToolStripMenuItem.Size = new System.Drawing.Size(165, 24);
-            this.delusedToolStripMenuItem.Text = "删除";
+            this.delusedToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.delusedToolStripMenuItem.Text = "Delete";
             this.delusedToolStripMenuItem.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(162, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(197, 6);
             // 
             // sortToolStripMenuItem
             // 
@@ -178,52 +178,52 @@
             this.toolStripMenuItem6,
             this.invertToolStripMenuItem});
             this.sortToolStripMenuItem.Name = "sortToolStripMenuItem";
-            this.sortToolStripMenuItem.Size = new System.Drawing.Size(165, 24);
-            this.sortToolStripMenuItem.Text = "排序";
+            this.sortToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.sortToolStripMenuItem.Text = "Sort";
             // 
             // usedSelectSortNameToolStripMenuItem
             // 
             this.usedSelectSortNameToolStripMenuItem.Name = "usedSelectSortNameToolStripMenuItem";
-            this.usedSelectSortNameToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.usedSelectSortNameToolStripMenuItem.Text = "按名称顺序";
+            this.usedSelectSortNameToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.usedSelectSortNameToolStripMenuItem.Text = "Sort by name";
             this.usedSelectSortNameToolStripMenuItem.Click += new System.EventHandler(this.usedSelectSortNameToolStripMenuItem_Click);
             // 
             // usedSelectSortNameReverseToolStripMenuItem
             // 
             this.usedSelectSortNameReverseToolStripMenuItem.Name = "usedSelectSortNameReverseToolStripMenuItem";
-            this.usedSelectSortNameReverseToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.usedSelectSortNameReverseToolStripMenuItem.Text = "按名称倒序";
+            this.usedSelectSortNameReverseToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.usedSelectSortNameReverseToolStripMenuItem.Text = "Reverse by name";
             this.usedSelectSortNameReverseToolStripMenuItem.Click += new System.EventHandler(this.usedSelectSortNameReverseToolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(150, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(199, 6);
             // 
             // usedSelectSortSizeToolStripMenuItem
             // 
             this.usedSelectSortSizeToolStripMenuItem.Name = "usedSelectSortSizeToolStripMenuItem";
-            this.usedSelectSortSizeToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.usedSelectSortSizeToolStripMenuItem.Text = "按尺寸顺序";
+            this.usedSelectSortSizeToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.usedSelectSortSizeToolStripMenuItem.Text = "Sort by size";
             this.usedSelectSortSizeToolStripMenuItem.Click += new System.EventHandler(this.usedSelectSortSizeToolStripMenuItem_Click);
             // 
             // usedSelectSortSizeReverseToolStripMenuItem
             // 
             this.usedSelectSortSizeReverseToolStripMenuItem.Name = "usedSelectSortSizeReverseToolStripMenuItem";
-            this.usedSelectSortSizeReverseToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.usedSelectSortSizeReverseToolStripMenuItem.Text = "按尺寸倒序";
+            this.usedSelectSortSizeReverseToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.usedSelectSortSizeReverseToolStripMenuItem.Text = "Reverse by size";
             this.usedSelectSortSizeReverseToolStripMenuItem.Click += new System.EventHandler(this.usedSelectSortSizeReverseToolStripMenuItem_Click);
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(150, 6);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(199, 6);
             // 
             // invertToolStripMenuItem
             // 
             this.invertToolStripMenuItem.Name = "invertToolStripMenuItem";
-            this.invertToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.invertToolStripMenuItem.Text = "倒置";
+            this.invertToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.invertToolStripMenuItem.Text = "Reverse";
             this.invertToolStripMenuItem.Click += new System.EventHandler(this.invertToolStripMenuItem_Click);
             // 
             // usedToolStrip
@@ -235,7 +235,7 @@
             this.imageCountToolStripLabel});
             this.usedToolStrip.Location = new System.Drawing.Point(0, 0);
             this.usedToolStrip.Name = "usedToolStrip";
-            this.usedToolStrip.Size = new System.Drawing.Size(179, 25);
+            this.usedToolStrip.Size = new System.Drawing.Size(195, 25);
             this.usedToolStrip.TabIndex = 2;
             this.usedToolStrip.Text = "toolStrip2";
             // 
@@ -246,26 +246,26 @@
             this.toolStripSeparator5,
             this.clearUsedToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(66, 25);
-            this.toolStripMenuItem1.Text = "图片组";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(73, 25);
+            this.toolStripMenuItem1.Text = "Images";
             // 
             // addImageMenuItem
             // 
             this.addImageMenuItem.Name = "addImageMenuItem";
-            this.addImageMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.addImageMenuItem.Text = "添加图片";
+            this.addImageMenuItem.Size = new System.Drawing.Size(191, 24);
+            this.addImageMenuItem.Text = "Add";
             this.addImageMenuItem.Click += new System.EventHandler(this.addImageMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(150, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(188, 6);
             // 
             // clearUsedToolStripMenuItem
             // 
             this.clearUsedToolStripMenuItem.Name = "clearUsedToolStripMenuItem";
-            this.clearUsedToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.clearUsedToolStripMenuItem.Text = "清空图片组";
+            this.clearUsedToolStripMenuItem.Size = new System.Drawing.Size(191, 24);
+            this.clearUsedToolStripMenuItem.Text = "Clear all images";
             this.clearUsedToolStripMenuItem.Click += new System.EventHandler(this.clearUsedToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
@@ -276,8 +276,8 @@
             // imageCountToolStripLabel
             // 
             this.imageCountToolStripLabel.Name = "imageCountToolStripLabel";
-            this.imageCountToolStripLabel.Size = new System.Drawing.Size(86, 22);
-            this.imageCountToolStripLabel.Text = "共 0 个图片";
+            this.imageCountToolStripLabel.Size = new System.Drawing.Size(134, 19);
+            this.imageCountToolStripLabel.Text = "Total of 0 images";
             // 
             // imageSetBox
             // 
@@ -287,7 +287,7 @@
             this.imageSetBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageSetBox.Location = new System.Drawing.Point(0, 27);
             this.imageSetBox.Name = "imageSetBox";
-            this.imageSetBox.Size = new System.Drawing.Size(752, 455);
+            this.imageSetBox.Size = new System.Drawing.Size(827, 523);
             this.imageSetBox.TabIndex = 2;
             this.imageSetBox.TabStop = false;
             this.imageSetBox.SizeChanged += new System.EventHandler(this.imageSetBox_SizeChanged);
@@ -300,25 +300,25 @@
             // imageSetBoxContextMenuStrip
             // 
             this.imageSetBoxContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.delusedToolStripMenuItem_Click2,
+            this.delusedToolStripMenuItem2,
             this.toolStripMenuItem3,
             this.alignmentToolStripMenuItem});
             this.imageSetBoxContextMenuStrip.Name = "imageSetBoxContextMenuStrip";
-            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(109, 58);
+            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(176, 86);
             this.imageSetBoxContextMenuStrip.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.imageSetBoxContextMenuStrip_Closing);
             this.imageSetBoxContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.imageSetBoxContextMenuStrip_Opening);
             // 
-            // delusedToolStripMenuItem_Click2
+            // delusedToolStripMenuItem2
             // 
-            this.delusedToolStripMenuItem_Click2.Name = "delusedToolStripMenuItem_Click2";
-            this.delusedToolStripMenuItem_Click2.Size = new System.Drawing.Size(108, 24);
-            this.delusedToolStripMenuItem_Click2.Text = "删除";
-            this.delusedToolStripMenuItem_Click2.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
+            this.delusedToolStripMenuItem2.Name = "delusedToolStripMenuItem2";
+            this.delusedToolStripMenuItem2.Size = new System.Drawing.Size(175, 24);
+            this.delusedToolStripMenuItem2.Text = "Delete";
+            this.delusedToolStripMenuItem2.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(105, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(172, 6);
             // 
             // alignmentToolStripMenuItem
             // 
@@ -333,75 +333,75 @@
             this.bottomOutsideAlignmentToolStripMenuItem,
             this.bottomInsideAlignmentToolStripMenuItem});
             this.alignmentToolStripMenuItem.Name = "alignmentToolStripMenuItem";
-            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
-            this.alignmentToolStripMenuItem.Text = "对齐";
+            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.alignmentToolStripMenuItem.Text = "Alignment";
             // 
             // leftOutsideAlignmentToolStripMenuItem
             // 
             this.leftOutsideAlignmentToolStripMenuItem.Name = "leftOutsideAlignmentToolStripMenuItem";
-            this.leftOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.leftOutsideAlignmentToolStripMenuItem.Text = "水平左外侧对齐";
+            this.leftOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.leftOutsideAlignmentToolStripMenuItem.Text = "Outside of the left";
             this.leftOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.leftOutsideAlignmentToolStripMenuItem_Click);
             this.leftOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.leftOutsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // leftInsideAlignmentToolStripMenuItem
             // 
             this.leftInsideAlignmentToolStripMenuItem.Name = "leftInsideAlignmentToolStripMenuItem";
-            this.leftInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.leftInsideAlignmentToolStripMenuItem.Text = "水平左内侧对齐";
+            this.leftInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.leftInsideAlignmentToolStripMenuItem.Text = "Inside of the left";
             this.leftInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.leftInsideAlignmentToolStripMenuItem_Click);
             this.leftInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.leftInsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // rightOutsideAlignmentToolStripMenuItem
             // 
             this.rightOutsideAlignmentToolStripMenuItem.Name = "rightOutsideAlignmentToolStripMenuItem";
-            this.rightOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.rightOutsideAlignmentToolStripMenuItem.Text = "水平右外侧对齐";
+            this.rightOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.rightOutsideAlignmentToolStripMenuItem.Text = "Outside of the right";
             this.rightOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.rightOutsideAlignmentToolStripMenuItem_Click);
             this.rightOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.rightOutsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // rightInsideAlignmentToolStripMenuItem
             // 
             this.rightInsideAlignmentToolStripMenuItem.Name = "rightInsideAlignmentToolStripMenuItem";
-            this.rightInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.rightInsideAlignmentToolStripMenuItem.Text = "水平右内侧对齐";
+            this.rightInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.rightInsideAlignmentToolStripMenuItem.Text = "Inside of the right";
             this.rightInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.rightInsideAlignmentToolStripMenuItem_Click);
             this.rightInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.rightInsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(239, 6);
             // 
             // topOutsideAlignmentToolStripMenuItem
             // 
             this.topOutsideAlignmentToolStripMenuItem.Name = "topOutsideAlignmentToolStripMenuItem";
-            this.topOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.topOutsideAlignmentToolStripMenuItem.Text = "垂直顶外侧对齐";
+            this.topOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.topOutsideAlignmentToolStripMenuItem.Text = "Outside of the top";
             this.topOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.topOutsideAlignmentToolStripMenuItem_Click);
             this.topOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.topOutsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // topInsideAlignmentToolStripMenuItem
             // 
             this.topInsideAlignmentToolStripMenuItem.Name = "topInsideAlignmentToolStripMenuItem";
-            this.topInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.topInsideAlignmentToolStripMenuItem.Text = "垂直顶内侧对齐";
+            this.topInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.topInsideAlignmentToolStripMenuItem.Text = "Inside of the top";
             this.topInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.topInsideAlignmentToolStripMenuItem_Click);
             this.topInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.topInsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // bottomOutsideAlignmentToolStripMenuItem
             // 
             this.bottomOutsideAlignmentToolStripMenuItem.Name = "bottomOutsideAlignmentToolStripMenuItem";
-            this.bottomOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.bottomOutsideAlignmentToolStripMenuItem.Text = "垂直底外侧对齐";
+            this.bottomOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.bottomOutsideAlignmentToolStripMenuItem.Text = "Outside of the bottom";
             this.bottomOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.bottomOutsideAlignmentToolStripMenuItem_Click);
             this.bottomOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.bottomOutsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // bottomInsideAlignmentToolStripMenuItem
             // 
             this.bottomInsideAlignmentToolStripMenuItem.Name = "bottomInsideAlignmentToolStripMenuItem";
-            this.bottomInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(183, 24);
-            this.bottomInsideAlignmentToolStripMenuItem.Text = "垂直底内侧对齐";
+            this.bottomInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.bottomInsideAlignmentToolStripMenuItem.Text = "Inside of the bottom";
             this.bottomInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.bottomInsideAlignmentToolStripMenuItem_Click);
             this.bottomInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.bottomInsideAlignmentToolStripMenuItem_MouseEnter);
             // 
@@ -409,18 +409,18 @@
             // 
             this.vScrollBar.Dock = System.Windows.Forms.DockStyle.Right;
             this.vScrollBar.LargeChange = 20;
-            this.vScrollBar.Location = new System.Drawing.Point(752, 27);
+            this.vScrollBar.Location = new System.Drawing.Point(827, 27);
             this.vScrollBar.Name = "vScrollBar";
-            this.vScrollBar.Size = new System.Drawing.Size(21, 455);
+            this.vScrollBar.Size = new System.Drawing.Size(21, 523);
             this.vScrollBar.TabIndex = 1;
             this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
             // 
             // hScrollBar
             // 
             this.hScrollBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.hScrollBar.Location = new System.Drawing.Point(0, 482);
+            this.hScrollBar.Location = new System.Drawing.Point(0, 550);
             this.hScrollBar.Name = "hScrollBar";
-            this.hScrollBar.Size = new System.Drawing.Size(773, 21);
+            this.hScrollBar.Size = new System.Drawing.Size(848, 21);
             this.hScrollBar.TabIndex = 0;
             this.hScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar_Scroll);
             // 
@@ -441,7 +441,7 @@
             this.sizeToolStripTextBox});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(773, 27);
+            this.toolStrip.Size = new System.Drawing.Size(848, 27);
             this.toolStrip.TabIndex = 3;
             this.toolStrip.Text = "toolStrip1";
             // 
@@ -451,23 +451,23 @@
             this.rimViewToolStripMenuItem,
             this.colorWorkspaceToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(51, 27);
-            this.viewToolStripMenuItem.Text = "显示";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(56, 27);
+            this.viewToolStripMenuItem.Text = "View";
             // 
             // rimViewToolStripMenuItem
             // 
             this.rimViewToolStripMenuItem.Checked = true;
             this.rimViewToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.rimViewToolStripMenuItem.Name = "rimViewToolStripMenuItem";
-            this.rimViewToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
-            this.rimViewToolStripMenuItem.Text = "始终显示图片边框";
+            this.rimViewToolStripMenuItem.Size = new System.Drawing.Size(254, 24);
+            this.rimViewToolStripMenuItem.Text = "Always show images rim";
             this.rimViewToolStripMenuItem.Click += new System.EventHandler(this.rimViewToolStripMenuItem_Click);
             // 
             // colorWorkspaceToolStripMenuItem
             // 
             this.colorWorkspaceToolStripMenuItem.Name = "colorWorkspaceToolStripMenuItem";
-            this.colorWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
-            this.colorWorkspaceToolStripMenuItem.Text = "工作区颜色";
+            this.colorWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(254, 24);
+            this.colorWorkspaceToolStripMenuItem.Text = "Workspace color";
             this.colorWorkspaceToolStripMenuItem.BackColorChanged += new System.EventHandler(this.colorWorkspaceToolStripMenuItem_BackColorChanged);
             this.colorWorkspaceToolStripMenuItem.Click += new System.EventHandler(this.colorWorkspaceToolStripMenuItem_Click);
             // 
@@ -479,8 +479,8 @@
             // toolStripLabel1
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(69, 24);
-            this.toolStripLabel1.Text = "画布尺寸";
+            this.toolStripLabel1.Size = new System.Drawing.Size(90, 24);
+            this.toolStripLabel1.Text = "Canvas size";
             // 
             // sizeSetToolStripComboBox
             // 
@@ -506,8 +506,8 @@
             // toolStripLabel2
             // 
             this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(39, 24);
-            this.toolStripLabel2.Text = "名称";
+            this.toolStripLabel2.Size = new System.Drawing.Size(52, 24);
+            this.toolStripLabel2.Text = "Name";
             // 
             // nameToolStripTextBox
             // 
@@ -519,8 +519,8 @@
             // toolStripLabel3
             // 
             this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(39, 24);
-            this.toolStripLabel3.Text = "位置";
+            this.toolStripLabel3.Size = new System.Drawing.Size(68, 24);
+            this.toolStripLabel3.Text = "Position";
             // 
             // posToolStripTextBox
             // 
@@ -531,8 +531,8 @@
             // toolStripLabel4
             // 
             this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(39, 24);
-            this.toolStripLabel4.Text = "尺寸";
+            this.toolStripLabel4.Size = new System.Drawing.Size(38, 24);
+            this.toolStripLabel4.Text = "Size";
             // 
             // sizeToolStripTextBox
             // 
@@ -552,7 +552,7 @@
             this.Controls.Add(this.splitContainer);
             this.MinimumSize = new System.Drawing.Size(300, 200);
             this.Name = "ImagesetEditControl";
-            this.Size = new System.Drawing.Size(956, 503);
+            this.Size = new System.Drawing.Size(1047, 571);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);
@@ -607,7 +607,7 @@
         private System.Windows.Forms.ToolStripMenuItem addImageMenuItem;
         private System.Windows.Forms.ContextMenuStrip imageSetBoxContextMenuStrip;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
-        private System.Windows.Forms.ToolStripMenuItem delusedToolStripMenuItem_Click2;
+        private System.Windows.Forms.ToolStripMenuItem delusedToolStripMenuItem2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripLabel imageCountToolStripLabel;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;

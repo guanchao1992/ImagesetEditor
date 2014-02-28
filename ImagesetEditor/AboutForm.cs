@@ -12,6 +12,16 @@ namespace ImageSetEditor
 {
     public partial class AboutForm : Form
     {
+        #region Methods
+        private void UpdateLocalization(Localization local)
+        {
+            this.Text = local.GetName("Forms.AboutForm.01");
+            okButton.Text = local.GetName("Forms.AboutForm.02");
+            toProjectWebButton.Text = local.GetName("Forms.AboutForm.03");
+        }
+
+        #endregion Methods
+
         #region Events
 
         private void AboutForm_Load(object sender, EventArgs e)
@@ -33,9 +43,14 @@ namespace ImageSetEditor
 
         #region Constructors
 
-        public AboutForm()
+        public AboutForm(Localization local)
         {
             InitializeComponent();
+
+            if (local != null)
+            {
+                UpdateLocalization(local);
+            }
         }
 
         #endregion Constructors 
