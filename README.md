@@ -33,7 +33,35 @@ C# 开发于 Visual Studio 2013
 	  ...
     </Imageset>
     
-你可以重新编写输出接口来实现自定义文本格式输出。
+###重新编写输出接口以自定义文本格式输出
+    class MyExport : IImagesetExport
+    {
+        void OnExportBegin(ICanvas canvas)
+        {
+            // 输出图片信息之前被调用
+        }
+
+        void OnExportImage(IImage image)
+        {
+            // 输出图片信息被调用
+            // IImage 接口可获取图片的 位置、尺寸、文件路径、名称
+        }
+
+        string OnExportEnd()
+        {
+            // 输出图片信息结束时被调用
+            // 返回的字符串为合并的图片的导出路径，如果返回 null 或 "" 则不导出。
+        }
+        
+        MyExport()
+        {
+            // ...
+        }
+    }
+    
+    // ...
+    
+    ImagesetEditControl.Export(new MyExport());
 
 如何使用
 ==============
