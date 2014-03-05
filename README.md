@@ -67,9 +67,9 @@ How to use
 
 3.When you select a single picture, you can edit the name and position of the picture on property text box.
 
-4.Click **File** - *Save* menu item to save your project. If image files in the same directory of the project file or subdirectory, relative path is stored.
+4.Click **File** - **Save** menu item to save your project. If image files in the same directory of the project file or subdirectory, relative path is stored.
 
-5.Click **File** - *Export*  to export to file.
+5.Click **File** - **Export**  to export to file.
 
 License
 ==============
