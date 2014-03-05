@@ -1,7 +1,7 @@
 ImagesetEditor
 ==============
 
-[README_CHS](https://github.com/frimin/ImagesetEditor/blob/master/README_CHS.md) (Chinese simplified version read me file)
+[README_CHS](https://github.com/frimin/ImagesetEditor/blob/master/README_CHS.md) (Chinese simplified version readme file)
 
 Development in Visual Studio 2013 C#
 
