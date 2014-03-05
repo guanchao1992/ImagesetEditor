@@ -8,7 +8,7 @@ Fast merge images and easily to export image's data.
 Preview
 ==============
 
-![preview](http://www.frimin.com/imageset.jpg "preview")
+![preview](http://www.frimin.com/imageset_en.jpg "preview")
 
 ###Plain text output：
     "image01" 228,0 76,76
