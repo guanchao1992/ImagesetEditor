@@ -6,19 +6,16 @@
                 <Item ID="02" Name="添加"/>
                 <Item ID="03" Name="清空图片组"/>
             </DropMenu>
-            
             <ContextMenu>
                 <Item ID="01" Name="全选"/>
                 <Item ID="02" Name="删除"/>
                 <Item ID="03" Name="排序"/>
-                
                 <Item ID="04" Name="按名称顺序"/>
                 <Item ID="05" Name="按名称倒序"/>
                 <Item ID="06" Name="按尺寸顺序"/>
                 <Item ID="07" Name="按尺寸倒序"/>
                 <Item ID="08" Name="倒置"/>
             </ContextMenu>
-            
             <Item ID="01" Name="一共 #COUNT# 张图片"/>
         </ImagesListView>
         <CanvasView>
@@ -27,7 +24,6 @@
                 <Item ID="02" Name="始终显示图片边框"/>
                 <Item ID="03" Name="工作区颜色"/>
             </DropMenu>
-            
             <ContextMenu>
                 <Item ID="01" Name="删除"/>
                 <Item ID="02" Name="对齐"/>
@@ -40,14 +36,12 @@
                 <Item ID="09" Name="垂直底外侧对齐"/>
                 <Item ID="10" Name="垂直底内侧对齐"/>
             </ContextMenu>
-            
             <Item ID="01" Name="画布尺寸"/>
             <Item ID="02" Name="名称"/>
             <Item ID="03" Name="位置"/>
             <Item ID="04" Name="尺寸"/>
             <Item ID="05" Name="不可用"/>
         </CanvasView>
-        
         <Messages>
             <Item ID="del-caption" Name="删除"/>
             <Item ID="del-all" Name="删除所有？"/>
@@ -56,7 +50,6 @@
             <Item ID="error-invalid-format" Name="无效的格式"/>
         </Messages>
     </Control>
-    
     <Forms>
         <MainForm>
             <Menu>
@@ -68,7 +61,6 @@
                     <Item ID="05" Name="另存为"/>
                     <Item ID="06" Name="导出"/>
                 </File>
-                
                 <Help>
                     <Item ID="01" Name="帮助"/>
                     <Item ID="02" Name="语言"/>
@@ -95,7 +87,7 @@
         <AboutForm>
             <Item ID="01" Name="关于"/>
             <Item ID="02" Name="确定"/>
-            <Item ID="03" Name="访问项目网页"/>
+            <Item ID="03" Name="访问项目页"/>
         </AboutForm>
     </Forms>
 </Language>

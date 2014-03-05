@@ -60,7 +60,7 @@
             this.mainMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.mainMenuStrip.Name = "mainMenuStrip";
             this.mainMenuStrip.Padding = new System.Windows.Forms.Padding(7, 3, 0, 3);
-            this.mainMenuStrip.Size = new System.Drawing.Size(875, 30);
+            this.mainMenuStrip.Size = new System.Drawing.Size(875, 29);
             this.mainMenuStrip.TabIndex = 0;
             this.mainMenuStrip.Text = "menuStrip1";
             // 
@@ -197,8 +197,8 @@
             // toolStripStatusLabel
             // 
             this.toolStripStatusLabel.Name = "toolStripStatusLabel";
-            this.toolStripStatusLabel.Size = new System.Drawing.Size(39, 19);
-            this.toolStripStatusLabel.Text = "就绪";
+            this.toolStripStatusLabel.Size = new System.Drawing.Size(54, 19);
+            this.toolStripStatusLabel.Text = "Ready";
             // 
             // MainForm
             // 

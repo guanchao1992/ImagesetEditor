@@ -170,6 +170,8 @@ namespace ImageSetEditor
             m_strChangeLanguageCaption = local.GetName("Forms.MainForm.Messages.change-language-caption");
 
             m_strChangeLanguage = local.GetName("Forms.MainForm.Messages.change-language");
+
+            toolStripStatusLabel.Text = m_strStatusReady;
         }
 
         #endregion Methods
@@ -193,7 +195,7 @@ namespace ImageSetEditor
                     m_strExportedTo.Replace("#FILENAME#", exportFileDialog.FileName);
 
                 m_lastExportFile = exportFileDialog.FileName;
-
+                
                 m_lastExportFilterIndex = openFileDialog.FilterIndex;
             }
         }
@@ -360,8 +362,6 @@ namespace ImageSetEditor
                 exportLastFileToolStripMenuItem.Text = 
                     m_strExportToLastPosition.Replace("#FILENAME#", m_lastExportFile);
                 exportLastFileToolStripMenuItem.Visible = true;
-                toolStripStatusLabel.Text =
-                    m_strExportedToLastPosition.Replace("#FILENAME#", exportFileDialog.FileName);
             }
             else
             {
