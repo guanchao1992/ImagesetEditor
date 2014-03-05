@@ -5,10 +5,14 @@ ImagesetEditor
 
 Development in Visual Studio 2013 C#
 
-Fast merge images and easily to export image's data.
-
 Preview
 ==============
+
+Fast merge images and easily to export image's data.
+
+Support input formats: BMP / JPG / PNG
+
+Supports output formats: PNG
 
 ![preview](http://www.frimin.com/imageset_en.jpg "preview")
 
