@@ -108,6 +108,16 @@ License
 Updates
 ==============
 
-2014.02.25 0.1.3 -> 0.2.0
+**March 7, 2014** 0.2.0 -> 0.2.1
 
-Adding multiple languages
+Fixed save project bug. **(Serious bug)**
+
+Fixed when selected small image drawing overlapping arrows.
+
+Adding press the **Ctrl** key + left mouse button to select / unselect images.
+
+Adding press the arrow keys to move images.
+
+**Feb 25, 2014** 0.1.3 -> 0.2.0
+
+Adding multiple languages.

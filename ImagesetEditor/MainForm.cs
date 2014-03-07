@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Xml;
 using System.IO;
 
-namespace ImageSetEditor
+namespace ImagesetEditor
 {
     public partial class MainForm : Form
     {
@@ -66,7 +66,7 @@ namespace ImageSetEditor
 
         public static string GetVersion()
         {
-            return "0.2.0";
+            return "0.2.1";
         }
 
         public static string GetProjectVersion()
@@ -213,6 +213,8 @@ namespace ImageSetEditor
                     return;
                 }
             }
+
+            m_docPath = "";
 
             m_lastExportFile = "";
 
@@ -374,7 +376,7 @@ namespace ImageSetEditor
         {
             if (m_docPath == "")
             {
-                exportToolStripMenuItem_Click(sender, e);
+                saveAsToolStripMenuItem_Click(sender, e);
             }
             else
             {

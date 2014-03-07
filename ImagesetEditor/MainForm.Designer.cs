@@ -1,4 +1,4 @@
-﻿namespace ImageSetEditor
+﻿namespace ImagesetEditor
 {
     partial class MainForm
     {

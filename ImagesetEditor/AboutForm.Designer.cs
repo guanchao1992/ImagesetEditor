@@ -1,4 +1,4 @@
-﻿namespace ImageSetEditor
+﻿namespace ImagesetEditor
 {
     partial class AboutForm
     {
@@ -28,9 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
             this.label1 = new System.Windows.Forms.Label();
             this.okButton = new System.Windows.Forms.Button();
             this.toProjectWebButton = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -63,11 +65,23 @@
             this.toProjectWebButton.UseVisualStyleBackColor = true;
             this.toProjectWebButton.Click += new System.EventHandler(this.toProjectWebButton_Click);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(16, 183);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox1.Size = new System.Drawing.Size(501, 96);
+            this.textBox1.TabIndex = 3;
+            this.textBox1.Text = resources.GetString("textBox1.Text");
+            // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 185);
+            this.ClientSize = new System.Drawing.Size(529, 291);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.toProjectWebButton);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.label1);
@@ -90,5 +104,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Button toProjectWebButton;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

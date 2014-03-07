@@ -1,4 +1,4 @@
-﻿namespace ImageSetEditor
+﻿namespace ImagesetEditor
 {
     partial class ImagesetEditControl
     {
@@ -131,6 +131,8 @@
             this.usedListView.View = System.Windows.Forms.View.Details;
             this.usedListView.SelectedIndexChanged += new System.EventHandler(this.usedListView_SelectedIndexChanged);
             this.usedListView.SizeChanged += new System.EventHandler(this.usedListView_SizeChanged);
+            this.usedListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.usedListView_KeyDown);
+            this.usedListView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.usedListView_KeyUp);
             // 
             // usedColumnHeader
             // 
@@ -304,21 +306,21 @@
             this.toolStripMenuItem3,
             this.alignmentToolStripMenuItem});
             this.imageSetBoxContextMenuStrip.Name = "imageSetBoxContextMenuStrip";
-            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(176, 86);
+            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(155, 58);
             this.imageSetBoxContextMenuStrip.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.imageSetBoxContextMenuStrip_Closing);
             this.imageSetBoxContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.imageSetBoxContextMenuStrip_Opening);
             // 
             // delusedToolStripMenuItem2
             // 
             this.delusedToolStripMenuItem2.Name = "delusedToolStripMenuItem2";
-            this.delusedToolStripMenuItem2.Size = new System.Drawing.Size(175, 24);
+            this.delusedToolStripMenuItem2.Size = new System.Drawing.Size(154, 24);
             this.delusedToolStripMenuItem2.Text = "Delete";
             this.delusedToolStripMenuItem2.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(172, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(151, 6);
             // 
             // alignmentToolStripMenuItem
             // 
@@ -333,7 +335,7 @@
             this.bottomOutsideAlignmentToolStripMenuItem,
             this.bottomInsideAlignmentToolStripMenuItem});
             this.alignmentToolStripMenuItem.Name = "alignmentToolStripMenuItem";
-            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
             this.alignmentToolStripMenuItem.Text = "Alignment";
             // 
             // leftOutsideAlignmentToolStripMenuItem

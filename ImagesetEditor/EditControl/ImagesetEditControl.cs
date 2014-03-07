@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-namespace ImageSetEditor
+namespace ImagesetEditor
 {
     public partial class ImagesetEditControl : UserControl, IDisposable, IRedraw
     {
@@ -102,6 +102,11 @@ namespace ImageSetEditor
         /// 用于排序对齐边的列表
         /// </summary>
         private List<int> m_alignmentArray;
+
+        /// <summary>
+        /// Control 键被按下
+        /// </summary>
+        private bool m_ctrlPress;
 
         #endregion Fields
 
@@ -266,6 +271,32 @@ namespace ImageSetEditor
             imageSetBox.Invalidate();
         }
 
+        private void SelectsRimUpdate()
+        {
+            if (m_select.Selects.Count == 0)
+            {
+                m_dockAid.SetImage(null);
+            }
+            else
+            {
+                m_select.UpdateRim();
+
+                m_dockAid.SetImage(m_select);
+            }
+        }
+
+        private void ImageViewInfoUpdate()
+        {
+            if (m_select.Selects.Count == 1)
+            {
+                SetViewInfo(m_select.Selects.First());
+            }
+            else
+            {
+                SetViewInfo(null);
+            }
+        }
+
         public void Redraw()
         {
             ImageSetBoxUpdate();
@@ -355,9 +386,9 @@ namespace ImageSetEditor
 
             m_strErrorCaption = local.GetName("Control.Messages.error-caption");
 
-            m_strErrorFormat = local.GetName("Control.Messages.error-invalid-format"); 
+            m_strErrorFormat = local.GetName("Control.Messages.error-invalid-format");
 
-            SetViewInfo(m_viewInfoImage);
+            ImageViewInfoUpdate();
 
             ImageCountUpdate();
         }
@@ -703,15 +734,11 @@ namespace ImageSetEditor
                             {
                                 SetViewInfo(m_viewInfoImage);
                             }
-
-                            ImageSetBoxUpdate();
                         }
                         break;
                     case MouseStatus.Select:
                         {
                             m_MouseStatus = MouseStatus.Normal;
-
-                            ClearSelects();
 
                             /// 拖动的矩形区域
                             Rectangle selectArea = GetRectangleArea(
@@ -727,11 +754,56 @@ namespace ImageSetEditor
 
                             if (m_beginMousePos == m_curMousePos)
                             {
-                                /// 光标位置不变点击一次则只选取最顶层的图片
-                                SelectTop();
+                                /// 光标位置不变点击一次
+                                if (m_ctrlPress)
+                                {
+                                    m_listViewNodeLock = true;
+
+                                    bool cancelSelected = false;
+
+                                    /// 优先检查取消选中
+                                    foreach (SubImage image in m_select.Selects)
+                                    {
+                                        if (image.Rectangle.Contains(
+                                            m_curMousePos.X + m_canvas.ViewPos.X,
+                                            m_curMousePos.Y + m_canvas.ViewPos.Y))
+                                        {
+                                            ((ListViewItem)image.BindItem)
+                                                .Selected = false;
+                                            cancelSelected = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (cancelSelected == false)
+                                    {
+                                        foreach (ListViewItem item in usedListView.Items)
+                                        {
+                                            SubImage image = (SubImage)item.Tag;
+
+                                            if (image.Rectangle.Contains(
+                                                m_curMousePos.X + m_canvas.ViewPos.X,
+                                                m_curMousePos.Y + m_canvas.ViewPos.Y))
+                                            {
+                                                item.Selected = !item.Selected;
+                                            }
+                                        }
+                                    }
+
+                                    m_listViewNodeLock = false;
+
+                                    usedListView_SelectedIndexChanged(null, null);
+                                }
+                                else
+                                {
+                                    ClearSelects();
+                                    SelectTop();
+                                }
                             }
                             else
                             {
+                                ClearSelects();
+
                                 foreach (ListViewItem item in usedListView.Items)
                                 {
                                     SubImage image = (SubImage)item.Tag;
@@ -750,24 +822,129 @@ namespace ImageSetEditor
                                 m_select.UpdateRim();
 
                                 m_dockAid.SetImage(m_select);
-
-                                if (m_select.Selects.Count == 1)
-                                {
-                                    SetViewInfo(m_select.Selects.First());
-                                }
                             }
-
-                            ImageSetBoxUpdate();
                         }
                         break;
                     default:
                         if (m_dockAid.InArrowButton(e.X, e.Y) && m_dockAid.OnClick(e.X, e.Y))
                         {
                             m_dockAid.SetImage(m_select);
-                            ImageSetBoxUpdate();
                         }
                         break;
                 }
+
+                ImageViewInfoUpdate();
+
+                ImageSetBoxUpdate();
+            }
+        }
+
+        private void usedListView_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    m_ctrlPress = true;
+
+                    m_MouseStatus = MouseStatus.Normal;
+
+                    imageSetBox_MouseMove(null, 
+                        new MouseEventArgs(MouseButtons.None, 0, m_curMousePos.X, m_curMousePos.Y, 0));
+
+                    break;
+                case Keys.Up:
+                    foreach(SubImage image in m_select.Selects)
+                    {
+                        image.Position = 
+                            new Point(image.Position.X, image.Position.Y - 1);
+                    }
+
+                    e.Handled = true;
+
+                    ImageViewInfoUpdate();
+
+                    SelectsRimUpdate();
+
+                    ImageSetBoxUpdate();
+
+                    break;
+                case Keys.Down:
+                    foreach(SubImage image in m_select.Selects)
+                    {
+                        image.Position = 
+                            new Point(image.Position.X, image.Position.Y + 1);
+                    }
+
+                    e.Handled = true;
+
+                    ImageViewInfoUpdate();
+
+                    SelectsRimUpdate();
+
+                    ImageSetBoxUpdate();
+
+                    break;
+                case Keys.Left:
+                    foreach(SubImage image in m_select.Selects)
+                    {
+                        image.Position = 
+                            new Point(image.Position.X - 1, image.Position.Y);
+                    }
+
+                    e.Handled = true;
+
+                    ImageViewInfoUpdate();
+
+                    SelectsRimUpdate();
+
+                    ImageSetBoxUpdate();
+
+                    break;
+                case Keys.Right:
+                    foreach(SubImage image in m_select.Selects)
+                    {
+                        image.Position = 
+                            new Point(image.Position.X + 1, image.Position.Y);
+                    }
+
+                    e.Handled = true;
+
+                    ImageViewInfoUpdate();
+
+                    SelectsRimUpdate();
+
+                    ImageSetBoxUpdate();
+
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+
+        private void usedListView_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    m_ctrlPress = false;
+
+                    m_MouseStatus = MouseStatus.Normal;
+
+                    imageSetBox_MouseMove(null,
+                        new MouseEventArgs(MouseButtons.None, 0, m_curMousePos.X, m_curMousePos.Y, 0));
+
+                    break;
+                case Keys.Up:
+                    break;
+                case Keys.Down:
+                    break;
+                case Keys.Left:
+                    break;
+                case Keys.Right:
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -810,25 +987,27 @@ namespace ImageSetEditor
 
             m_inSelects = false;
 
-            if (m_dockAid.OnMouseMove(e.X, e.Y))
+            if (m_ctrlPress == false)
             {
-                imageSetBox.Cursor = Cursors.Hand;
-                return;
-            }
-
-            /// 鼠标移动到已经选择的图片里时变更光标
-
-            foreach (SubImage image in m_select.Selects)
-            {
-                if (image.Rectangle.Contains(new Point(
-                    e.X + m_canvas.ViewPos.X,
-                    e.Y + m_canvas.ViewPos.Y)))
+                if (m_dockAid.OnMouseMove(e.X, e.Y))
                 {
-                    m_inSelects = true;
-                    break;
+                    imageSetBox.Cursor = Cursors.Hand;
+                    return;
+                }
+
+                /// 鼠标移动到已经选择的图片里时变更光标
+
+                foreach (SubImage image in m_select.Selects)
+                {
+                    if (image.Rectangle.Contains(new Point(
+                        e.X + m_canvas.ViewPos.X,
+                        e.Y + m_canvas.ViewPos.Y)))
+                    {
+                        m_inSelects = true;
+                        break;
+                    }
                 }
             }
-
             if (m_inSelects)
             {
                 imageSetBox.Cursor = Cursors.SizeAll;
@@ -1172,17 +1351,6 @@ namespace ImageSetEditor
             if (m_listViewNodeLock)
                 return;
 
-            int n = usedListView.SelectedItems.Count;
-
-            if (n == 1)
-            {
-                SetViewInfo((SubImage)usedListView.SelectedItems[0].Tag);
-            }
-            else
-            {
-                SetViewInfo(null);
-            }
-
             m_select.Selects.Clear();
 
             foreach (ListViewItem item in usedListView.SelectedItems)
@@ -1190,7 +1358,9 @@ namespace ImageSetEditor
                 m_select.Selects.Add((SubImage)item.Tag);
             }
 
-            m_select.UpdateRim();
+            ImageViewInfoUpdate();
+
+            SelectsRimUpdate();
 
             ImageSetBoxUpdate();
         }
@@ -1854,6 +2024,8 @@ namespace ImageSetEditor
 
         private const int Direction_Nums = 8;
 
+        private const int RimMinLength = 64;
+
         private int m_selectArrow;
 
         private Arrow[] m_arrow;
@@ -1865,6 +2037,8 @@ namespace ImageSetEditor
         private Canvas m_canvas;
 
         private IRedraw m_redraw;
+
+        private RealDrawRim m_realDrawRim;
 
         private List<int> m_leftContactEdge;
 
@@ -1916,22 +2090,24 @@ namespace ImageSetEditor
                 return;
             }
 
+            m_realDrawRim.Set(m_select.Position, m_select.Size);
+
             m_arrow[Direction_Upper].Position
-                = new Point(m_select.Position.X + m_select.Size.Width / 2 - m_arrow[Direction_Upper].Size.Width / 2, m_select.Position.Y - m_arrow[Direction_Upper].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X + m_realDrawRim.Size.Width / 2 - m_arrow[Direction_Upper].Size.Width / 2, m_realDrawRim.Position.Y - m_arrow[Direction_Upper].Size.Height / 2);
             m_arrow[Direction_UpperLeft].Position
-                = new Point(m_select.Position.X - m_arrow[Direction_UpperLeft].Size.Width / 2, m_select.Position.Y - m_arrow[Direction_UpperLeft].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X - m_arrow[Direction_UpperLeft].Size.Width / 2, m_realDrawRim.Position.Y - m_arrow[Direction_UpperLeft].Size.Height / 2);
             m_arrow[Direction_UpperRight].Position
-                = new Point(m_select.Position.X + m_select.Size.Width - m_arrow[Direction_UpperRight].Size.Width / 2, m_select.Position.Y - m_arrow[Direction_UpperRight].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X + m_realDrawRim.Size.Width - m_arrow[Direction_UpperRight].Size.Width / 2, m_realDrawRim.Position.Y - m_arrow[Direction_UpperRight].Size.Height / 2);
             m_arrow[Direction_Lower].Position
-                = new Point(m_select.Position.X + m_select.Size.Width / 2 - m_arrow[Direction_Lower].Size.Width / 2, m_select.Position.Y + m_select.Size.Height - m_arrow[Direction_Lower].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X + m_realDrawRim.Size.Width / 2 - m_arrow[Direction_Lower].Size.Width / 2, m_realDrawRim.Position.Y + m_realDrawRim.Size.Height - m_arrow[Direction_Lower].Size.Height / 2);
             m_arrow[Direction_LowerLeft].Position
-                = new Point(m_select.Position.X - m_arrow[Direction_LowerLeft].Size.Width / 2, m_select.Position.Y + m_select.Size.Height - m_arrow[Direction_LowerLeft].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X - m_arrow[Direction_LowerLeft].Size.Width / 2, m_realDrawRim.Position.Y + m_realDrawRim.Size.Height - m_arrow[Direction_LowerLeft].Size.Height / 2);
             m_arrow[Direction_LowerRight].Position
-                = new Point(m_select.Position.X + m_select.Size.Width - m_arrow[Direction_LowerRight].Size.Width / 2, m_select.Position.Y + m_select.Size.Height - m_arrow[Direction_LowerRight].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X + m_realDrawRim.Size.Width - m_arrow[Direction_LowerRight].Size.Width / 2, m_realDrawRim.Position.Y + m_realDrawRim.Size.Height - m_arrow[Direction_LowerRight].Size.Height / 2);
             m_arrow[Direction_Left].Position
-                = new Point(m_select.Position.X - m_arrow[Direction_Left].Size.Width / 2, m_select.Position.Y + m_select.Size.Height / 2 - m_arrow[Direction_Left].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X - m_arrow[Direction_Left].Size.Width / 2, m_realDrawRim.Position.Y + m_realDrawRim.Size.Height / 2 - m_arrow[Direction_Left].Size.Height / 2);
             m_arrow[Direction_Right].Position
-                = new Point(m_select.Position.X + m_select.Size.Width - m_arrow[Direction_Right].Size.Width / 2, m_select.Position.Y + m_select.Size.Height / 2 - m_arrow[Direction_Right].Size.Height / 2);
+                = new Point(m_realDrawRim.Position.X + m_realDrawRim.Size.Width - m_arrow[Direction_Right].Size.Width / 2, m_realDrawRim.Position.Y + m_realDrawRim.Size.Height / 2 - m_arrow[Direction_Right].Size.Height / 2);
 
             if (m_arrow[Direction_Upper].Visible = (m_upperContactEdge.Count > 0))
             {
@@ -2193,6 +2369,8 @@ namespace ImageSetEditor
 
             m_redraw = redraw;
 
+            m_realDrawRim = new RealDrawRim(new Point(0, 0), new Size(0, 0), RimMinLength);
+
             m_leftContactEdge = new List<int>();
 
             m_upperContactEdge = new List<int>();
@@ -2400,6 +2578,56 @@ namespace ImageSetEditor
         #endregion Constructors
     }
 
+    /// <summary>
+    /// 实际绘制的线框
+    /// </summary>
+    internal class RealDrawRim : SubImage
+    {
+        #region Fields
+
+        private int m_rimMinLength;
+
+        #endregion Fields
+
+        #region Methods
+
+        public void Set(Point position, Size size)
+        {
+            m_position = position;
+            m_size = size;
+
+            if (m_size.Width < m_rimMinLength)
+            {
+                m_position.X -= (m_rimMinLength - m_size.Width) / 2;
+                m_size.Width = m_rimMinLength;
+            }
+
+            if (m_size.Height < m_rimMinLength)
+            {
+                m_position.Y -= (m_rimMinLength - m_size.Height) / 2;
+                m_size.Height = m_rimMinLength;
+            }
+
+            m_rect = new Rectangle(this.Position, this.Size);
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public RealDrawRim(Point position, Size size, int rimMinLength) 
+            : base((Image)null)
+        {
+            m_rimMinLength = rimMinLength;
+            Set(position, size);
+        }
+
+        #endregion Constructors
+    }
+
+    /// <summary>
+    /// 被选择的图片集合
+    /// </summary>
     internal class SubImageSelects : SubImage
     {
         #region Fields

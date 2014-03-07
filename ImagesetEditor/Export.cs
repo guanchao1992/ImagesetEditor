@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Xml;
 
-namespace ImageSetEditor
+namespace ImagesetEditor
 {
     class ProjectExport : IImagesetExport
     {
