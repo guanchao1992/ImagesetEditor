@@ -108,6 +108,12 @@ License
 Updates
 ==============
 
+**March 8, 2014** 0.2.1 -> 0.2.2
+
+Fixed **Exported to last Position** menu item's bug.
+
+Adding **Recent Files** menu item.
+
 **March 7, 2014** 0.2.0 -> 0.2.1
 
 Fixed save project bug. **(Serious bug)**

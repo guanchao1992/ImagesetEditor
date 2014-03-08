@@ -60,6 +60,8 @@
                     <Item ID="04" Name="保存"/>
                     <Item ID="05" Name="另存为"/>
                     <Item ID="06" Name="导出"/>
+                    <Item ID="07" Name="最近的文件"/>
+                    <Item ID="08" Name="退出"/>
                 </File>
                 <Help>
                     <Item ID="01" Name="帮助"/>
@@ -82,6 +84,7 @@
                 <Item ID="status-ready" Name="就绪"/>
                 <Item ID="change-language-caption" Name="更改语言"/>
                 <Item ID="change-language" Name="更改界面语言必须重新启动程序"/>
+                <Item ID="file-not-exist" Name="文件不存在"/>
             </Messages>
         </MainForm>
         <AboutForm>

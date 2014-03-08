@@ -1222,7 +1222,7 @@ namespace ImagesetEditor
         private void nameToolStripTextBox_Leave(object sender, EventArgs e)
         {
             if (m_select != null)
-                nameToolStripTextBox.Text = m_select.Name;
+                nameToolStripTextBox.Text = m_viewInfoImage.Name;
         }
 
         private void nameToolStripTextBox_KeyUp(object sender, KeyEventArgs e)
@@ -1234,8 +1234,8 @@ namespace ImagesetEditor
                     nameToolStripTextBox.Text = m_select.Name;
                     return;
                 }
-                m_select.Name = nameToolStripTextBox.Text;
-                m_select.BindItem.Text = m_select.Name;
+                m_viewInfoImage.Name = nameToolStripTextBox.Text;
+                m_viewInfoImage.BindItem.Text = m_viewInfoImage.Name;
             }
         }
 
@@ -1246,7 +1246,7 @@ namespace ImagesetEditor
                 if (posToolStripTextBox.Text.Length == 0)
                 {
                     posToolStripTextBox.Text = posToolStripTextBox.Text =
-                    String.Format("{0},{1}", m_select.Position.X, m_select.Position.Y); ;
+                    String.Format("{0},{1}", m_viewInfoImage.Position.X, m_viewInfoImage.Position.Y); ;
                     return;
                 }
 
@@ -1259,7 +1259,7 @@ namespace ImagesetEditor
                         throw new SystemException(m_strErrorFormat);
                     }
 
-                    m_select.Position =
+                    m_viewInfoImage.Position =
                         new Point(int.Parse(strArray[0]), int.Parse(strArray[1]));
 
                     ImageSetBoxUpdate();
@@ -1267,8 +1267,8 @@ namespace ImagesetEditor
                 catch (SystemException exc)
                 {
                     MessageBox.Show(exc.Message, m_strErrorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    posToolStripTextBox.Text = 
-                        String.Format("{0},{1}", m_select.Position.X, m_select.Position.Y); ;
+                    posToolStripTextBox.Text =
+                        String.Format("{0},{1}", m_viewInfoImage.Position.X, m_viewInfoImage.Position.Y); ;
                 }
             }
         }

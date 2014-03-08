@@ -28,6 +28,8 @@ namespace ImagesetEditor
 
         private string m_docPath = "";
 
+        private List<string> m_recentFiles;
+
         #endregion Fields
 
         #region Strings
@@ -60,13 +62,15 @@ namespace ImagesetEditor
 
         private string m_strChangeLanguage = "Change the interface language must restart the program.";
 
+        private string m_strFileNotExist = "File does not exist.";
+
         #endregion Strings
 
         #region Methods
 
         public static string GetVersion()
         {
-            return "0.2.1";
+            return "0.2.2";
         }
 
         public static string GetProjectVersion()
@@ -115,6 +119,136 @@ namespace ImagesetEditor
             att.Value = value;
         }
 
+        private void OpenFile(string fileName)
+        {
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+
+                xmlDoc.Load(fileName);
+
+                string projectVer = xmlDoc.DocumentElement.Attributes.GetNamedItem("ProjectVersion").Value;
+
+                if (projectVer != GetProjectVersion())
+                {
+                    if (DialogResult.Cancel ==
+                        MessageBox.Show(
+                        m_strOpenVersionMismatch
+                        .Replace("#N#", "\n")
+                        .Replace("#OPEN-PROJECT-VER#", projectVer)
+                        .Replace("#OPEN-PROJECT-CREATED-VER#", xmlDoc.DocumentElement.Attributes.GetNamedItem("Version").Value)
+                        .Replace("#CURRENT-PROJECT-VER#", GetProjectVersion()),
+                        m_strOpenProject, MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
+                    {
+                        return;
+                    }
+                }
+
+                m_editControl.ClearImages();
+
+                string projectDir = ProjectExport.GetFolder(fileName);
+
+                List<string> loadFaild = new List<string>();
+
+                m_editControl.CanvasSize = new Size(
+                    int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("Width").Value),
+                    int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("Height").Value)
+                    );
+
+                string[] colorParams =
+                    xmlDoc.DocumentElement.Attributes.GetNamedItem("Background").Value.Split(',');
+
+                if (colorParams.Count() == 3)
+                {
+                    m_editControl.ColorWorkSpace = Color.FromArgb(
+                        int.Parse(colorParams[0]),
+                        int.Parse(colorParams[1]),
+                        int.Parse(colorParams[2]));
+                }
+                else
+                {
+                    m_editControl.ColorWorkSpace = Color.White;
+                }
+
+                m_editControl.RimView =
+                    xmlDoc.DocumentElement.Attributes.GetNamedItem("RimView").Value == "True";
+
+                m_lastExportFile =
+                    xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
+
+                m_lastExportFilterIndex =
+                    int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFilterIndex").Value);
+
+                foreach (XmlNode n in xmlDoc.DocumentElement)
+                {
+                    if (m_editControl.AddImage(
+                        n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir),
+                        n.Attributes.GetNamedItem("Name").Value,
+                        new Point(
+                            int.Parse(n.Attributes.GetNamedItem("XPos").Value),
+                            int.Parse(n.Attributes.GetNamedItem("YPos").Value)
+                            ),
+                        new Size(
+                            int.Parse(n.Attributes.GetNamedItem("Width").Value),
+                            int.Parse(n.Attributes.GetNamedItem("Height").Value)
+                            )
+                        ) == false)
+                    {
+                        loadFaild.Add(n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir));
+                    }
+                }
+
+                if (loadFaild.Count != 0)
+                {
+                    string text = m_strOpenImageFailed;
+
+                    foreach (string s in loadFaild)
+                    {
+                        text = text + "\n\n" + s;
+                    }
+
+                    MessageBox.Show(text, m_strOpenProject, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                m_editControl.Redraw();
+
+                m_docPath = fileName;
+
+                toolStripStatusLabel.Text = m_strStatusReady;
+
+                AddRecentFiles(fileName);
+            }
+            catch
+            {
+                MessageBox.Show(m_strOpenProjectFailed.Replace("#FILENAME#", fileName),
+                    m_strOpenProject, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void AddRecentFiles(string path)
+        {
+            this.Text = "ImagesetEditor - " + path.Split('\\').Last();
+
+            for (int i = 0; i != m_recentFiles.Count();)
+            {
+                if (m_recentFiles[i] == path)
+                {
+                    m_recentFiles.RemoveAt(i);
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+
+            m_recentFiles.Insert(0, path);
+
+            while (m_recentFiles.Count() > 10)
+            {
+                m_recentFiles.RemoveAt(m_recentFiles.Count() - 1);
+            }
+        }
+
         private void UpdateLocalization(Localization local)
         {
             // Menu
@@ -132,6 +266,10 @@ namespace ImagesetEditor
             saveAsToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.05");
 
             exportToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.06");
+
+            recentFilesToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.07");
+
+            exitToolStripMenuItem.Text = local.GetName("Forms.MainForm.Menu.File.08");
 
             // help
 
@@ -171,6 +309,8 @@ namespace ImagesetEditor
 
             m_strChangeLanguage = local.GetName("Forms.MainForm.Messages.change-language");
 
+            m_strFileNotExist = local.GetName("Forms.MainForm.Messages.file-not-exist");
+
             toolStripStatusLabel.Text = m_strStatusReady;
         }
 
@@ -195,8 +335,8 @@ namespace ImagesetEditor
                     m_strExportedTo.Replace("#FILENAME#", exportFileDialog.FileName);
 
                 m_lastExportFile = exportFileDialog.FileName;
-                
-                m_lastExportFilterIndex = openFileDialog.FilterIndex;
+
+                m_lastExportFilterIndex = exportFileDialog.FilterIndex;
             }
         }
 
@@ -214,6 +354,8 @@ namespace ImagesetEditor
                 }
             }
 
+            this.Text = "ImagesetEditor";
+
             m_docPath = "";
 
             m_lastExportFile = "";
@@ -227,109 +369,7 @@ namespace ImagesetEditor
 
             if (DialogResult.OK == openFileDialog.ShowDialog())
             {
-                try
-                {
-                    XmlDocument xmlDoc = new XmlDocument();
-
-                    xmlDoc.Load(openFileDialog.FileName);
-
-                    string projectVer = xmlDoc.DocumentElement.Attributes.GetNamedItem("ProjectVersion").Value;
-
-                    if (projectVer != GetProjectVersion())
-                    {
-                        if (DialogResult.Cancel ==
-                            MessageBox.Show(
-                            m_strOpenVersionMismatch
-                            .Replace("#N#", "\n")
-                            .Replace("#OPEN-PROJECT-VER#", projectVer)
-                            .Replace("#OPEN-PROJECT-CREATED-VER#", xmlDoc.DocumentElement.Attributes.GetNamedItem("Version").Value)
-                            .Replace("#CURRENT-PROJECT-VER#", GetProjectVersion()),
-                            m_strOpenProject, MessageBoxButtons.OKCancel, MessageBoxIcon.Question))
-                        {
-                            return;
-                        }
-                    }
-
-                    m_editControl.ClearImages();
-
-                    string projectDir = ProjectExport.GetFolder(openFileDialog.FileName);
-
-                    List<string> loadFaild = new List<string>();
-
-                    m_editControl.CanvasSize = new Size(
-                        int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("Width").Value),
-                        int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("Height").Value)
-                        );
-
-                    string[] colorParams =
-                        xmlDoc.DocumentElement.Attributes.GetNamedItem("Background").Value.Split(',');
-
-                    if (colorParams.Count() == 3)
-                    {
-                        m_editControl.ColorWorkSpace = Color.FromArgb(
-                            int.Parse(colorParams[0]),
-                            int.Parse(colorParams[1]),
-                            int.Parse(colorParams[2]));
-                    }
-                    else
-                    {
-                        m_editControl.ColorWorkSpace = Color.White;
-                    }
-
-                    m_editControl.RimView =
-                        xmlDoc.DocumentElement.Attributes.GetNamedItem("RimView").Value == "True";
-
-                    exportFileDialog.InitialDirectory =
-                        xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
-
-                    m_lastExportFile =
-                        xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFile").Value;
-
-                    m_lastExportFilterIndex =
-                        int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFilterIndex").Value);
-
-                    foreach (XmlNode n in xmlDoc.DocumentElement)
-                    {
-                        if (m_editControl.AddImage(
-                            n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir),
-                            n.Attributes.GetNamedItem("Name").Value,
-                            new Point(
-                                int.Parse(n.Attributes.GetNamedItem("XPos").Value),
-                                int.Parse(n.Attributes.GetNamedItem("YPos").Value)
-                                ),
-                            new Size(
-                                int.Parse(n.Attributes.GetNamedItem("Width").Value),
-                                int.Parse(n.Attributes.GetNamedItem("Height").Value)
-                                )
-                            ) == false)
-                        {
-                            loadFaild.Add(n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir));
-                        }
-                    }
-
-                    if (loadFaild.Count != 0)
-                    {
-                        string text = m_strOpenImageFailed;
-
-                        foreach (string s in loadFaild)
-                        {
-                            text = text + "\n\n" + s;
-                        }
-
-                        MessageBox.Show(text, m_strOpenProject, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-
-                    m_editControl.Redraw();
-
-                    m_docPath = openFileDialog.FileName;
-
-                    toolStripStatusLabel.Text = m_strStatusReady;
-                }
-                catch
-                {
-                    MessageBox.Show(m_strOpenProjectFailed.Replace("#FILENAME#", openFileDialog.FileName),
-                        m_strOpenProject, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                OpenFile(openFileDialog.FileName);
             }
         }
 
@@ -347,6 +387,8 @@ namespace ImagesetEditor
 
                     toolStripStatusLabel.Text = 
                         m_strSavedTo.Replace("#FILENAME#", saveFileDialog.FileName);
+
+                    AddRecentFiles(saveFileDialog.FileName);
                 }
                 catch (SystemException exc)
                 {
@@ -437,6 +479,49 @@ namespace ImagesetEditor
             item.Checked = true;
         }
 
+        private void recentFilesToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            recentFilesToolStripMenuItem.DropDownItems.Clear();
+            foreach (string s in m_recentFiles)
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(s);
+                item.Click += recentFileToolStripMenuItem_Click;
+                recentFilesToolStripMenuItem.DropDownItems.Add(item);
+            }
+        }
+
+        private void recentFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string fileName = ((ToolStripMenuItem)sender).Text;
+
+            if (File.Exists(fileName))
+            {
+                OpenFile(fileName);
+            }
+            else
+            {
+                for (int i = 0; i != m_recentFiles.Count(); )
+                {
+                    if (m_recentFiles[i] == fileName)
+                    {
+                        m_recentFiles.RemoveAt(i);
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                }
+
+                MessageBox.Show(m_strOpenProjectFailed.Replace("#FILENAME#", fileName), m_strFileNotExist, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             DirectoryInfo dirInfo = new DirectoryInfo("Localization");
@@ -467,10 +552,32 @@ namespace ImagesetEditor
                     }
                 }
             }
+
+            int i = 0;
+
+            while(true)
+            {
+                string path = GetConfig("RecentFiles", "n" + i.ToString(), "");
+
+                if (path == "")
+                {
+                    break;
+                }
+
+                m_recentFiles.Add(path);
+
+                ++i;
+            }
+            
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            for (int i = 0; i != m_recentFiles.Count; ++i)
+            {
+                SetConfig("RecentFiles", "n" + i.ToString(), m_recentFiles[i]);
+            }
+
             m_configDoc.Save("config.xml");
         }
 
@@ -514,6 +621,8 @@ namespace ImagesetEditor
 
         public MainForm()
         {
+            m_recentFiles = new List<string>();
+
             InitializeComponent();
 
             try
