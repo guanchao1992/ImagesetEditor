@@ -108,6 +108,14 @@ License
 Updates
 ==============
 
+**March 9, 2014** 0.2.1 -> 0.2.3
+
+Fixed sort bugs.
+
+Fixed some display bugs.
+
+Adding auto typesetting, to select some of the same size image to view typesetting options.
+
 **March 8, 2014** 0.2.1 -> 0.2.2
 
 Fixed **Exported to last Position** menu item's bug.

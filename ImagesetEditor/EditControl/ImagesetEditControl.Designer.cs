@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImagesetEditControl));
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.usedListView = new System.Windows.Forms.ListView();
             this.usedColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -72,14 +73,20 @@
             this.rimViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.colorWorkspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.canvasSizeToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.sizeSetToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.nameToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.nameToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
+            this.autoTypesettingToolStripLabel = new System.Windows.Forms.ToolStripDropDownButton();
+            this.horizontalLimitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.verticalLimitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.amountMinusToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.amountSetToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
+            this.amountAddToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.positionToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.posToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
+            this.sizeToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.sizeToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -112,8 +119,8 @@
             this.splitContainer.Panel2.Controls.Add(this.vScrollBar);
             this.splitContainer.Panel2.Controls.Add(this.hScrollBar);
             this.splitContainer.Panel2.Controls.Add(this.toolStrip);
-            this.splitContainer.Size = new System.Drawing.Size(1047, 571);
-            this.splitContainer.SplitterDistance = 195;
+            this.splitContainer.Size = new System.Drawing.Size(977, 537);
+            this.splitContainer.SplitterDistance = 181;
             this.splitContainer.TabIndex = 0;
             // 
             // usedListView
@@ -125,7 +132,7 @@
             this.usedListView.HideSelection = false;
             this.usedListView.Location = new System.Drawing.Point(0, 25);
             this.usedListView.Name = "usedListView";
-            this.usedListView.Size = new System.Drawing.Size(195, 546);
+            this.usedListView.Size = new System.Drawing.Size(181, 512);
             this.usedListView.TabIndex = 1;
             this.usedListView.UseCompatibleStateImageBehavior = false;
             this.usedListView.View = System.Windows.Forms.View.Details;
@@ -237,7 +244,7 @@
             this.imageCountToolStripLabel});
             this.usedToolStrip.Location = new System.Drawing.Point(0, 0);
             this.usedToolStrip.Name = "usedToolStrip";
-            this.usedToolStrip.Size = new System.Drawing.Size(195, 25);
+            this.usedToolStrip.Size = new System.Drawing.Size(181, 25);
             this.usedToolStrip.TabIndex = 2;
             this.usedToolStrip.Text = "toolStrip2";
             // 
@@ -287,9 +294,9 @@
             this.imageSetBox.ContextMenuStrip = this.imageSetBoxContextMenuStrip;
             this.imageSetBox.Cursor = System.Windows.Forms.Cursors.SizeAll;
             this.imageSetBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageSetBox.Location = new System.Drawing.Point(0, 27);
+            this.imageSetBox.Location = new System.Drawing.Point(0, 29);
             this.imageSetBox.Name = "imageSetBox";
-            this.imageSetBox.Size = new System.Drawing.Size(827, 523);
+            this.imageSetBox.Size = new System.Drawing.Size(771, 487);
             this.imageSetBox.TabIndex = 2;
             this.imageSetBox.TabStop = false;
             this.imageSetBox.SizeChanged += new System.EventHandler(this.imageSetBox_SizeChanged);
@@ -411,18 +418,18 @@
             // 
             this.vScrollBar.Dock = System.Windows.Forms.DockStyle.Right;
             this.vScrollBar.LargeChange = 20;
-            this.vScrollBar.Location = new System.Drawing.Point(827, 27);
+            this.vScrollBar.Location = new System.Drawing.Point(771, 29);
             this.vScrollBar.Name = "vScrollBar";
-            this.vScrollBar.Size = new System.Drawing.Size(21, 523);
+            this.vScrollBar.Size = new System.Drawing.Size(21, 487);
             this.vScrollBar.TabIndex = 1;
             this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
             // 
             // hScrollBar
             // 
             this.hScrollBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.hScrollBar.Location = new System.Drawing.Point(0, 550);
+            this.hScrollBar.Location = new System.Drawing.Point(0, 516);
             this.hScrollBar.Name = "hScrollBar";
-            this.hScrollBar.Size = new System.Drawing.Size(848, 21);
+            this.hScrollBar.Size = new System.Drawing.Size(792, 21);
             this.hScrollBar.TabIndex = 0;
             this.hScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar_Scroll);
             // 
@@ -432,18 +439,22 @@
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewToolStripMenuItem,
             this.toolStripSeparator1,
-            this.toolStripLabel1,
+            this.canvasSizeToolStripLabel,
             this.sizeSetToolStripComboBox,
             this.toolStripSeparator4,
-            this.toolStripLabel2,
+            this.nameToolStripLabel,
             this.nameToolStripTextBox,
-            this.toolStripLabel3,
+            this.autoTypesettingToolStripLabel,
+            this.amountMinusToolStripButton,
+            this.amountSetToolStripTextBox,
+            this.amountAddToolStripButton,
+            this.positionToolStripLabel,
             this.posToolStripTextBox,
-            this.toolStripLabel4,
+            this.sizeToolStripLabel,
             this.sizeToolStripTextBox});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(848, 27);
+            this.toolStrip.Size = new System.Drawing.Size(792, 29);
             this.toolStrip.TabIndex = 3;
             this.toolStrip.Text = "toolStrip1";
             // 
@@ -453,7 +464,7 @@
             this.rimViewToolStripMenuItem,
             this.colorWorkspaceToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(56, 27);
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(56, 29);
             this.viewToolStripMenuItem.Text = "View";
             // 
             // rimViewToolStripMenuItem
@@ -476,13 +487,13 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 29);
             // 
-            // toolStripLabel1
+            // canvasSizeToolStripLabel
             // 
-            this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(90, 24);
-            this.toolStripLabel1.Text = "Canvas size";
+            this.canvasSizeToolStripLabel.Name = "canvasSizeToolStripLabel";
+            this.canvasSizeToolStripLabel.Size = new System.Drawing.Size(90, 26);
+            this.canvasSizeToolStripLabel.Text = "Canvas size";
             // 
             // sizeSetToolStripComboBox
             // 
@@ -496,33 +507,92 @@
             "2048*2048",
             "4096*4096"});
             this.sizeSetToolStripComboBox.Name = "sizeSetToolStripComboBox";
-            this.sizeSetToolStripComboBox.Size = new System.Drawing.Size(121, 27);
+            this.sizeSetToolStripComboBox.Size = new System.Drawing.Size(121, 29);
             this.sizeSetToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.sizeSetToolStripComboBox_SelectedIndexChanged);
             this.sizeSetToolStripComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.sizeSetToolStripComboBox_KeyUp);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 29);
             // 
-            // toolStripLabel2
+            // nameToolStripLabel
             // 
-            this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(52, 24);
-            this.toolStripLabel2.Text = "Name";
+            this.nameToolStripLabel.Name = "nameToolStripLabel";
+            this.nameToolStripLabel.Size = new System.Drawing.Size(52, 26);
+            this.nameToolStripLabel.Text = "Name";
             // 
             // nameToolStripTextBox
             // 
             this.nameToolStripTextBox.Name = "nameToolStripTextBox";
-            this.nameToolStripTextBox.Size = new System.Drawing.Size(150, 27);
+            this.nameToolStripTextBox.Size = new System.Drawing.Size(150, 29);
             this.nameToolStripTextBox.Leave += new System.EventHandler(this.nameToolStripTextBox_Leave);
             this.nameToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.nameToolStripTextBox_KeyUp);
             // 
-            // toolStripLabel3
+            // autoTypesettingToolStripLabel
             // 
-            this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(68, 24);
-            this.toolStripLabel3.Text = "Position";
+            this.autoTypesettingToolStripLabel.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.horizontalLimitToolStripMenuItem,
+            this.verticalLimitToolStripMenuItem});
+            this.autoTypesettingToolStripLabel.Name = "autoTypesettingToolStripLabel";
+            this.autoTypesettingToolStripLabel.Size = new System.Drawing.Size(146, 26);
+            this.autoTypesettingToolStripLabel.Text = "Auto typesetting";
+            this.autoTypesettingToolStripLabel.Visible = false;
+            // 
+            // horizontalLimitToolStripMenuItem
+            // 
+            this.horizontalLimitToolStripMenuItem.Checked = true;
+            this.horizontalLimitToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.horizontalLimitToolStripMenuItem.Name = "horizontalLimitToolStripMenuItem";
+            this.horizontalLimitToolStripMenuItem.Size = new System.Drawing.Size(190, 24);
+            this.horizontalLimitToolStripMenuItem.Text = "Horizontal limit";
+            this.horizontalLimitToolStripMenuItem.Click += new System.EventHandler(this.horizontalLimitToolStripMenuItem_Click);
+            // 
+            // verticalLimitToolStripMenuItem
+            // 
+            this.verticalLimitToolStripMenuItem.Name = "verticalLimitToolStripMenuItem";
+            this.verticalLimitToolStripMenuItem.Size = new System.Drawing.Size(190, 24);
+            this.verticalLimitToolStripMenuItem.Text = "Vertical limit";
+            this.verticalLimitToolStripMenuItem.Click += new System.EventHandler(this.verticalLimitToolStripMenuItem_Click);
+            // 
+            // amountMinusToolStripButton
+            // 
+            this.amountMinusToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.amountMinusToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("amountMinusToolStripButton.Image")));
+            this.amountMinusToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.amountMinusToolStripButton.Name = "amountMinusToolStripButton";
+            this.amountMinusToolStripButton.Size = new System.Drawing.Size(23, 26);
+            this.amountMinusToolStripButton.Text = "-";
+            this.amountMinusToolStripButton.Visible = false;
+            this.amountMinusToolStripButton.Click += new System.EventHandler(this.amountMinusToolStripButton_Click);
+            // 
+            // amountSetToolStripTextBox
+            // 
+            this.amountSetToolStripTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.amountSetToolStripTextBox.MaxLength = 3;
+            this.amountSetToolStripTextBox.Name = "amountSetToolStripTextBox";
+            this.amountSetToolStripTextBox.Size = new System.Drawing.Size(30, 29);
+            this.amountSetToolStripTextBox.Text = "1";
+            this.amountSetToolStripTextBox.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.amountSetToolStripTextBox.Visible = false;
+            this.amountSetToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.amountSetToolStripTextBox_KeyUp);
+            // 
+            // amountAddToolStripButton
+            // 
+            this.amountAddToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.amountAddToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("amountAddToolStripButton.Image")));
+            this.amountAddToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.amountAddToolStripButton.Name = "amountAddToolStripButton";
+            this.amountAddToolStripButton.Size = new System.Drawing.Size(24, 26);
+            this.amountAddToolStripButton.Text = "+";
+            this.amountAddToolStripButton.Visible = false;
+            this.amountAddToolStripButton.Click += new System.EventHandler(this.amountAddToolStripButton_Click);
+            // 
+            // positionToolStripLabel
+            // 
+            this.positionToolStripLabel.Name = "positionToolStripLabel";
+            this.positionToolStripLabel.Size = new System.Drawing.Size(68, 19);
+            this.positionToolStripLabel.Text = "Position";
             // 
             // posToolStripTextBox
             // 
@@ -530,11 +600,11 @@
             this.posToolStripTextBox.Size = new System.Drawing.Size(100, 27);
             this.posToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.posToolStripTextBox_KeyUp);
             // 
-            // toolStripLabel4
+            // sizeToolStripLabel
             // 
-            this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(38, 24);
-            this.toolStripLabel4.Text = "Size";
+            this.sizeToolStripLabel.Name = "sizeToolStripLabel";
+            this.sizeToolStripLabel.Size = new System.Drawing.Size(38, 19);
+            this.sizeToolStripLabel.Text = "Size";
             // 
             // sizeToolStripTextBox
             // 
@@ -554,7 +624,7 @@
             this.Controls.Add(this.splitContainer);
             this.MinimumSize = new System.Drawing.Size(300, 200);
             this.Name = "ImagesetEditControl";
-            this.Size = new System.Drawing.Size(1047, 571);
+            this.Size = new System.Drawing.Size(977, 537);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);
@@ -580,7 +650,7 @@
         private System.Windows.Forms.PictureBox imageSetBox;
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.ToolStripComboBox sizeSetToolStripComboBox;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStripLabel canvasSizeToolStripLabel;
         private System.Windows.Forms.ListView usedListView;
         private System.Windows.Forms.ToolStrip usedToolStrip;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
@@ -598,11 +668,11 @@
         private System.Windows.Forms.ToolStripMenuItem usedSelectSortSizeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem usedSelectSortSizeReverseToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ToolStripLabel nameToolStripLabel;
         private System.Windows.Forms.ToolStripTextBox nameToolStripTextBox;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel3;
+        private System.Windows.Forms.ToolStripLabel positionToolStripLabel;
         private System.Windows.Forms.ToolStripTextBox posToolStripTextBox;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel4;
+        private System.Windows.Forms.ToolStripLabel sizeToolStripLabel;
         private System.Windows.Forms.ToolStripTextBox sizeToolStripTextBox;
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader usedColumnHeader;
@@ -629,5 +699,11 @@
         private System.Windows.Forms.ToolStripMenuItem bottomInsideAlignmentToolStripMenuItem;
         private System.Windows.Forms.ColorDialog colorDialog;
         private System.Windows.Forms.ToolStripMenuItem colorWorkspaceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton amountMinusToolStripButton;
+        private System.Windows.Forms.ToolStripTextBox amountSetToolStripTextBox;
+        private System.Windows.Forms.ToolStripButton amountAddToolStripButton;
+        private System.Windows.Forms.ToolStripDropDownButton autoTypesettingToolStripLabel;
+        private System.Windows.Forms.ToolStripMenuItem horizontalLimitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem verticalLimitToolStripMenuItem;
     }
 }

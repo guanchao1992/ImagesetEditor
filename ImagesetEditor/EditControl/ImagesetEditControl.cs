@@ -291,6 +291,10 @@ namespace ImagesetEditor
             {
                 SetViewInfo(m_select.Selects.First());
             }
+            else if (m_select.Selects.Count > 1)
+            {
+                SetViewInfo(m_select);
+            }
             else
             {
                 SetViewInfo(null);
@@ -336,15 +340,21 @@ namespace ImagesetEditor
 
             // CanvasView
 
-            toolStripLabel1.Text = local.GetName("Control.CanvasView.01");
+            canvasSizeToolStripLabel.Text = local.GetName("Control.CanvasView.01");
 
-            toolStripLabel2.Text = local.GetName("Control.CanvasView.02");
+            nameToolStripLabel.Text = local.GetName("Control.CanvasView.02");
 
-            toolStripLabel3.Text = local.GetName("Control.CanvasView.03");
+            positionToolStripLabel.Text = local.GetName("Control.CanvasView.03");
 
-            toolStripLabel4.Text = local.GetName("Control.CanvasView.04");
+            sizeToolStripLabel.Text = local.GetName("Control.CanvasView.04");
 
             m_strUnavailable = local.GetName("Control.CanvasView.05");
+
+            autoTypesettingToolStripLabel.Text = local.GetName("Control.CanvasView.06");
+
+            horizontalLimitToolStripMenuItem.Text = local.GetName("Control.CanvasView.07");
+
+            verticalLimitToolStripMenuItem.Text = local.GetName("Control.CanvasView.08");
 
             // DropMenu
 
@@ -416,7 +426,18 @@ namespace ImagesetEditor
             }
             else
             {
-                nameToolStripTextBox.Text = image.Name;
+                if (image == m_select)
+                {
+                    nameToolStripTextBox.Text = m_strUnavailable;
+
+                    nameToolStripTextBox.Enabled = false;
+                }
+                else
+                {
+                    nameToolStripTextBox.Text = image.Name;
+
+                    nameToolStripTextBox.Enabled = true;
+                }
 
                 posToolStripTextBox.Text =
                     String.Format("{0},{1}", image.Position.X, image.Position.Y);
@@ -424,14 +445,70 @@ namespace ImagesetEditor
                 sizeToolStripTextBox.Text =
                     String.Format("{0},{1}", image.Size.Width, image.Size.Height);
 
-                nameToolStripTextBox.Enabled = true;
-
                 posToolStripTextBox.Enabled = true;
 
                 sizeToolStripTextBox.Enabled = true;
             }
 
             m_viewInfoImage = image;
+        }
+
+        private void ViewNameTextBoxUpdate()
+        {
+            bool viewName = m_select.Selects.Count <= 1;
+
+            if (viewName == false)
+            {
+                // 检查每个选中的图片尺寸都相同
+                Size s = m_select.Selects.First().Size;
+
+                foreach(SubImage img in m_select.Selects)
+                {
+                    if (img.Size != s)
+                    {
+                        viewName = true;
+                        break;
+                    }
+                }
+            }
+
+            if (viewName == false)
+            {
+                if (horizontalLimitToolStripMenuItem.Checked == true)
+                {
+                    amountSetToolStripTextBox.Text =
+                        Math.Min(m_select.Size.Width / m_select.Selects.First().Size.Width, m_select.Selects.Count).ToString();
+                }
+                else
+                {
+                    amountSetToolStripTextBox.Text =
+                        Math.Min(m_select.Size.Height / m_select.Selects.First().Size.Height, m_select.Selects.Count).ToString();
+                }
+            }
+
+            if (nameToolStripTextBox.Visible == viewName)
+                return;
+
+            if (viewName)
+            {
+                autoTypesettingToolStripLabel.Visible = false;
+                amountMinusToolStripButton.Visible = false;
+                amountAddToolStripButton.Visible = false;
+                amountSetToolStripTextBox.Visible = false;
+
+                nameToolStripLabel.Visible = true;
+                nameToolStripTextBox.Visible = true;
+            }
+            else
+            {
+                nameToolStripLabel.Visible = false;
+                nameToolStripTextBox.Visible = false;
+
+                autoTypesettingToolStripLabel.Visible = true;
+                amountMinusToolStripButton.Visible = true;
+                amountAddToolStripButton.Visible = true;
+                amountSetToolStripTextBox.Visible = true;
+            }
         }
 
         private Image CreateErrorImage(Size size)
@@ -588,6 +665,22 @@ namespace ImagesetEditor
                 image.BindItem = item;
             }
 
+            m_listViewNodeLock = true;
+
+            m_select.Selects.Clear();
+
+            foreach (ListViewItem item in usedListView.Items)
+            {
+                SubImage image = (SubImage)item.Tag;
+
+                if (item.Selected)
+                {
+                    m_select.Selects.Add(image);
+                }
+            }
+
+            m_listViewNodeLock = false;
+
             ImageSetBoxUpdate();
         }
 
@@ -639,6 +732,44 @@ namespace ImagesetEditor
                     break;
                 }
             }
+        }
+
+        private void Typesetting(bool horizontalLimit, int amount)
+        {
+            int xNum = 0, yNum = 0;
+
+            Point p = m_select.Position;
+
+            Size size = m_select.Selects.First().Size;
+
+            foreach(SubImage image in m_select.Selects)
+            {
+                image.Position =
+                    new Point(p.X + size.Width * xNum, p.Y + size.Height * yNum);
+
+                if (horizontalLimit)
+                {
+                    if (++xNum == amount)
+                    {
+                        ++yNum;
+                        xNum = 0;
+                    }
+                }
+                else
+                {
+                    if (++yNum == amount)
+                    {
+                        ++xNum;
+                        yNum = 0;
+                    }
+                }
+            }
+
+            SelectsRimUpdate();
+
+            ImageViewInfoUpdate();
+
+            ImageSetBoxUpdate();
         }
 
         #endregion Methods
@@ -717,7 +848,6 @@ namespace ImagesetEditor
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-
                 switch (m_MouseStatus)
                 {
                     case MouseStatus.Drag:
@@ -819,9 +949,7 @@ namespace ImagesetEditor
                                     m_listViewNodeLock = false;
                                 }
 
-                                m_select.UpdateRim();
-
-                                m_dockAid.SetImage(m_select);
+                                SelectsRimUpdate();
                             }
                         }
                         break;
@@ -832,6 +960,8 @@ namespace ImagesetEditor
                         }
                         break;
                 }
+
+                ViewNameTextBoxUpdate();
 
                 ImageViewInfoUpdate();
 
@@ -1181,6 +1311,8 @@ namespace ImagesetEditor
                 m_select.Selects.Clear();
             }
 
+            SelectsRimUpdate();
+
             ImageCountUpdate();
 
             ImageSetBoxUpdate();
@@ -1234,6 +1366,7 @@ namespace ImagesetEditor
                     nameToolStripTextBox.Text = m_select.Name;
                     return;
                 }
+
                 m_viewInfoImage.Name = nameToolStripTextBox.Text;
                 m_viewInfoImage.BindItem.Text = m_viewInfoImage.Name;
             }
@@ -1358,9 +1491,11 @@ namespace ImagesetEditor
                 m_select.Selects.Add((SubImage)item.Tag);
             }
 
-            ImageViewInfoUpdate();
-
             SelectsRimUpdate();
+
+            ViewNameTextBoxUpdate();
+
+            ImageViewInfoUpdate();
 
             ImageSetBoxUpdate();
         }
@@ -1675,6 +1810,109 @@ namespace ImagesetEditor
             usedListView.Select();
         }
 
+        private void horizontalLimitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            horizontalLimitToolStripMenuItem.Checked = true;
+            verticalLimitToolStripMenuItem.Checked = false;
+
+            ViewNameTextBoxUpdate();
+        }
+
+        private void verticalLimitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            horizontalLimitToolStripMenuItem.Checked = false;
+            verticalLimitToolStripMenuItem.Checked = true;
+
+            ViewNameTextBoxUpdate();
+        }
+
+        private void amountMinusToolStripButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int n = int.Parse(amountSetToolStripTextBox.Text);
+
+                if (n == 1)
+                {
+                    return;
+                }
+
+                --n;
+
+                amountSetToolStripTextBox.Text = n.ToString();
+
+                Typesetting(
+                    horizontalLimitToolStripMenuItem.Checked,
+                    int.Parse(amountSetToolStripTextBox.Text));
+            }
+            catch
+            {
+                MessageBox.Show(m_strErrorFormat, m_strErrorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ViewNameTextBoxUpdate();
+            }
+        }
+
+        private void amountAddToolStripButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int n = int.Parse(amountSetToolStripTextBox.Text);
+
+                if (n == m_select.Selects.Count)
+                {
+                    return;
+                }
+
+                ++n;
+
+                amountSetToolStripTextBox.Text = n.ToString();
+
+                Typesetting(
+                    horizontalLimitToolStripMenuItem.Checked,
+                    int.Parse(amountSetToolStripTextBox.Text));
+            }
+            catch
+            {
+                MessageBox.Show(m_strErrorFormat, m_strErrorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ViewNameTextBoxUpdate();
+            }
+        }
+
+        private void amountSetToolStripTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                try
+                {
+                    int n = int.Parse(amountSetToolStripTextBox.Text);
+
+                    if (n < 1)
+                    {
+                        n = 1;
+                    }
+
+                    if (n > m_select.Selects.Count)
+                    {
+                        n = m_select.Selects.Count;
+                    }
+
+                    amountSetToolStripTextBox.Text = n.ToString();
+
+                    Typesetting(
+                    horizontalLimitToolStripMenuItem.Checked,
+                    int.Parse(amountSetToolStripTextBox.Text));
+                }
+                catch
+                {
+                    MessageBox.Show(m_strErrorFormat, m_strErrorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    ViewNameTextBoxUpdate();
+                }
+            }
+        }
+
         #endregion Events
 
         #region Constructors
@@ -1701,7 +1939,9 @@ namespace ImagesetEditor
                 UpdateLocalization(local);
         }
 
-        #endregion Constructors     
+        #endregion Constructors    
+
+        
     }
 
     public interface IImage
@@ -2579,7 +2819,7 @@ namespace ImagesetEditor
     }
 
     /// <summary>
-    /// 实际绘制的线框
+    /// 实际绘制的箭头范围线框
     /// </summary>
     internal class RealDrawRim : SubImage
     {

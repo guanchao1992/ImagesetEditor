@@ -70,7 +70,7 @@ namespace ImagesetEditor
 
         public static string GetVersion()
         {
-            return "0.2.2";
+            return "0.2.3";
         }
 
         public static string GetProjectVersion()
@@ -573,9 +573,16 @@ namespace ImagesetEditor
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            for (int i = 0; i != m_recentFiles.Count; ++i)
+            for (int i = 0; i != 10; ++i)
             {
-                SetConfig("RecentFiles", "n" + i.ToString(), m_recentFiles[i]);
+                if (i < m_recentFiles.Count)
+                {
+                    SetConfig("RecentFiles", "n" + i.ToString(), m_recentFiles[i]);
+                }
+                else
+                {
+                    SetConfig("RecentFiles", "n" + i.ToString(), "");
+                }
             }
 
             m_configDoc.Save("config.xml");

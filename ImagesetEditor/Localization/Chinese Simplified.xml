@@ -41,6 +41,9 @@
             <Item ID="03" Name="位置"/>
             <Item ID="04" Name="尺寸"/>
             <Item ID="05" Name="不可用"/>
+            <Item ID="06" Name="自动排版"/>
+            <Item ID="07" Name="水平数量限制"/>
+            <Item ID="08" Name="垂直数量限制"/>
         </CanvasView>
         <Messages>
             <Item ID="del-caption" Name="删除"/>
