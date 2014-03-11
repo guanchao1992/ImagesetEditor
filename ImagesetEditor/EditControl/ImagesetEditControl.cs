@@ -457,33 +457,69 @@ namespace ImagesetEditor
         {
             bool viewName = m_select.Selects.Count <= 1;
 
+            bool widthLike = true;
+            bool heightLike = true; 
+
             if (viewName == false)
             {
-                // 检查每个选中的图片尺寸都相同
+                // 检查图片尺寸
                 Size s = m_select.Selects.First().Size;
 
                 foreach(SubImage img in m_select.Selects)
                 {
-                    if (img.Size != s)
+                    if (img.Size.Width != s.Width)
                     {
-                        viewName = true;
+                        widthLike = false;
+                    }
+
+                    if (img.Size.Height != s.Height)
+                    {
+                        heightLike = false;
+                    }
+
+                    if (!widthLike && !heightLike)
+                    {
                         break;
                     }
                 }
             }
 
-            if (viewName == false)
+            if (horizontalLimitToolStripMenuItem.Checked == true)
             {
-                if (horizontalLimitToolStripMenuItem.Checked == true)
+                int len = 0;
+                int i = 0;
+
+                for (; i != m_select.Selects.Count; ++i)
                 {
-                    amountSetToolStripTextBox.Text =
-                        Math.Min(m_select.Size.Width / m_select.Selects.First().Size.Width, m_select.Selects.Count).ToString();
+                    len += m_select.Selects[i].Size.Width;
+
+                    if (len >= m_select.Size.Width)
+                        break;
                 }
-                else
+
+                amountSetToolStripTextBox.Text =
+                    Math.Min(i + 1, m_select.Selects.Count).ToString();
+            }
+            else
+            {
+                int len = 0;
+                int i = 0;
+
+                for (; i != m_select.Selects.Count; ++i)
                 {
-                    amountSetToolStripTextBox.Text =
-                        Math.Min(m_select.Size.Height / m_select.Selects.First().Size.Height, m_select.Selects.Count).ToString();
+                    len += m_select.Selects[i].Size.Height;
+
+                    if (len >= m_select.Size.Height)
+                        break;
                 }
+
+                amountSetToolStripTextBox.Text =
+                    Math.Min(i + 1, m_select.Selects.Count).ToString();
+            }
+
+            if (!widthLike && !heightLike)
+            {
+                viewName = true;
             }
 
             if (nameToolStripTextBox.Visible == viewName)
@@ -503,6 +539,20 @@ namespace ImagesetEditor
             {
                 nameToolStripLabel.Visible = false;
                 nameToolStripTextBox.Visible = false;
+
+                horizontalLimitToolStripMenuItem.Enabled = heightLike;
+                verticalLimitToolStripMenuItem.Enabled = widthLike;
+
+                if (widthLike == heightLike)
+                {
+                    horizontalLimitToolStripMenuItem.Checked = true;
+                    verticalLimitToolStripMenuItem.Checked = false;
+                }
+                else
+                {
+                    horizontalLimitToolStripMenuItem.Checked = heightLike;
+                    verticalLimitToolStripMenuItem.Checked = widthLike;
+                }
 
                 autoTypesettingToolStripLabel.Visible = true;
                 amountMinusToolStripButton.Visible = true;
@@ -736,32 +786,54 @@ namespace ImagesetEditor
 
         private void Typesetting(bool horizontalLimit, int amount)
         {
-            int xNum = 0, yNum = 0;
-
             Point p = m_select.Position;
 
             Size size = m_select.Selects.First().Size;
 
+            int lenLimit = 0;
+
+            int curLen = 0;
+
+            int lineNum = 0;
+
+            for (int i = 0; i != amount; ++i)
+            {
+                lenLimit += horizontalLimit ? 
+                    m_select.Selects[i].Size.Width :
+                    m_select.Selects[i].Size.Height;
+            }
+
             foreach(SubImage image in m_select.Selects)
             {
-                image.Position =
-                    new Point(p.X + size.Width * xNum, p.Y + size.Height * yNum);
-
                 if (horizontalLimit)
                 {
-                    if (++xNum == amount)
+                    Point newPos = new Point(p.X + curLen, p.Y + size.Height * lineNum);
+
+                    curLen += image.Size.Width;
+
+                    if (curLen > lenLimit)
                     {
-                        ++yNum;
-                        xNum = 0;
+                        curLen = image.Size.Width;
+                        ++lineNum;
+                        newPos = new Point(p.X, p.Y + size.Height * lineNum);
                     }
+
+                    image.Position = newPos;
                 }
                 else
                 {
-                    if (++yNum == amount)
+                    Point newPos = new Point(p.X + size.Width * lineNum, p.Y + curLen);
+
+                    curLen += image.Size.Height;
+
+                    if (curLen > lenLimit)
                     {
-                        ++xNum;
-                        yNum = 0;
+                        curLen = image.Size.Height;
+                        ++lineNum;
+                        newPos = new Point(p.X + size.Width * lineNum, p.Y);
                     }
+
+                    image.Position = newPos;
                 }
             }
 
@@ -1940,8 +2012,6 @@ namespace ImagesetEditor
         }
 
         #endregion Constructors    
-
-        
     }
 
     public interface IImage
@@ -2437,9 +2507,11 @@ namespace ImagesetEditor
 
         public bool InArrowButton(int x, int y)
         {
-            foreach (SubImage image in m_arrow)
+            foreach (Arrow arrow in m_arrow)
             {
-                if (image.Rectangle.Contains(x + m_canvas.ViewPos.X, y + m_canvas.ViewPos.Y))
+                if (arrow.Visible == false)
+                    continue;
+                if (arrow.Rectangle.Contains(x + m_canvas.ViewPos.X, y + m_canvas.ViewPos.Y))
                 {
                     return true;
                 }

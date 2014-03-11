@@ -70,7 +70,7 @@ namespace ImagesetEditor
 
         public static string GetVersion()
         {
-            return "0.2.3";
+            return "0.2.4";
         }
 
         public static string GetProjectVersion()
