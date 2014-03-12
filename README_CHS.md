@@ -1,4 +1,4 @@
-ImagesetEditor
+图片集编辑器
 ==============
 
 开发于 Visual Studio 2013 C#
@@ -6,13 +6,19 @@ ImagesetEditor
 概述
 ==============
 
-添加图片快速合并它们并且导出位置数据的简易工具。
+困扰于合并大量的图片？你可以考虑使用下这个工具
+
+* 添加图片快速合并它们并且导出位置
+
+* 自动排版相同高度或者宽度的图片
+
+* 保存至项目文件
 
 支持输入格式：BMP/JPG/PNG
 
 支持输出的格式：PNG
 
-![preview](http://www.frimin.com/imageset.jpg "preview")
+![preview](http://www.frimin.com/imageset_en.jpg "preview")
 
 ###纯文本导出：
     "image01" 228,0 76,76

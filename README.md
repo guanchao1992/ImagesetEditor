@@ -5,10 +5,16 @@ ImagesetEditor
 
 Development in Visual Studio 2013 C#
 
-Preview
+Overview
 ==============
 
-Fast merge images and easily to export image's data.
+Be confused in merging lots of images? You might consider using this tool.
+
+* Fast merge images and easily to export image's data.
+
+* Auto typesetting same height or width images.
+
+* Save to project file.
 
 Support input formats: BMP / JPG / PNG
 
