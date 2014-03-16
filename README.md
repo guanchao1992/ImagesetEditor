@@ -5,7 +5,7 @@ ImagesetEditor
 
 Development in Visual Studio 2013 C#
 
-Please set the working directory to "..\..\"
+Please set the working directory to "..\\..\\"
 
 Overview
 ==============
