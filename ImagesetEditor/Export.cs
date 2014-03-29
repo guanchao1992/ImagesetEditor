@@ -262,15 +262,30 @@ namespace ImagesetEditor
                 File.Delete(m_fileName);
             }
 
-            FileStream file = new FileStream(m_fileName, FileMode.OpenOrCreate);
+            FileStream tFile = new FileStream(m_fileName, FileMode.Create, FileAccess.Write, FileShare.Read);
 
-            StreamWriter sw = new StreamWriter(file);
+            try
+            {
+                XmlWriterSettings tSetting = new XmlWriterSettings();
+                tSetting.CloseOutput = false;
+                tSetting.Encoding = Encoding.UTF8;
+                tSetting.Indent = true;
+                tSetting.IndentChars = "  ";
+                tSetting.NewLineOnAttributes = false;
+                tSetting.OmitXmlDeclaration = true;
 
-            m_xml.Save(sw);
+                XmlWriter tWritter = XmlWriter.Create(tFile, tSetting);
 
-            sw.Close();
+                m_xml.Save(tWritter);
+            }
+            catch
+            {
+                tFile.Close();
 
-            file.Close();
+                throw;
+            }
+
+            tFile.Close();
 
             return m_fileName.Split('.').First() + ".png"; ;
         }
