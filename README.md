@@ -51,16 +51,28 @@ Supports output formats: PNG
             // Be called before the output image information.
         }
 
-        void OnExportImage(IImage image)
-        {
-            // Called on export image information
-        }
-
         string OnExportEnd()
         {
             // Be called after the output image information.
             // Returns a string for the merger picture export path, If it returns null or "" not exported.
         }
+        
+        public void OnExportGroupBegin(GroupExpression expression)
+        {
+            
+        }
+
+        public void OnExportGroupEnd()
+        {
+
+        }
+        
+        void OnExportImage(IImage image)
+        {
+            // Called on export image information
+        }
+
+        
         
         MyExport()
         {
