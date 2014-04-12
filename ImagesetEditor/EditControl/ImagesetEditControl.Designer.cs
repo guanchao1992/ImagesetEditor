@@ -29,13 +29,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Default", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImagesetEditControl));
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.usedListView = new System.Windows.Forms.ListView();
             this.usedColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.unsedImageContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.delusedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.sortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.usedSelectSortNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,27 +46,21 @@
             this.usedSelectSortSizeReverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
+            this.moveToGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.usedToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.addImageMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
+            this.newGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editGroupItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.clearUsedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.imageCountToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.imageSetBox = new System.Windows.Forms.PictureBox();
-            this.imageSetBoxContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.delusedToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
-            this.alignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.leftOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.leftInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rightOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rightInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.topOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.topInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.bottomOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.bottomInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.hScrollBar = new System.Windows.Forms.HScrollBar();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
@@ -88,6 +83,19 @@
             this.posToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
             this.sizeToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.sizeToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
+            this.imageSetBoxContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.delusedToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+            this.alignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.leftOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.leftInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rightOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rightInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.topOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.topInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bottomOutsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bottomInsideAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.colorDialog = new System.Windows.Forms.ColorDialog();
@@ -98,8 +106,8 @@
             this.unsedImageContextMenuStrip.SuspendLayout();
             this.usedToolStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageSetBox)).BeginInit();
-            this.imageSetBoxContextMenuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
+            this.imageSetBoxContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer
@@ -125,10 +133,15 @@
             // 
             // usedListView
             // 
+            this.usedListView.AllowDrop = true;
             this.usedListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.usedColumnHeader});
             this.usedListView.ContextMenuStrip = this.unsedImageContextMenuStrip;
             this.usedListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            listViewGroup1.Header = "Default";
+            listViewGroup1.Name = "default";
+            this.usedListView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
+            listViewGroup1});
             this.usedListView.HideSelection = false;
             this.usedListView.Location = new System.Drawing.Point(0, 25);
             this.usedListView.Name = "usedListView";
@@ -138,6 +151,8 @@
             this.usedListView.View = System.Windows.Forms.View.Details;
             this.usedListView.SelectedIndexChanged += new System.EventHandler(this.usedListView_SelectedIndexChanged);
             this.usedListView.SizeChanged += new System.EventHandler(this.usedListView_SizeChanged);
+            this.usedListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.usedListView_DragDrop);
+            this.usedListView.DragEnter += new System.Windows.Forms.DragEventHandler(this.usedListView_DragEnter);
             this.usedListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.usedListView_KeyDown);
             this.usedListView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.usedListView_KeyUp);
             // 
@@ -148,20 +163,15 @@
             // unsedImageContextMenuStrip
             // 
             this.unsedImageContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAllToolStripMenuItem,
             this.delusedToolStripMenuItem,
+            this.selectAllToolStripMenuItem,
             this.toolStripMenuItem4,
-            this.sortToolStripMenuItem});
+            this.sortToolStripMenuItem,
+            this.toolStripMenuItem8,
+            this.moveToGroupToolStripMenuItem});
             this.unsedImageContextMenuStrip.Name = "unusedImageContextMenuStrip";
-            this.unsedImageContextMenuStrip.Size = new System.Drawing.Size(201, 82);
-            // 
-            // selectAllToolStripMenuItem
-            // 
-            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
-            this.selectAllToolStripMenuItem.Text = "Select all";
-            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+            this.unsedImageContextMenuStrip.Size = new System.Drawing.Size(201, 112);
+            this.unsedImageContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.unsedImageContextMenuStrip_Opening);
             // 
             // delusedToolStripMenuItem
             // 
@@ -170,6 +180,14 @@
             this.delusedToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
             this.delusedToolStripMenuItem.Text = "Delete";
             this.delusedToolStripMenuItem.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
+            // 
+            // selectAllToolStripMenuItem
+            // 
+            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.selectAllToolStripMenuItem.Text = "Select all";
+            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
@@ -235,6 +253,26 @@
             this.invertToolStripMenuItem.Text = "Reverse";
             this.invertToolStripMenuItem.Click += new System.EventHandler(this.invertToolStripMenuItem_Click);
             // 
+            // toolStripMenuItem8
+            // 
+            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
+            this.toolStripMenuItem8.Size = new System.Drawing.Size(197, 6);
+            // 
+            // moveToGroupToolStripMenuItem
+            // 
+            this.moveToGroupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toGroupToolStripMenuItem});
+            this.moveToGroupToolStripMenuItem.Name = "moveToGroupToolStripMenuItem";
+            this.moveToGroupToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.moveToGroupToolStripMenuItem.Text = "Move to group";
+            // 
+            // toGroupToolStripMenuItem
+            // 
+            this.toGroupToolStripMenuItem.Name = "toGroupToolStripMenuItem";
+            this.toGroupToolStripMenuItem.Size = new System.Drawing.Size(140, 24);
+            this.toGroupToolStripMenuItem.Text = "toGroup";
+            this.toGroupToolStripMenuItem.Click += new System.EventHandler(this.toGroupToolStripMenuItem_Click);
+            // 
             // usedToolStrip
             // 
             this.usedToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
@@ -252,18 +290,49 @@
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addImageMenuItem,
+            this.toolStripMenuItem7,
+            this.newGroupToolStripMenuItem,
+            this.editGroupToolStripMenuItem,
             this.toolStripSeparator5,
             this.clearUsedToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(73, 25);
             this.toolStripMenuItem1.Text = "Images";
+            this.toolStripMenuItem1.DropDownOpening += new System.EventHandler(this.toolStripMenuItem1_DropDownOpening);
             // 
             // addImageMenuItem
             // 
             this.addImageMenuItem.Name = "addImageMenuItem";
             this.addImageMenuItem.Size = new System.Drawing.Size(191, 24);
-            this.addImageMenuItem.Text = "Add";
+            this.addImageMenuItem.Text = "Add Files";
             this.addImageMenuItem.Click += new System.EventHandler(this.addImageMenuItem_Click);
+            // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(188, 6);
+            // 
+            // newGroupToolStripMenuItem
+            // 
+            this.newGroupToolStripMenuItem.Name = "newGroupToolStripMenuItem";
+            this.newGroupToolStripMenuItem.Size = new System.Drawing.Size(191, 24);
+            this.newGroupToolStripMenuItem.Text = "New Group";
+            this.newGroupToolStripMenuItem.Click += new System.EventHandler(this.newGroupToolStripMenuItem_Click);
+            // 
+            // editGroupToolStripMenuItem
+            // 
+            this.editGroupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editGroupItemToolStripMenuItem});
+            this.editGroupToolStripMenuItem.Name = "editGroupToolStripMenuItem";
+            this.editGroupToolStripMenuItem.Size = new System.Drawing.Size(191, 24);
+            this.editGroupToolStripMenuItem.Text = "Edit Group";
+            // 
+            // editGroupItemToolStripMenuItem
+            // 
+            this.editGroupItemToolStripMenuItem.Name = "editGroupItemToolStripMenuItem";
+            this.editGroupItemToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
+            this.editGroupItemToolStripMenuItem.Text = "editGroup";
+            this.editGroupItemToolStripMenuItem.Click += new System.EventHandler(this.editGroupItemToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -291,7 +360,6 @@
             // imageSetBox
             // 
             this.imageSetBox.BackColor = System.Drawing.Color.Gray;
-            this.imageSetBox.ContextMenuStrip = this.imageSetBoxContextMenuStrip;
             this.imageSetBox.Cursor = System.Windows.Forms.Cursors.SizeAll;
             this.imageSetBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageSetBox.Location = new System.Drawing.Point(0, 29);
@@ -305,114 +373,6 @@
             this.imageSetBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.imageSetBox_MouseDown);
             this.imageSetBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.imageSetBox_MouseMove);
             this.imageSetBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.imageSetBox_MouseUp);
-            // 
-            // imageSetBoxContextMenuStrip
-            // 
-            this.imageSetBoxContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.delusedToolStripMenuItem2,
-            this.toolStripMenuItem3,
-            this.alignmentToolStripMenuItem});
-            this.imageSetBoxContextMenuStrip.Name = "imageSetBoxContextMenuStrip";
-            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(155, 58);
-            this.imageSetBoxContextMenuStrip.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.imageSetBoxContextMenuStrip_Closing);
-            this.imageSetBoxContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.imageSetBoxContextMenuStrip_Opening);
-            // 
-            // delusedToolStripMenuItem2
-            // 
-            this.delusedToolStripMenuItem2.Name = "delusedToolStripMenuItem2";
-            this.delusedToolStripMenuItem2.Size = new System.Drawing.Size(154, 24);
-            this.delusedToolStripMenuItem2.Text = "Delete";
-            this.delusedToolStripMenuItem2.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem3
-            // 
-            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(151, 6);
-            // 
-            // alignmentToolStripMenuItem
-            // 
-            this.alignmentToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.leftOutsideAlignmentToolStripMenuItem,
-            this.leftInsideAlignmentToolStripMenuItem,
-            this.rightOutsideAlignmentToolStripMenuItem,
-            this.rightInsideAlignmentToolStripMenuItem,
-            this.toolStripMenuItem2,
-            this.topOutsideAlignmentToolStripMenuItem,
-            this.topInsideAlignmentToolStripMenuItem,
-            this.bottomOutsideAlignmentToolStripMenuItem,
-            this.bottomInsideAlignmentToolStripMenuItem});
-            this.alignmentToolStripMenuItem.Name = "alignmentToolStripMenuItem";
-            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
-            this.alignmentToolStripMenuItem.Text = "Alignment";
-            // 
-            // leftOutsideAlignmentToolStripMenuItem
-            // 
-            this.leftOutsideAlignmentToolStripMenuItem.Name = "leftOutsideAlignmentToolStripMenuItem";
-            this.leftOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.leftOutsideAlignmentToolStripMenuItem.Text = "Outside of the left";
-            this.leftOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.leftOutsideAlignmentToolStripMenuItem_Click);
-            this.leftOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.leftOutsideAlignmentToolStripMenuItem_MouseEnter);
-            // 
-            // leftInsideAlignmentToolStripMenuItem
-            // 
-            this.leftInsideAlignmentToolStripMenuItem.Name = "leftInsideAlignmentToolStripMenuItem";
-            this.leftInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.leftInsideAlignmentToolStripMenuItem.Text = "Inside of the left";
-            this.leftInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.leftInsideAlignmentToolStripMenuItem_Click);
-            this.leftInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.leftInsideAlignmentToolStripMenuItem_MouseEnter);
-            // 
-            // rightOutsideAlignmentToolStripMenuItem
-            // 
-            this.rightOutsideAlignmentToolStripMenuItem.Name = "rightOutsideAlignmentToolStripMenuItem";
-            this.rightOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.rightOutsideAlignmentToolStripMenuItem.Text = "Outside of the right";
-            this.rightOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.rightOutsideAlignmentToolStripMenuItem_Click);
-            this.rightOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.rightOutsideAlignmentToolStripMenuItem_MouseEnter);
-            // 
-            // rightInsideAlignmentToolStripMenuItem
-            // 
-            this.rightInsideAlignmentToolStripMenuItem.Name = "rightInsideAlignmentToolStripMenuItem";
-            this.rightInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.rightInsideAlignmentToolStripMenuItem.Text = "Inside of the right";
-            this.rightInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.rightInsideAlignmentToolStripMenuItem_Click);
-            this.rightInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.rightInsideAlignmentToolStripMenuItem_MouseEnter);
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(239, 6);
-            // 
-            // topOutsideAlignmentToolStripMenuItem
-            // 
-            this.topOutsideAlignmentToolStripMenuItem.Name = "topOutsideAlignmentToolStripMenuItem";
-            this.topOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.topOutsideAlignmentToolStripMenuItem.Text = "Outside of the top";
-            this.topOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.topOutsideAlignmentToolStripMenuItem_Click);
-            this.topOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.topOutsideAlignmentToolStripMenuItem_MouseEnter);
-            // 
-            // topInsideAlignmentToolStripMenuItem
-            // 
-            this.topInsideAlignmentToolStripMenuItem.Name = "topInsideAlignmentToolStripMenuItem";
-            this.topInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.topInsideAlignmentToolStripMenuItem.Text = "Inside of the top";
-            this.topInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.topInsideAlignmentToolStripMenuItem_Click);
-            this.topInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.topInsideAlignmentToolStripMenuItem_MouseEnter);
-            // 
-            // bottomOutsideAlignmentToolStripMenuItem
-            // 
-            this.bottomOutsideAlignmentToolStripMenuItem.Name = "bottomOutsideAlignmentToolStripMenuItem";
-            this.bottomOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.bottomOutsideAlignmentToolStripMenuItem.Text = "Outside of the bottom";
-            this.bottomOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.bottomOutsideAlignmentToolStripMenuItem_Click);
-            this.bottomOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.bottomOutsideAlignmentToolStripMenuItem_MouseEnter);
-            // 
-            // bottomInsideAlignmentToolStripMenuItem
-            // 
-            this.bottomInsideAlignmentToolStripMenuItem.Name = "bottomInsideAlignmentToolStripMenuItem";
-            this.bottomInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
-            this.bottomInsideAlignmentToolStripMenuItem.Text = "Inside of the bottom";
-            this.bottomInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.bottomInsideAlignmentToolStripMenuItem_Click);
-            this.bottomInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.bottomInsideAlignmentToolStripMenuItem_MouseEnter);
             // 
             // vScrollBar
             // 
@@ -561,7 +521,7 @@
             this.amountMinusToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("amountMinusToolStripButton.Image")));
             this.amountMinusToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.amountMinusToolStripButton.Name = "amountMinusToolStripButton";
-            this.amountMinusToolStripButton.Size = new System.Drawing.Size(23, 24);
+            this.amountMinusToolStripButton.Size = new System.Drawing.Size(23, 26);
             this.amountMinusToolStripButton.Text = "-";
             this.amountMinusToolStripButton.Visible = false;
             this.amountMinusToolStripButton.Click += new System.EventHandler(this.amountMinusToolStripButton_Click);
@@ -571,7 +531,7 @@
             this.amountSetToolStripTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.amountSetToolStripTextBox.MaxLength = 3;
             this.amountSetToolStripTextBox.Name = "amountSetToolStripTextBox";
-            this.amountSetToolStripTextBox.Size = new System.Drawing.Size(30, 27);
+            this.amountSetToolStripTextBox.Size = new System.Drawing.Size(30, 29);
             this.amountSetToolStripTextBox.Text = "1";
             this.amountSetToolStripTextBox.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.amountSetToolStripTextBox.Visible = false;
@@ -583,7 +543,7 @@
             this.amountAddToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("amountAddToolStripButton.Image")));
             this.amountAddToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.amountAddToolStripButton.Name = "amountAddToolStripButton";
-            this.amountAddToolStripButton.Size = new System.Drawing.Size(24, 24);
+            this.amountAddToolStripButton.Size = new System.Drawing.Size(24, 26);
             this.amountAddToolStripButton.Text = "+";
             this.amountAddToolStripButton.Visible = false;
             this.amountAddToolStripButton.Click += new System.EventHandler(this.amountAddToolStripButton_Click);
@@ -612,9 +572,117 @@
             this.sizeToolStripTextBox.ReadOnly = true;
             this.sizeToolStripTextBox.Size = new System.Drawing.Size(100, 27);
             // 
+            // imageSetBoxContextMenuStrip
+            // 
+            this.imageSetBoxContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.delusedToolStripMenuItem2,
+            this.toolStripMenuItem3,
+            this.alignmentToolStripMenuItem});
+            this.imageSetBoxContextMenuStrip.Name = "imageSetBoxContextMenuStrip";
+            this.imageSetBoxContextMenuStrip.Size = new System.Drawing.Size(176, 86);
+            this.imageSetBoxContextMenuStrip.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.imageSetBoxContextMenuStrip_Closing);
+            this.imageSetBoxContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.imageSetBoxContextMenuStrip_Opening);
+            // 
+            // delusedToolStripMenuItem2
+            // 
+            this.delusedToolStripMenuItem2.Name = "delusedToolStripMenuItem2";
+            this.delusedToolStripMenuItem2.Size = new System.Drawing.Size(175, 24);
+            this.delusedToolStripMenuItem2.Text = "Delete";
+            this.delusedToolStripMenuItem2.Click += new System.EventHandler(this.delusedToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(172, 6);
+            // 
+            // alignmentToolStripMenuItem
+            // 
+            this.alignmentToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.leftOutsideAlignmentToolStripMenuItem,
+            this.leftInsideAlignmentToolStripMenuItem,
+            this.rightOutsideAlignmentToolStripMenuItem,
+            this.rightInsideAlignmentToolStripMenuItem,
+            this.toolStripMenuItem2,
+            this.topOutsideAlignmentToolStripMenuItem,
+            this.topInsideAlignmentToolStripMenuItem,
+            this.bottomOutsideAlignmentToolStripMenuItem,
+            this.bottomInsideAlignmentToolStripMenuItem});
+            this.alignmentToolStripMenuItem.Name = "alignmentToolStripMenuItem";
+            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.alignmentToolStripMenuItem.Text = "Alignment";
+            // 
+            // leftOutsideAlignmentToolStripMenuItem
+            // 
+            this.leftOutsideAlignmentToolStripMenuItem.Name = "leftOutsideAlignmentToolStripMenuItem";
+            this.leftOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.leftOutsideAlignmentToolStripMenuItem.Text = "Outside of the left";
+            this.leftOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.leftOutsideAlignmentToolStripMenuItem_Click);
+            this.leftOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.leftOutsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
+            // leftInsideAlignmentToolStripMenuItem
+            // 
+            this.leftInsideAlignmentToolStripMenuItem.Name = "leftInsideAlignmentToolStripMenuItem";
+            this.leftInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.leftInsideAlignmentToolStripMenuItem.Text = "Inside of the left";
+            this.leftInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.leftInsideAlignmentToolStripMenuItem_Click);
+            this.leftInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.leftInsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
+            // rightOutsideAlignmentToolStripMenuItem
+            // 
+            this.rightOutsideAlignmentToolStripMenuItem.Name = "rightOutsideAlignmentToolStripMenuItem";
+            this.rightOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.rightOutsideAlignmentToolStripMenuItem.Text = "Outside of the right";
+            this.rightOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.rightOutsideAlignmentToolStripMenuItem_Click);
+            this.rightOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.rightOutsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
+            // rightInsideAlignmentToolStripMenuItem
+            // 
+            this.rightInsideAlignmentToolStripMenuItem.Name = "rightInsideAlignmentToolStripMenuItem";
+            this.rightInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.rightInsideAlignmentToolStripMenuItem.Text = "Inside of the right";
+            this.rightInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.rightInsideAlignmentToolStripMenuItem_Click);
+            this.rightInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.rightInsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(239, 6);
+            // 
+            // topOutsideAlignmentToolStripMenuItem
+            // 
+            this.topOutsideAlignmentToolStripMenuItem.Name = "topOutsideAlignmentToolStripMenuItem";
+            this.topOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.topOutsideAlignmentToolStripMenuItem.Text = "Outside of the top";
+            this.topOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.topOutsideAlignmentToolStripMenuItem_Click);
+            this.topOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.topOutsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
+            // topInsideAlignmentToolStripMenuItem
+            // 
+            this.topInsideAlignmentToolStripMenuItem.Name = "topInsideAlignmentToolStripMenuItem";
+            this.topInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.topInsideAlignmentToolStripMenuItem.Text = "Inside of the top";
+            this.topInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.topInsideAlignmentToolStripMenuItem_Click);
+            this.topInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.topInsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
+            // bottomOutsideAlignmentToolStripMenuItem
+            // 
+            this.bottomOutsideAlignmentToolStripMenuItem.Name = "bottomOutsideAlignmentToolStripMenuItem";
+            this.bottomOutsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.bottomOutsideAlignmentToolStripMenuItem.Text = "Outside of the bottom";
+            this.bottomOutsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.bottomOutsideAlignmentToolStripMenuItem_Click);
+            this.bottomOutsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.bottomOutsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
+            // bottomInsideAlignmentToolStripMenuItem
+            // 
+            this.bottomInsideAlignmentToolStripMenuItem.Name = "bottomInsideAlignmentToolStripMenuItem";
+            this.bottomInsideAlignmentToolStripMenuItem.Size = new System.Drawing.Size(242, 24);
+            this.bottomInsideAlignmentToolStripMenuItem.Text = "Inside of the bottom";
+            this.bottomInsideAlignmentToolStripMenuItem.Click += new System.EventHandler(this.bottomInsideAlignmentToolStripMenuItem_Click);
+            this.bottomInsideAlignmentToolStripMenuItem.MouseEnter += new System.EventHandler(this.bottomInsideAlignmentToolStripMenuItem_MouseEnter);
+            // 
             // openFileDialog
             // 
-            this.openFileDialog.Filter = "图片文件(png,bmp,jpg)|*.png;*.bmp;*.jpg;";
+            this.openFileDialog.Filter = "Image File(png,bmp,jpg)|*.png;*.bmp;*.jpg;";
             this.openFileDialog.Multiselect = true;
             // 
             // ImagesetEditControl
@@ -635,9 +703,9 @@
             this.usedToolStrip.ResumeLayout(false);
             this.usedToolStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageSetBox)).EndInit();
-            this.imageSetBoxContextMenuStrip.ResumeLayout(false);
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
+            this.imageSetBoxContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -705,5 +773,12 @@
         private System.Windows.Forms.ToolStripDropDownButton autoTypesettingToolStripLabel;
         private System.Windows.Forms.ToolStripMenuItem horizontalLimitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem verticalLimitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
+        private System.Windows.Forms.ToolStripMenuItem newGroupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editGroupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editGroupItemToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
+        private System.Windows.Forms.ToolStripMenuItem moveToGroupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toGroupToolStripMenuItem;
     }
 }

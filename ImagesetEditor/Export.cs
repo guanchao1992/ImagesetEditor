@@ -70,6 +70,39 @@ namespace ImagesetEditor
             lastExportFilterIndex.Value = m_form.LastExportFilterIndex.ToString();
         }
 
+        public string OnExportEnd()
+        {
+            if (File.Exists(m_fileName))
+            {
+                File.Delete(m_fileName);
+            }
+
+            FileStream file = new FileStream(m_fileName, FileMode.OpenOrCreate);
+
+            StreamWriter sw = new StreamWriter(file);
+
+            m_xml.Save(sw);
+
+            sw.Close();
+
+            file.Close();
+
+            return null;
+        }
+
+        public void OnExportGroupBegin(GroupExpression expression)
+        {
+            XmlNode groupNode = m_root.AppendChild(m_xml.CreateElement("Group"));
+
+            XmlNode exp = groupNode.Attributes.Append(m_xml.CreateAttribute("Expression"));
+
+            exp.Value = expression.Expression;
+        }
+
+        public void OnExportGroupEnd()
+        {
+        }
+
         public void OnExportImage(IImage image)
         {
             XmlNode imageNode = m_root.AppendChild(m_xml.CreateElement("Image"));
@@ -97,26 +130,6 @@ namespace ImagesetEditor
             XmlAttribute source = imageNode.Attributes.Append(m_xml.CreateAttribute("Source"));
 
             source.Value = image.FilePath.Replace(m_folder, "$(ProjectDir)");
-        }
-
-        public string OnExportEnd()
-        {
-            if (File.Exists(m_fileName))
-            {
-                File.Delete(m_fileName);
-            }
-
-            FileStream file = new FileStream(m_fileName, FileMode.OpenOrCreate);
-
-            StreamWriter sw = new StreamWriter(file);
-
-            m_xml.Save(sw);
-
-            sw.Close();
-
-            file.Close();
-
-            return null;
         }
 
         public static string GetFolder(string fileName)
@@ -179,15 +192,6 @@ namespace ImagesetEditor
             m_sw = new StreamWriter(m_file);
         }
 
-        public void OnExportImage(IImage image)
-        {
-            m_sw.WriteLine(
-                "\"" + image.Name + "\" " + 
-                image.Position.X + "," + image.Position.Y + " " +
-                image.Size.Width + "," + image.Size.Height
-                );
-        }
-
         public string OnExportEnd()
         {
             m_sw.Close();
@@ -195,6 +199,25 @@ namespace ImagesetEditor
             m_file.Close();
 
             return m_fileName.Split('.').First() + ".png";
+        }
+
+        public void OnExportGroupBegin(GroupExpression expression)
+        {
+            m_sw.WriteLine("\"" + expression.Name + "\"");
+        }
+
+        public void OnExportGroupEnd()
+        {
+
+        }
+
+        public void OnExportImage(IImage image)
+        {
+            m_sw.WriteLine(
+                "    \"" + image.Name + "\" " + 
+                image.Position.X + "," + image.Position.Y + " " +
+                image.Size.Width + "," + image.Size.Height
+                );
         }
 
         #endregion Methods
@@ -230,31 +253,6 @@ namespace ImagesetEditor
             m_xml.AppendChild(m_root);
         }
 
-        public void OnExportImage(IImage image)
-        {
-            XmlNode imageNode = m_root.AppendChild(m_xml.CreateElement("Image"));
-
-            XmlNode name = imageNode.Attributes.Append(m_xml.CreateAttribute("Name"));
-
-            name.Value = image.Name;
-
-            XmlNode xPos = imageNode.Attributes.Append(m_xml.CreateAttribute("XPos"));
-
-            xPos.Value = image.Position.X.ToString();
-
-            XmlNode yPos = imageNode.Attributes.Append(m_xml.CreateAttribute("YPos"));
-
-            yPos.Value = image.Position.Y.ToString();
-
-            XmlNode width = imageNode.Attributes.Append(m_xml.CreateAttribute("Width"));
-
-            width.Value = image.Size.Width.ToString();
-
-            XmlNode height = imageNode.Attributes.Append(m_xml.CreateAttribute("Height"));
-
-            height.Value = image.Size.Height.ToString();
-        }
-
         public string OnExportEnd()
         {
             if (File.Exists(m_fileName))
@@ -288,6 +286,51 @@ namespace ImagesetEditor
             tFile.Close();
 
             return m_fileName.Split('.').First() + ".png"; ;
+        }
+
+        public void OnExportGroupBegin(GroupExpression expression)
+        {
+            XmlNode groupNode = m_root.AppendChild(m_xml.CreateElement("Group"));
+
+            XmlNode name = groupNode.Attributes.Append(m_xml.CreateAttribute("Name"));
+
+            name.Value = expression.Name;
+
+            foreach (KeyValuePair<string, string> item in expression.Data)
+            {
+                XmlNode attr = groupNode.Attributes.Append(m_xml.CreateAttribute(item.Key));
+
+                attr.Value = item.Value;
+            }
+        }
+
+        public void OnExportGroupEnd()
+        {
+        }
+
+        public void OnExportImage(IImage image)
+        {
+            XmlNode imageNode = m_root.AppendChild(m_xml.CreateElement("Image"));
+
+            XmlNode name = imageNode.Attributes.Append(m_xml.CreateAttribute("Name"));
+
+            name.Value = image.Name;
+
+            XmlNode xPos = imageNode.Attributes.Append(m_xml.CreateAttribute("XPos"));
+
+            xPos.Value = image.Position.X.ToString();
+
+            XmlNode yPos = imageNode.Attributes.Append(m_xml.CreateAttribute("YPos"));
+
+            yPos.Value = image.Position.Y.ToString();
+
+            XmlNode width = imageNode.Attributes.Append(m_xml.CreateAttribute("Width"));
+
+            width.Value = image.Size.Width.ToString();
+
+            XmlNode height = imageNode.Attributes.Append(m_xml.CreateAttribute("Height"));
+
+            height.Value = image.Size.Height.ToString();
         }
 
         #endregion Methods

@@ -64,18 +64,22 @@ namespace ImagesetEditor
 
         private string m_strFileNotExist = "File does not exist.";
 
+        private string m_strFileModifyAsk = "The project has been modified, save it?";
+
+        private string m_strCloseProject = "Close project";
+
         #endregion Strings
 
         #region Methods
 
         public static string GetVersion()
         {
-            return "0.2.4";
+            return "0.2.5";
         }
 
         public static string GetProjectVersion()
         {
-            return "0.2";
+            return "0.2.1";
         }
 
         private void ExportToFile(string fileName, int typeIndex)
@@ -85,10 +89,10 @@ namespace ImagesetEditor
                 switch (typeIndex)
                 {
                     case 1:
-                        export = new TextExport(fileName);
+                        export = new XmlExport(fileName);
                         break;
                     case 2:
-                        export = new XmlExport(fileName);
+                        export = new TextExport(fileName);
                         break;
                     default:
                         break;
@@ -145,6 +149,7 @@ namespace ImagesetEditor
                 }
 
                 m_editControl.ClearImages();
+                m_editControl.ClearGroup();
 
                 string projectDir = ProjectExport.GetFolder(fileName);
 
@@ -179,23 +184,48 @@ namespace ImagesetEditor
                 m_lastExportFilterIndex =
                     int.Parse(xmlDoc.DocumentElement.Attributes.GetNamedItem("LastExportFilterIndex").Value);
 
+
+                bool defaultSeted = false;
+
+                int groupIndex = 0;
+
                 foreach (XmlNode n in xmlDoc.DocumentElement)
                 {
-                    if (m_editControl.AddImage(
-                        n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir),
-                        n.Attributes.GetNamedItem("Name").Value,
-                        new Point(
-                            int.Parse(n.Attributes.GetNamedItem("XPos").Value),
-                            int.Parse(n.Attributes.GetNamedItem("YPos").Value)
-                            ),
-                        new Size(
-                            int.Parse(n.Attributes.GetNamedItem("Width").Value),
-                            int.Parse(n.Attributes.GetNamedItem("Height").Value)
-                            )
-                        ) == false)
+                    switch(n.Name)
                     {
-                        loadFaild.Add(n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir));
-                    }
+                        case "Group":
+                            {
+                                if (defaultSeted == false)
+                                {
+                                    m_editControl.SetDefaultGroup(n.Attributes.GetNamedItem("Expression").Value);
+
+                                    defaultSeted = true;
+                                }
+                                else
+                                {
+                                    groupIndex = m_editControl.AddGroup(n.Attributes.GetNamedItem("Expression").Value);
+                                }  
+                            }
+                            break;
+                        case "Image":
+                            if (m_editControl.AddImage(
+                                n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir),
+                                n.Attributes.GetNamedItem("Name").Value,
+                                new Point(
+                                    int.Parse(n.Attributes.GetNamedItem("XPos").Value),
+                                    int.Parse(n.Attributes.GetNamedItem("YPos").Value)
+                                    ),
+                                new Size(
+                                    int.Parse(n.Attributes.GetNamedItem("Width").Value),
+                                    int.Parse(n.Attributes.GetNamedItem("Height").Value)
+                                    ),
+                                groupIndex
+                                ) == false)
+                            {
+                                loadFaild.Add(n.Attributes.GetNamedItem("Source").Value.Replace("$(ProjectDir)", projectDir));
+                            }
+                        break;
+                     }
                 }
 
                 if (loadFaild.Count != 0)
@@ -217,10 +247,12 @@ namespace ImagesetEditor
                 toolStripStatusLabel.Text = m_strStatusReady;
 
                 AddRecentFiles(fileName);
+
+                m_editControl.Modify = false;
             }
-            catch
+            catch(SystemException exc)
             {
-                MessageBox.Show(m_strOpenProjectFailed.Replace("#FILENAME#", fileName),
+                MessageBox.Show(m_strOpenProjectFailed.Replace("#FILENAME#", fileName) + "\n\n" + exc.Message,
                     m_strOpenProject, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -311,6 +343,10 @@ namespace ImagesetEditor
 
             m_strFileNotExist = local.GetName("Forms.MainForm.Messages.file-not-exist");
 
+            m_strFileModifyAsk = local.GetName("Forms.MainForm.Messages.file-modify-ask");
+
+            m_strCloseProject = local.GetName("Forms.MainForm.Messages.close-project");
+
             toolStripStatusLabel.Text = m_strStatusReady;
         }
 
@@ -361,6 +397,9 @@ namespace ImagesetEditor
             m_lastExportFile = "";
 
             m_editControl.ClearImages();
+            m_editControl.ClearGroup();
+
+            m_editControl.ColorWorkSpace = Color.White;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -573,6 +612,21 @@ namespace ImagesetEditor
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (m_editControl.Modify == true)
+            {
+                switch (MessageBox.Show(m_strFileModifyAsk, m_strCloseProject, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question))
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        return;
+                    case DialogResult.Yes:
+                        saveToolStripMenuItem_Click(null, null);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             for (int i = 0; i != 10; ++i)
             {
                 if (i < m_recentFiles.Count)

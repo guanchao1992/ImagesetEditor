@@ -116,6 +116,16 @@ License
 Updates
 ==============
 
+**April 12, 2014** 0.2.4 -> 0.2.5
+
+Adding right mouse button to drag the canvas.
+
+Adding drag image files to added from Explorer.
+
+Adding create image group.
+
+Adding exit the program will to ask save project.
+
 **March 9, 2014** 0.2.1 -> 0.2.3
 
 Fixed sort bugs.

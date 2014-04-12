@@ -54,6 +54,12 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="EditControl\GroupEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditControl\GroupEditForm.Designer.cs">
+      <DependentUpon>GroupEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditControl\ImagesetEditControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -71,6 +77,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditControl\GroupEditForm.resx">
+      <DependentUpon>GroupEditForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditControl\ImagesetEditControl.resx">
       <DependentUpon>ImagesetEditControl.cs</DependentUpon>

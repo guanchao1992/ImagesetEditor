@@ -3,8 +3,10 @@
         <ImagesListView>
             <DropMenu>
                 <Item ID="01" Name="图片组"/>
-                <Item ID="02" Name="添加"/>
-                <Item ID="03" Name="清空图片组"/>
+                <Item ID="02" Name="添加文件"/>
+                <Item ID="03" Name="新建分组"/>
+                <Item ID="04" Name="编辑分组"/>
+                <Item ID="05" Name="清空图片组"/>
             </DropMenu>
             <ContextMenu>
                 <Item ID="01" Name="全选"/>
@@ -15,8 +17,10 @@
                 <Item ID="06" Name="按尺寸顺序"/>
                 <Item ID="07" Name="按尺寸倒序"/>
                 <Item ID="08" Name="倒置"/>
+                <Item ID="09" Name="移至分组"/>
             </ContextMenu>
             <Item ID="01" Name="一共 #COUNT# 张图片"/>
+            <Item ID="02" Name="默认分组"/>
         </ImagesListView>
         <CanvasView>
             <DropMenu>
@@ -51,8 +55,19 @@
             <Item ID="del-delete-select" Name="确定从列表中删除所选的 #COUNT# 个图片？"/>
             <Item ID="error-caption" Name="错误"/>
             <Item ID="error-invalid-format" Name="无效的格式"/>
+            <Item ID="error-del-default-group" Name="你不能删除默认分组"/>
         </Messages>
     </Control>
+    <GroupEditForm>
+        <Item ID="01" Name="分组表达式"/>
+        <Item ID="02" Name="填写空白的内容即可删除当前组。
+              
+如果需要附加额外的数据，你可以这样填写分组表达式:
+
+GroupName:{&quot;key1&quot;,&quot;value1&quot;}{&quot;key2&quot;,&quot;value2&quot;}..."/>
+        <Item ID="03" Name="确定"/>
+        <Item ID="04" Name="取消"/>
+    </GroupEditForm>
     <Forms>
         <MainForm>
             <Menu>
@@ -88,6 +103,8 @@
                 <Item ID="change-language-caption" Name="更改语言"/>
                 <Item ID="change-language" Name="更改界面语言必须重新启动程序"/>
                 <Item ID="file-not-exist" Name="文件不存在"/>
+                <Item ID="file-modify-ask" Name="当前项目已经被修改，是否保存?"/>
+                <Item ID="close-project" Name="关闭项目"/>
             </Messages>
         </MainForm>
         <AboutForm>

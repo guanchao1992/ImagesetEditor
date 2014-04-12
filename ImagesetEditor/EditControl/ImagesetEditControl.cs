@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
+
 
 namespace ImagesetEditor
 {
@@ -26,6 +28,7 @@ namespace ImagesetEditor
             Normal, /// 正常
             Drag,   /// 拖拽图片
             Select, /// 选择图片
+            MoveCanvas, /// 移动画布
         };
 
         private enum SortTypes
@@ -36,6 +39,8 @@ namespace ImagesetEditor
             SizeReverse = 3,
             Invert = 4,
         };
+
+        private Localization m_local;
 
         /// <summary>
         /// 画布
@@ -108,6 +113,11 @@ namespace ImagesetEditor
         /// </summary>
         private bool m_ctrlPress;
 
+        /// <summary>
+        /// 当前内容是否被修改
+        /// </summary>
+        private bool m_modify;
+
         #endregion Fields
 
         #region Strings
@@ -126,11 +136,13 @@ namespace ImagesetEditor
 
         private string m_strErrorFormat = "Invalid format";
 
+        private string m_strErrorDelDefaultGroup = "You can't delete the default group.";
+
         #endregion Strings
 
         #region Methods
 
-        public void AddImage(string fileName)
+        public void AddImage(string fileName, int groupIndex = 0)
         {
             ListViewItem newItem = new ListViewItem();
 
@@ -161,12 +173,16 @@ namespace ImagesetEditor
             newImage.Position =
                 new Point(m_canvas.ViewPos.X, m_canvas.ViewPos.Y);
 
+            newItem.Group = usedListView.Groups[groupIndex];
+
             usedListView.Items.Add(newItem);
+
+            m_modify = true;
 
             ImageCountUpdate();
         }
 
-        public bool AddImage(string fileName, string name, Point position, Size size)
+        public bool AddImage(string fileName, string name, Point position, Size size, int groupIndex = 0)
         {
             bool result = true;
 
@@ -199,12 +215,36 @@ namespace ImagesetEditor
             newItem.Tag = newImage;
 
             newItem.Text = newImage.Name;
-           
+
+            newItem.Group = usedListView.Groups[groupIndex];
+
             usedListView.Items.Add(newItem);
+
+            m_modify = true;
 
             ImageCountUpdate();
 
             return result;
+        }
+
+        public int AddGroup(string expression)
+        {
+            ListViewGroup group = new ListViewGroup(expression.Split(':').First());
+
+            group.Tag = expression;
+
+            usedListView.Groups.Add(group);
+
+            return usedListView.Groups.Count - 1;
+        }
+
+        public void SetDefaultGroup(string expression)
+        {
+            ListViewGroup group = usedListView.Groups[0];
+
+            group.Header = expression.Split(':').First();
+
+            group.Tag = expression;
         }
 
         public void ClearImages()
@@ -225,14 +265,40 @@ namespace ImagesetEditor
             ImageSetBoxUpdate();
         }
 
+        public void ClearGroup()
+        {
+            string header;
+
+            if (m_local == null)
+                header = "Default";
+            else
+                header = m_local.GetName("Control.ImagesListView.02");
+
+            usedListView.Groups[0].Header = header;
+            usedListView.Groups[0].Tag = header;
+
+            while(usedListView.Groups.Count != 1)
+            {
+                usedListView.Groups.RemoveAt(usedListView.Groups.Count - 1);
+            }
+        }
+
         public void Export(IImagesetExport saver)
         {
             saver.OnExportBegin(m_canvas);
 
-            foreach (ListViewItem item in usedListView.Items)
+            foreach (ListViewGroup group in usedListView.Groups)
             {
-                saver.OnExportImage((SubImage)item.Tag);
+                saver.OnExportGroupBegin(new GroupExpression((string)group.Tag));
+
+                foreach (ListViewItem item in group.Items)
+                {
+                    saver.OnExportImage((SubImage)item.Tag);
+                }
+
+                saver.OnExportGroupEnd();
             }
+
 
             ExportImage(saver.OnExportEnd());
         }
@@ -316,7 +382,11 @@ namespace ImagesetEditor
 
             addImageMenuItem.Text = local.GetName("Control.ImagesListView.DropMenu.02");
 
-            clearUsedToolStripMenuItem.Text = local.GetName("Control.ImagesListView.DropMenu.03");
+            newGroupToolStripMenuItem.Text = local.GetName("Control.ImagesListView.DropMenu.03");
+
+            editGroupToolStripMenuItem.Text = local.GetName("Control.ImagesListView.DropMenu.04");
+
+            clearUsedToolStripMenuItem.Text = local.GetName("Control.ImagesListView.DropMenu.05");
 
             // ContextMenu
 
@@ -336,7 +406,11 @@ namespace ImagesetEditor
 
             invertToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.08");
 
+            moveToGroupToolStripMenuItem.Text = local.GetName("Control.ImagesListView.ContextMenu.09");
+
             m_strImageNums = local.GetName("Control.ImagesListView.01");
+
+            usedListView.Groups[0].Header = local.GetName("Control.ImagesListView.02");
 
             // CanvasView
 
@@ -397,6 +471,8 @@ namespace ImagesetEditor
             m_strErrorCaption = local.GetName("Control.Messages.error-caption");
 
             m_strErrorFormat = local.GetName("Control.Messages.error-invalid-format");
+
+            m_strErrorDelDefaultGroup = local.GetName("Control.Messages.error-del-default-group");
 
             ImageViewInfoUpdate();
 
@@ -731,6 +807,8 @@ namespace ImagesetEditor
 
             m_listViewNodeLock = false;
 
+            m_modify = true;
+
             ImageSetBoxUpdate();
         }
 
@@ -881,6 +959,12 @@ namespace ImagesetEditor
             }
         }
 
+        public bool Modify
+        {
+            get { return m_modify; }
+            set { m_modify = value; }
+        }
+
         #endregion Properties
 
         #region Events
@@ -936,6 +1020,8 @@ namespace ImagesetEditor
                             {
                                 SetViewInfo(m_viewInfoImage);
                             }
+
+                            m_modify = true;
                         }
                         break;
                     case MouseStatus.Select:
@@ -1029,6 +1115,7 @@ namespace ImagesetEditor
                         if (m_dockAid.InArrowButton(e.X, e.Y) && m_dockAid.OnClick(e.X, e.Y))
                         {
                             m_dockAid.SetImage(m_select);
+                            m_modify = true;
                         }
                         break;
                 }
@@ -1036,6 +1123,35 @@ namespace ImagesetEditor
                 ViewNameTextBoxUpdate();
 
                 ImageViewInfoUpdate();
+
+                ImageSetBoxUpdate();
+            }
+
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                switch (m_MouseStatus)
+                {
+                    case MouseStatus.MoveCanvas:
+                        {
+                            m_MouseStatus = MouseStatus.Normal;
+
+                            /// 拖动的矩形区域
+                            Rectangle selectArea = GetRectangleArea(
+                                m_beginMousePos,
+                                m_curMousePos,
+                                m_canvas.ViewPos);
+
+                            /// 当拖动一个很小的矩形区域时，视为点击了一下
+                            if (selectArea.Width <= 5 && selectArea.Height <= 5)
+                            {
+                                imageSetBoxContextMenuStrip.Show(Control.MousePosition);
+                            }
+                        }
+                        break;
+                    default:
+                        m_MouseStatus = MouseStatus.Normal;
+                        break;
+                }
 
                 ImageSetBoxUpdate();
             }
@@ -1174,17 +1290,58 @@ namespace ImagesetEditor
                     m_curMousePos = e.Location;
                 }
             }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                
+                m_MouseStatus = MouseStatus.MoveCanvas;
+                m_beginMousePos = e.Location;
+                m_curMousePos = e.Location;
+                m_canvas.LastViewPos = m_canvas.ViewPos;
+            }
         }
 
         private void imageSetBox_MouseMove(object sender, MouseEventArgs e)
         {
             m_curMousePos = e.Location;
 
-            if (m_MouseStatus != MouseStatus.Normal)
+            switch(m_MouseStatus)
             {
-                ImageSetBoxUpdate();
+                case MouseStatus.Normal:
+                    break;
+                case MouseStatus.MoveCanvas:
+                    {
+                        Point p = m_canvas.LastViewPos;
 
-                return;
+                        if (m_MouseStatus == MouseStatus.MoveCanvas)
+                        {
+                            if (m_canvas.ViewSize.Width < m_canvas.Size.Width)
+                            {
+                                p.X = Math.Max(Math.Min(
+                                p.X - (m_curMousePos.X - m_beginMousePos.X),
+                                m_canvas.Size.Width - m_canvas.ViewSize.Width)
+                                , 0);
+
+                                hScrollBar.Value = p.X;
+                            }
+
+                            if (m_canvas.ViewSize.Height < m_canvas.Size.Height)
+                            {
+                                p.Y = Math.Max(Math.Min(
+                                p.Y - (m_curMousePos.Y - m_beginMousePos.Y),
+                                m_canvas.Size.Height - m_canvas.ViewSize.Height)
+                                , 0);
+
+                                vScrollBar.Value = p.Y;
+                            }
+
+                            m_canvas.ViewPos = p;
+                        }
+                    }
+                    ImageSetBoxUpdate();
+                    return;
+                default:
+                    ImageSetBoxUpdate();
+                    return;
             }
 
             m_inSelects = false;
@@ -1259,15 +1416,17 @@ namespace ImagesetEditor
                 m_canvas.DrawImage(image);
 
                 if (rimViewToolStripMenuItem.Checked)
+                {
                     m_canvas.DrawImageRim(image, m_canvas.RimPen);
+                }
             }
 
             /// 绘制选中项
             if (m_MouseStatus == MouseStatus.Drag)
             {
                 Point offset = new Point(
-                    m_curMousePos.X - m_beginMousePos.X,
-                    m_curMousePos.Y - m_beginMousePos.Y);
+                m_curMousePos.X - m_beginMousePos.X,
+                m_curMousePos.Y - m_beginMousePos.Y);
 
                 foreach (SubImage image in m_select.Selects)
                 {
@@ -1351,6 +1510,20 @@ namespace ImagesetEditor
             }
         }
 
+        private void newGroupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ListViewGroup group = new ListViewGroup("");
+
+            (new GroupEditForm(newGroupToolStripMenuItem.Text, group, m_local)).ShowDialog();
+
+            if (group.Header != "")
+            {
+                usedListView.Groups.Add(group);
+            }
+
+            m_modify = true;
+        }
+
         private void clearUsedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (usedListView.Items.Count == 0)
@@ -1382,6 +1555,8 @@ namespace ImagesetEditor
                 SetViewInfo(null);
                 m_select.Selects.Clear();
             }
+
+            m_modify = true;
 
             SelectsRimUpdate();
 
@@ -1480,62 +1655,29 @@ namespace ImagesetEditor
 
         private void usedSelectSortNameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (usedListView.SelectedItems.Count <= 1)
-            {
-                SortItems(SortTypes.Name, usedListView.Items);
-            }
-            else
-            {
-                SortItems(SortTypes.Name, usedListView.SelectedItems);
-            }
+            SortItems(SortTypes.Name, usedListView.SelectedItems);
         }
 
         private void usedSelectSortNameReverseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (usedListView.SelectedItems.Count <= 1)
-            {
-                SortItems(SortTypes.NameReverse, usedListView.Items);
-            }
-            else
-            {
-                SortItems(SortTypes.NameReverse, usedListView.SelectedItems);
-            }
+
+             SortItems(SortTypes.NameReverse, usedListView.SelectedItems);
         }
 
         private void usedSelectSortSizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (usedListView.SelectedItems.Count <= 1)
-            {
-                SortItems(SortTypes.Size, usedListView.Items);
-            }
-            else
-            {
-                SortItems(SortTypes.Size, usedListView.SelectedItems);
-            }
+            SortItems(SortTypes.Size, usedListView.SelectedItems);
         }
 
         private void usedSelectSortSizeReverseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (usedListView.SelectedItems.Count <= 1)
-            {
-                SortItems(SortTypes.SizeReverse, usedListView.Items);
-            }
-            else
-            {
-                SortItems(SortTypes.SizeReverse, usedListView.SelectedItems);
-            }
+
+            SortItems(SortTypes.SizeReverse, usedListView.SelectedItems);
         }
 
         private void invertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (usedListView.SelectedItems.Count <= 1)
-            {
-                SortItems(SortTypes.Invert, usedListView.Items);
-            }
-            else
-            {
-                SortItems(SortTypes.Invert, usedListView.SelectedItems);
-            }
+            SortItems(SortTypes.Invert, usedListView.SelectedItems);
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1581,7 +1723,69 @@ namespace ImagesetEditor
 
         private void imageSetBoxContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            alignmentToolStripMenuItem.Enabled = (m_select.Selects.Count > 1);
+            delusedToolStripMenuItem2.Enabled = m_select.Selects.Count > 0;
+            alignmentToolStripMenuItem.Enabled = m_select.Selects.Count > 1;
+        }
+
+        private void unsedImageContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            selectAllToolStripMenuItem.Enabled = usedListView.Items.Count > 0;
+
+            delusedToolStripMenuItem.Enabled = m_select.Selects.Count > 0;
+
+            sortToolStripMenuItem.Enabled = usedListView.Items.Count > 1;
+
+            if (m_select.Selects.Count == 0)
+            {
+                moveToGroupToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                moveToGroupToolStripMenuItem.Enabled = true;
+
+                moveToGroupToolStripMenuItem.DropDownItems.Clear();
+
+                foreach (ListViewGroup group in usedListView.Groups)
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem(group.Header);
+                    item.Click += toGroupToolStripMenuItem_Click;
+                    item.Tag = group;
+                    moveToGroupToolStripMenuItem.DropDownItems.Add(item);
+                }
+            }
+
+            if (usedListView.SelectedItems.Count <= 1)
+            {
+                sortToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                bool enabled = true;
+
+                /// 检查当前选中项是否为同一组
+                ListViewGroup selectdGroup = usedListView.SelectedItems[0].Group;
+
+                foreach (ListViewItem item in usedListView.SelectedItems)
+                {
+                    if (item.Group != selectdGroup)
+                    {
+                        enabled = false;
+                        break;
+                    }
+                }
+
+                sortToolStripMenuItem.Enabled = enabled;
+            }
+        }
+
+        private void toGroupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ListViewGroup group = (ListViewGroup)((ToolStripMenuItem)sender).Tag;
+
+            foreach (ListViewItem item in usedListView.SelectedItems)
+            {
+                item.Group = group;
+            }
         }
 
         private void imageSetBoxContextMenuStrip_Closing(object sender, ToolStripDropDownClosingEventArgs e)
@@ -1985,6 +2189,65 @@ namespace ImagesetEditor
             }
         }
 
+        private void usedListView_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Effect == DragDropEffects.Link)
+            {
+                System.Array arrayFiles = (System.Array)e.Data.GetData(DataFormats.FileDrop);
+
+                foreach (string file in arrayFiles)
+                {
+                    AddImage(file);
+                }
+
+                ImageSetBoxUpdate();
+            }
+        }
+
+        private void usedListView_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Link;
+            else e.Effect = DragDropEffects.None;
+        }
+
+        private void toolStripMenuItem1_DropDownOpening(object sender, EventArgs e)
+        {
+            editGroupToolStripMenuItem.DropDownItems.Clear();
+
+            foreach (ListViewGroup group in usedListView.Groups)
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(group.Header);
+                item.Click += editGroupItemToolStripMenuItem_Click;
+                item.Tag = group;
+                editGroupToolStripMenuItem.DropDownItems.Add(item);
+            }
+        }
+
+        private void editGroupItemToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ListViewGroup group = (ListViewGroup)((ToolStripMenuItem)sender).Tag;
+
+            (new GroupEditForm(editGroupToolStripMenuItem.Text, group, m_local)).ShowDialog();
+
+            if (group.Header == "")
+            {
+                if (group.Name == "default") {
+                    MessageBox.Show(m_strErrorDelDefaultGroup, m_strErrorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                while (group.Items.Count != 0)
+                {
+                    group.Items[0].Group = usedListView.Groups[0];
+                }
+
+                usedListView.Groups.Remove(group);
+            }
+
+            m_modify = true;
+        }
+
         #endregion Events
 
         #region Constructors
@@ -2001,17 +2264,79 @@ namespace ImagesetEditor
 
             InitializeComponent();
 
+            this.imageSetBox.AllowDrop = true;
+
+            this.imageSetBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.usedListView_DragDrop);
+
+            this.imageSetBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.usedListView_DragEnter);
+
             m_dockAid = new DockAid(usedListView.Items, m_canvas, this);
 
             SetViewInfo(null);
 
             sizeSetToolStripComboBox.SelectedIndex = 3;
 
-            if (local != null)
-                UpdateLocalization(local);
+            m_local = local;
+
+            if (m_local != null)
+                UpdateLocalization(m_local);
+
+            usedListView.Groups[0].Tag = usedListView.Groups[0].Header;
         }
 
         #endregion Constructors    
+    }
+
+    public class GroupExpression
+    {
+        #region Fields
+
+        private Dictionary<string, string> m_data;
+
+        private string m_name;
+
+        private string m_expression;
+
+        #endregion Fields
+
+        #region Properties
+
+        public Dictionary<string, string> Data
+        {
+            get { return m_data; }
+        }
+
+        public string Name
+        {
+            get { return m_name; }
+        }
+
+        public string Expression
+        {
+            get { return m_expression; }
+        }
+
+        #endregion Properties
+
+        #region Constructors
+
+        public GroupExpression(string expression)
+        {
+            m_data = new Dictionary<string, string>();
+            m_name = expression.Split(':').First();
+            m_expression = expression;
+
+            Regex r = new Regex(@"\{""(.*?)"",""(.*?)""\}");
+
+            MatchCollection matchs = r.Matches(expression);
+            
+            foreach (Match match in matchs)
+            {
+                m_data.Add(match.Groups[1].Value, match.Groups[2].Value);
+            }
+        }
+
+        #endregion Constructors
     }
 
     public interface IImage
@@ -2046,9 +2371,13 @@ namespace ImagesetEditor
 
         void OnExportBegin(ICanvas canvas);
 
-        void OnExportImage(IImage image);
-
         string OnExportEnd();
+
+        void OnExportGroupBegin(GroupExpression expression);
+
+        void OnExportGroupEnd();
+
+        void OnExportImage(IImage image);
 
         #endregion Methods
     }
@@ -2078,6 +2407,11 @@ namespace ImagesetEditor
         /// 当前查看位置
         /// </summary>
         private Point m_viewPosition;
+
+        /// <summary>
+        /// 上一次的查看位置
+        /// </summary>
+        private Point m_lastViewPosition;
 
         /// <summary>
         /// 查看范围
@@ -2123,12 +2457,33 @@ namespace ImagesetEditor
                 m_size.Height);
         }
 
+        public void Begin(Graphics viewGraph, Point offset)
+        {
+            m_viewGraph = viewGraph;
+            m_viewGraph.FillRectangle(
+                m_workSpacePen.Brush,
+                -m_viewPosition.X + offset.X,
+                -m_viewPosition.Y + offset.Y,
+                m_size.Width,
+                m_size.Height);
+        }
+
         public void DrawRim()
         {
             m_viewGraph.DrawRectangle(
                 m_rimPen,
                 -m_viewPosition.X,
                 -m_viewPosition.Y,
+                m_size.Width,
+                m_size.Height);
+        }
+
+        public void DrawRim(Point offset)
+        {
+            m_viewGraph.DrawRectangle(
+                m_rimPen,
+                -m_viewPosition.X + offset.X,
+                -m_viewPosition.Y + offset.Y,
                 m_size.Width,
                 m_size.Height);
         }
@@ -2250,6 +2605,12 @@ namespace ImagesetEditor
         {
             get { return m_viewPosition; }
             set { m_viewPosition = value; }
+        }
+
+        public Point LastViewPos
+        {
+            get { return m_lastViewPosition; }
+            set { m_lastViewPosition = value; }
         }
 
         public Size ViewSize
