@@ -71,8 +71,6 @@ Supports output formats: PNG
         {
             // Called on export image information
         }
-
-        
         
         MyExport()
         {
