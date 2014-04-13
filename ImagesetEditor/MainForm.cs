@@ -427,6 +427,8 @@ namespace ImagesetEditor
                     toolStripStatusLabel.Text = 
                         m_strSavedTo.Replace("#FILENAME#", saveFileDialog.FileName);
 
+                    m_editControl.Modify = false;
+
                     AddRecentFiles(saveFileDialog.FileName);
                 }
                 catch (SystemException exc)
@@ -468,6 +470,8 @@ namespace ImagesetEditor
                     m_editControl.Export(export);
 
                     toolStripStatusLabel.Text = m_strSavedTo.Replace("#FILENAME#", m_docPath);
+
+                    m_editControl.Modify = false;
                 }
                 catch (SystemException exc)
                 {
