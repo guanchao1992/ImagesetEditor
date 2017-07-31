@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImagesetProject ProjectVersion="0.2.1" Version="0.2.5" Width="512" Height="512" RimView="True" Background="255,255,255" LastExportFile="" LastExportFilterIndex="0">
+  <Group Expression="Default" />
+  <Image Name="arrow_left" XPos="0" YPos="0" Width="16" Height="16" Source="$(ProjectDir)arrow_left.png" />
+  <Image Name="arrow_lower" XPos="56" YPos="0" Width="16" Height="16" Source="$(ProjectDir)arrow_lower.png" />
+  <Image Name="arrow_lower_left" XPos="0" YPos="16" Width="16" Height="16" Source="$(ProjectDir)arrow_lower_left.png" />
+  <Image Name="arrow_lower_right" XPos="0" YPos="32" Width="16" Height="16" Source="$(ProjectDir)arrow_lower_right.png" />
+  <Image Name="arrow_right" XPos="0" YPos="48" Width="16" Height="16" Source="$(ProjectDir)arrow_right.png" />
+  <Image Name="arrow_upper" XPos="0" YPos="64" Width="16" Height="16" Source="$(ProjectDir)arrow_upper.png" />
+  <Image Name="arrow_upper_left" XPos="0" YPos="80" Width="16" Height="16" Source="$(ProjectDir)arrow_upper_left.png" />
+  <Image Name="arrow_upper_right" XPos="0" YPos="96" Width="16" Height="16" Source="$(ProjectDir)arrow_upper_right.png" />
+</ImagesetProject>

@@ -1,0 +1,11 @@
+﻿<Imageset>
+  <Group Name="Default" />
+  <Image Name="arrow_left" XPos="0" YPos="0" Width="16" Height="16" />
+  <Image Name="arrow_lower" XPos="0" YPos="0" Width="16" Height="16" />
+  <Image Name="arrow_lower_left" XPos="0" YPos="0" Width="16" Height="16" />
+  <Image Name="arrow_lower_right" XPos="0" YPos="0" Width="16" Height="16" />
+  <Image Name="arrow_right" XPos="0" YPos="0" Width="16" Height="16" />
+  <Image Name="arrow_upper" XPos="0" YPos="0" Width="16" Height="16" />
+  <Image Name="arrow_upper_left" XPos="0" YPos="0" Width="16" Height="16" />
+  <Image Name="arrow_upper_right" XPos="0" YPos="0" Width="16" Height="16" />
+</Imageset>

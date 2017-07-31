@@ -1497,6 +1497,14 @@ namespace ImagesetEditor
 
         private void addImageMenuItem_Click(object sender, EventArgs e)
         {
+            if (!System.IO.Directory.Exists(MainForm.GetImportFilePath()))
+            {
+                //创建路径
+                System.IO.Directory.CreateDirectory(MainForm.GetImportFilePath());
+            }
+            //设置默认打开路径(绝对路径)
+            openFileDialog.InitialDirectory = MainForm.GetImportFilePath();
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 foreach (string file in openFileDialog.FileNames)

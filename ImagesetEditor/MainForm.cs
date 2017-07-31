@@ -28,6 +28,10 @@ namespace ImagesetEditor
 
         private string m_docPath = "";
 
+        public static string m_ImportFilePath = "";
+
+        public static string m_ExportFilePath = "";
+
         private List<string> m_recentFiles;
 
         #endregion Fields
@@ -80,6 +84,15 @@ namespace ImagesetEditor
         public static string GetProjectVersion()
         {
             return "0.2.1";
+        }
+
+        public static string GetImportFilePath()
+        {
+            return m_ImportFilePath;
+        }
+        public static string GetExportFilePath()
+        {
+            return m_ExportFilePath;
         }
 
         private void ExportToFile(string fileName, int typeIndex)
@@ -363,6 +376,14 @@ namespace ImagesetEditor
         {
             exportFileDialog.FileName = "";
 
+            if (!System.IO.Directory.Exists(MainForm.GetExportFilePath()))
+            {
+                //创建路径
+                System.IO.Directory.CreateDirectory(MainForm.GetExportFilePath());
+            }
+            //设置默认打开路径(绝对路径)
+            exportFileDialog.InitialDirectory = MainForm.GetExportFilePath();
+
             if (DialogResult.OK == exportFileDialog.ShowDialog())
             {
                 ExportToFile(exportFileDialog.FileName, exportFileDialog.FilterIndex);
@@ -406,6 +427,14 @@ namespace ImagesetEditor
         {
             openFileDialog.FileName = "";
 
+            if (!System.IO.Directory.Exists(MainForm.GetExportFilePath()))
+            {
+                //创建路径
+                System.IO.Directory.CreateDirectory(MainForm.GetExportFilePath());
+            }
+            //设置默认打开路径(绝对路径)
+            openFileDialog.InitialDirectory = MainForm.GetExportFilePath();
+
             if (DialogResult.OK == openFileDialog.ShowDialog())
             {
                 OpenFile(openFileDialog.FileName);
@@ -415,6 +444,14 @@ namespace ImagesetEditor
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog.FileName = "";
+
+            if (!System.IO.Directory.Exists(MainForm.GetExportFilePath()))
+            {
+                //创建路径
+                System.IO.Directory.CreateDirectory(MainForm.GetExportFilePath());
+            }
+            //设置默认打开路径(绝对路径)
+            saveFileDialog.InitialDirectory = MainForm.GetExportFilePath();
 
             if (DialogResult.OK == saveFileDialog.ShowDialog())
             {
@@ -727,6 +764,10 @@ namespace ImagesetEditor
             this.Controls.Add(m_editControl);
 
             m_editControl.BringToFront();
+
+            m_ImportFilePath = GetConfig("Path", "ImportFile", "icons");
+
+            m_ExportFilePath = GetConfig("Path", "ExportFile", "icons");
         }
 
         #endregion Constructors
