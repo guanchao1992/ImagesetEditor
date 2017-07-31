@@ -307,31 +307,40 @@ namespace ImagesetEditor
         public void OnExportGroupEnd()
         {
         }
+        private void setXmlAttribute(XmlDocument xml, XmlNode imageNode, string attribute, string value)
+        {
+            MainForm.setXmlAttribute(xml, imageNode, attribute, value);
+        }
 
         public void OnExportImage(IImage image)
         {
+            //XmlNodeList xnl = m_xml.GetElementsByTagName(image.Name);
             XmlNode imageNode = m_root.AppendChild(m_xml.CreateElement("Image"));
 
             XmlNode name = imageNode.Attributes.Append(m_xml.CreateAttribute("Name"));
 
             name.Value = image.Name;
+            /*
+            XmlNode imageNode = null;
+            if (xnl.Count >0)
+            {
+                imageNode = m_root.AppendChild(m_xml.CreateElement("Image"));
+                XmlNode name = imageNode.Attributes.Append(m_xml.CreateAttribute("Name"));
+                name.Value = image.Name;
+            }
+            else
+            {
+                imageNode = xnl[0];
+            }
+            */
 
-            XmlNode xPos = imageNode.Attributes.Append(m_xml.CreateAttribute("XPos"));
-
-            xPos.Value = image.Position.X.ToString();
-
-            XmlNode yPos = imageNode.Attributes.Append(m_xml.CreateAttribute("YPos"));
-
-            yPos.Value = image.Position.Y.ToString();
-
-            XmlNode width = imageNode.Attributes.Append(m_xml.CreateAttribute("Width"));
-
-            width.Value = image.Size.Width.ToString();
-
-            XmlNode height = imageNode.Attributes.Append(m_xml.CreateAttribute("Height"));
-
-            height.Value = image.Size.Height.ToString();
+            setXmlAttribute(m_xml, imageNode, "XPos", image.Position.X.ToString());
+            setXmlAttribute(m_xml, imageNode, "YPos", image.Position.Y.ToString());
+            setXmlAttribute(m_xml, imageNode, "Width", image.Size.Width.ToString());
+            setXmlAttribute(m_xml, imageNode, "Height", image.Size.Height.ToString());
         }
+
+   
 
         #endregion Methods
 

@@ -32,6 +32,10 @@ namespace ImagesetEditor
 
         public static string m_ExportFilePath = "";
 
+        public static string m_ImagetsetPath = "";
+        public static string m_ImagetsetFile = "";
+        private XmlDocument m_ImagesetDoc;
+
         private List<string> m_recentFiles;
 
         #endregion Fields
@@ -95,6 +99,14 @@ namespace ImagesetEditor
             return m_ExportFilePath;
         }
 
+        public static void setXmlAttribute(XmlDocument xml, XmlNode imageNode, string attribute, string value)
+        {
+            XmlNode att = imageNode.Attributes.GetNamedItem(attribute);
+            if (att == null)
+                att = imageNode.Attributes.Append(xml.CreateAttribute(attribute));
+            att.Value = value;
+        }
+
         private void ExportToFile(string fileName, int typeIndex)
         {
             IImagesetExport export = null;
@@ -134,6 +146,17 @@ namespace ImagesetEditor
             if (att == null)
                 att = node.Attributes.Append(m_configDoc.CreateAttribute(attribute));
             att.Value = value;
+        }
+
+        private void SetImageset(string imageName, string ImagesetName)
+        {
+            XmlNode node = m_ImagesetDoc.DocumentElement.SelectSingleNode(imageName);
+            if (node == null)
+                node = m_ImagesetDoc.DocumentElement.AppendChild(m_ImagesetDoc.CreateNode(XmlNodeType.Element, imageName, ""));
+            XmlNode att = node.Attributes.GetNamedItem(imageName);
+            if (att == null)
+                att = node.Attributes.Append(m_ImagesetDoc.CreateAttribute("imageset"));
+            att.Value = ImagesetName;
         }
 
         private void OpenFile(string fileName)
@@ -765,11 +788,69 @@ namespace ImagesetEditor
 
             m_editControl.BringToFront();
 
-            m_ImportFilePath = GetConfig("Path", "ImportFile", "icons");
+            m_ImportFilePath = GetConfig("ImportFile", "Path", "icons");
 
-            m_ExportFilePath = GetConfig("Path", "ExportFile", "icons");
+            m_ExportFilePath = GetConfig("ExportFile", "Path", "icons");
+
+            m_ImagetsetPath = GetConfig("Imagetset", "Path", "E:\\gitproject\\gitLua\\_run\\Data\\imageset\\");
+
+            m_ImagetsetFile = GetConfig("Imagetset", "File", "image.imageset");
+
+            try
+            {
+                m_ImagesetDoc = new XmlDocument();
+                m_configDoc.Load(m_ImagetsetPath + m_ImagetsetFile);
+            }
+            catch
+            {
+                m_ImagesetDoc = new XmlDocument();
+                m_configDoc.AppendChild(m_configDoc.CreateElement("Config"));
+            }
         }
 
         #endregion Constructors
+
+        private void exportToImagesetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            XmlDocument imagesetXD = null;
+
+            imagesetXD = new XmlDocument();
+            XmlElement root = imagesetXD.CreateElement("Imageset");
+            imagesetXD.AppendChild(root);
+
+            DirectoryInfo TheFolder = new DirectoryInfo(MainForm.m_ImagetsetPath);
+
+            //遍历文件
+            foreach (FileInfo NextFile in TheFolder.GetFiles())
+            {
+                string name = NextFile.Name;
+                string aFirstName = name.Substring(name.LastIndexOf("\\") + 1, (name.LastIndexOf(".") - name.LastIndexOf("\\") - 1)); //文件名
+                string aLastName = name.Substring(name.LastIndexOf(".") + 1, (name.Length - name.LastIndexOf(".") - 1)); //扩展名
+
+                if (aLastName == "xml")
+                {
+                    XmlDocument xmld = new XmlDocument();
+                    xmld.Load(NextFile.FullName);
+
+                    XmlNodeList xdroot = xmld.SelectNodes("Imageset");
+                    if (xdroot.Count > 0)
+                    {
+                        XmlNodeList xdl = xdroot[0].SelectNodes("Image");
+                        for (int i = 0; i < xdl.Count; ++i)
+                        {
+                            XmlNode att = xdl[i].Attributes.GetNamedItem("Name");
+                            if (att != null)
+                            {
+                                XmlNode xd2 = imagesetXD.CreateNode(XmlNodeType.Element, "Image", "");
+                                root.AppendChild(xd2);
+                                setXmlAttribute(imagesetXD, xd2, "Name", att.Value);
+                                setXmlAttribute(imagesetXD, xd2, "Imageset", aFirstName);
+                            }
+                        }
+                    }
+                }
+            }
+            imagesetXD.Save(MainForm.m_ImagetsetPath + MainForm.m_ImagetsetFile);
+        }
     }
 }
